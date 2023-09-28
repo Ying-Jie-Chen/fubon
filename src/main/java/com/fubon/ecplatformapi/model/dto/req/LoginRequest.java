@@ -1,13 +1,11 @@
-package com.fubon.ecplatformapi.FubonApi;
+package com.fubon.ecplatformapi.model.dto.req;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Data;
 
-@Entity
 @Data
-public class FubonApiRequest {
+public class LoginRequest {
     @Id
     private String identify;
     private String account;

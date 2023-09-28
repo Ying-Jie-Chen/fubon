@@ -1,13 +1,15 @@
 package com.fubon.ecplatformapi;
 
-import com.fubon.ecplatformapi.FubonApi.FubonApiResponse;
-import com.fubon.ecplatformapi.FubonApi.FubonApiService;
+import com.fubon.ecplatformapi.model.dto.req.LoginRequest;
+import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.LoginResponse;
+import com.fubon.ecplatformapi.model.entity.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 //@Slf4j
 //@RestController
@@ -26,14 +28,28 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 
     @Autowired
-    private FubonApiService fubonApiService;
+    private FubonApiService fbecService;
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public ResponseEntity<FubonApiResponse> login(@RequestBody LoginRequest request) {
-        // 調用富邦 API 登入方法
-        FubonApiResponse response = fubonApiService.login();
+    public ApiRespDTO<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
 
-        // 返回富邦 API 的響應
-        return ResponseEntity.ok(response);
+        // 身分驗證服務驗證身分
+        LoginResponse loginResponse = authenticationService.login(loginRequest);
+
+        ApiRespDTO<LoginResponse> response = ApiRespDTO.<LoginResponse>builder()
+                .data(loginResponse)
+                .build();
+
+        return response;
     }
+
+    @GetMapping(value = "nonblock")
+    public ApiRespDTO<UserInfo> getDemoDataNonBlock() {
+        return ApiRespDTO.<UserInfo>builder()
+                .data(fbecService.testWebClient())
+                .build();
+    }
+
 }

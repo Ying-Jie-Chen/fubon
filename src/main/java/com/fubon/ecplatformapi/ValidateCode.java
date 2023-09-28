@@ -1,9 +1,7 @@
 package com.fubon.ecplatformapi;
 
+import com.fubon.ecplatformapi.model.dto.resp.LoginResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.apache.coyote.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Verification Image Base64
