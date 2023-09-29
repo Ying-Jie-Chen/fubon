@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Builder
 @Data
-public class FbecResponse {
+public class FbecRes {
     private boolean staffValid;
     private String staffValidMsg;
     private  UserInfo userInfo;

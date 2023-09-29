@@ -5,7 +5,7 @@ import jakarta.persistence.Id;
 import lombok.Data;
 
 @Data
-public class LoginRequest {
+public class LoginReq {
     @Id
     private String identify;
     private String account;
