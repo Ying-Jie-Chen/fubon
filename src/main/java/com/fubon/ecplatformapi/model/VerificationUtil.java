@@ -1,8 +1,9 @@
-package com.fubon.ecplatformapi;
+package com.fubon.ecplatformapi.model;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -12,9 +13,8 @@ import java.util.Base64;
 import java.util.Random;
 
 import static javax.swing.plaf.basic.BasicGraphicsUtils.drawString;
-import static javax.swing.text.html.CSS.Attribute.FONT_SIZE;
-
-public class ValidateUtil {
+@Service
+public class VerificationUtil {
     private int CODE_SIZE = 4;
     private int WIDTH = 165;
     private int HEIGHT = 45;
@@ -23,6 +23,7 @@ public class ValidateUtil {
     private static final Random random = new Random();
     private String randomString = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWSYZ";
     private final String sessionKey = "JCCODE";
+
 
     // 字體
     Font font = new Font("Times New Roman", Font.BOLD + Font.ITALIC, FONT_SIZE);
@@ -53,6 +54,8 @@ public class ValidateUtil {
 //
 //    }
 
+
+
     //随机字符的获取
     private  String getRandomString(int num){
         num = num > 0 ? num : randomString.length();
@@ -73,7 +76,6 @@ public class ValidateUtil {
     }
 
     //生成随机图片的base64编码字符串
-
     public String getRandomCodeBase64(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession();
         BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_BGR);
@@ -117,4 +119,5 @@ public class ValidateUtil {
 
         return base64String;
     }
+
 }

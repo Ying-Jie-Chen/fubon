@@ -1,11 +1,10 @@
-//package com.fubon.ecplatformapi.FubonApi;
-//
-//import com.fubon.ecplatformapi.DTO.LoginRequest;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.*;
-//import org.springframework.stereotype.Service;
-//import org.springframework.web.client.RestTemplate;
-//
+package com.fubon.ecplatformapi.FubonApi;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
 //@Service
 //public class FubonApiService {
 //
