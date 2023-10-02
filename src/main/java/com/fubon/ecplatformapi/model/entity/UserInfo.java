@@ -6,7 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.Value;
-@Entity
+
 @Data
 public class UserInfo {
 
@@ -15,8 +15,7 @@ public class UserInfo {
     private String admin_num;
     private String identify;
     private String unionNum;
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+
     private String id;
     private boolean signed;
     private boolean tested2;

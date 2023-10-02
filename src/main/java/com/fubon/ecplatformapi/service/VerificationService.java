@@ -12,6 +12,7 @@ import com.fubon.ecplatformapi.model.dto.resp.VerificationRes;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,44 +27,46 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.Base64;
 import java.util.Random;
-
+@Slf4j
 @Service
 public class VerificationService {
-
+    @Autowired
+    private VerificationUtil verificationUtil;
     @Autowired
     private ObjectMapper objectMapper;
-    private static final int CAPTCHA_EXPIRY_SECONDS = 1200;  // 驗證碼有效期限（20分鐘）
     @Autowired
     private HttpSession session;
 
-    public String generateCaptchaBase64(HttpServletRequest request, HttpServletResponse response) {
+    private static final String SESSION_KEY = "captcha";
+//    private static final int CAPTCHA_EXPIRY_SECONDS = 1200;  // 驗證碼有效期限（20分鐘）
 
-        VerificationUtil verificationUtil = new VerificationUtil();
-        String captcha = verificationUtil.getRandomCodeBase64(request, response);
+    public String generateCaptchaBase64(HttpServletRequest request) {
 
-        // 将验证码存储在会话中，并设置有效期
-        session.setAttribute("captcha", captcha);
-        session.setMaxInactiveInterval(CAPTCHA_EXPIRY_SECONDS);
+        String captcha = verificationUtil.getRandomCodeBase64(request);
+        log.info("Captcha Base64 : " + captcha);
+
+//        // 將驗證碼存儲在會話中，並設置有效期
+//        HttpSession session = request.getSession();
+//        session.setAttribute("captcha", captcha);
+//        session.setMaxInactiveInterval(CAPTCHA_EXPIRY_SECONDS);
 
         return captcha;
     }
 
-
     // 驗證用戶輸入的驗證碼是否匹配
     public boolean verifyCaptcha(String userInput) {
         // 從會話中取得先前儲存的驗證碼
-        String expectedCaptcha = (String) session.getAttribute("captcha");
+        String storedCode = (String) session.getAttribute(SESSION_KEY);
+        log.info("存在 session 的驗證碼: " + storedCode);
 
-        // 如果會話中沒有驗證碼或驗證碼過期，則傳回驗證失敗
-        if (expectedCaptcha == null) {
-            return false;
+        if (storedCode == null) {
+            throw new RuntimeException("session 中沒有驗證碼或驗證碼過期");
         }
-
         // 比較使用者輸入的驗證碼與預期的驗證碼（忽略大小寫）
-        return userInput.equalsIgnoreCase(expectedCaptcha);
+        return userInput.equalsIgnoreCase(storedCode);
     }
 
-    public String generateResponseJson(String system, String insureType, String verificationTypes, String base64String) {
+    public String generateResponseJson(String system, String insureType, String verificationTypes, String token, String base64String) {
 
         try {
 
@@ -95,7 +98,7 @@ public class VerificationService {
                             .StatusDesc("成功")
                             .build())
                     .any(VerificationRes.Any.builder()
-                            .token("2da6cf70570e44658d8fd7e5c334ca03")
+                            .token(token)
                             .verificationImageBase64(base64String)
                             .build())
                     .build();
@@ -111,13 +114,13 @@ public class VerificationService {
 
     @Autowired
     public VerificationService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("富邦API的URL").build();
+        this.webClient = webClientBuilder.baseUrl("http://localhost:8080").build();
     }
 
     public Mono<Boolean> authenticateWithFubon(FubonLoginReq loginRequest) {
         return webClient
                 .post()
-                .uri("/富邦API的路径")
+                .uri("/FBECAPPCERT1001")
                 .body(BodyInserters.fromValue(loginRequest))
                 .retrieve()
                 .bodyToMono(FubonLoginResp.class)

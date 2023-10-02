@@ -7,106 +7,58 @@ import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
 import com.fubon.ecplatformapi.service.VerificationService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
+import java.util.Map;
+
+@Slf4j
 @RestController
+@RequestMapping("/auth")
 public class AuthController {
-    @Autowired
-    private VerificationService verificationService;
 
-    @PostMapping("/auth/login")
-    public ResponseEntity<ApiRespDTO<FubonLoginResp>> login(@RequestBody LoginReq loginRequest) {
-
+    // 取得登入頁面中的圖形驗證碼，還沒寫如何生成token!!
+    @GetMapping("/getVerificationImage")
+    public ResponseEntity<ApiRespDTO<Map<String, Object>>>  getVerificationImage(HttpServletRequest request, HttpServletResponse response) {
         try {
-            // 驗證圖形驗證碼
-            boolean captchaValid = verificationService.verifyCaptcha(loginRequest.getVerificationCode());
+                response.setContentType("image/png");
+                //String base64String = verificationService.generateCaptchaBase64(request);
+                String token = "token123456";
 
-            if (!captchaValid) {
-                return createErrorResponse(HttpStatus.UNAUTHORIZED, StatusCodeEnum.Err10001);
-            }
+                Map<String, Object> responseData = new HashMap<>();
+                //responseData.put("verificationImage", base64String);
+                responseData.put("token", token);
 
-            // 呼叫富邦API的 FBECAPPCERT1001 進行身份驗證
-            FubonLoginReq fubonLoginRequest = buildFubonLoginRequest(loginRequest);
+                ApiRespDTO<Map<String, Object>> successResponse = ApiRespDTO.<Map<String, Object>>builder()
+                        .data(responseData)
+                        .build();
 
-            // 根據富邦API的回應結果判斷身分驗證是否成功
-            Mono<Boolean> authenticationResult = verificationService.authenticateWithFubon(fubonLoginRequest);
-
-            return authenticationResult.flatMap(isValid -> {
-                if (isValid) {
-                    // 身份验证成功
-                    FubonLoginResp fubonLoginResp = buildFubonLoginResponse(); // 构建富邦API的回應
-                    return ResponseEntity.ok(createSuccessResponse(fubonLoginResp));
-
-                    return Mono.just(ResponseEntity.ok(response));
-                } else {
-                    // 身份验证失败
-                    ApiRespDTO<FubonLoginResp> response = ApiRespDTO.<FubonLoginResp>builder()
-                            .code(StatusCodeEnum.Err10001.name())
-                            .message(StatusCodeEnum.Err10001.getMessage())
-                            //.data(errorMsg)
-                            .build();
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-                }
-            }).block(); // 阻塞等待响应
+                return new ResponseEntity<>(successResponse, HttpStatus.OK);
         } catch (Exception e) {
-            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, StatusCodeEnum.Err10001);
+
+                ApiRespDTO<Map<String, Object>> errorResponse = ApiRespDTO.<Map<String, Object>>builder()
+                        .code(StatusCodeEnum.Err10001.name())
+                        .message(StatusCodeEnum.Err10001.getMessage())
+                        .build();
+
+                return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-
-    private FubonLoginReq buildFubonLoginRequest(LoginReq loginRequest) {
-        FubonLoginReq fubonLoginReq = FubonLoginReq.builder()
-                .Header(FubonLoginReq.Header.builder()
-                        .FromSys("B2A")
-                        .SysPwd("*****PW8SGg=")
-                        .FunctionCode("FBECAPPCERT1001")
-                        .build())
-                .FBECAPPCERT1001RQ(FubonLoginReq.FBECAPPCERT1001.builder()
-                        .returnPfx("1")
-                        .identify(loginRequest.getIdentify())
-                        .empNo(loginRequest.getAccount())
-                        .password(loginRequest.getPassword())
-                        .verificationCode(loginRequest.getVerificationCode())
-                        .token(loginRequest.getToken())
-                        .build())
-                .build();
-
-        return fubonLoginReq;
-    }
-
-    private FubonLoginResp buildFubonLoginResponse() {
-        FubonLoginResp fubonLoginResp = FubonLoginResp.builder()
-                .Header(FubonLoginResp.Header.builder()
-                        .MsgId("7cdf926e-561a-43a7-bc52-ec947468fc66")
-                        .FromSys("ECWS")
-                        .ToSys("B2A")
-                        .SysPwd("*****PW8SGg=")
-                        .FunctionCode("FBECAPPCERT1001")
-                        .StatusCode("0000")
-                        .StatusDesc("成功")
-                        .build())
-                .Any(FubonLoginResp.Any.builder()
-                        .staffValid(true)
-                        .staffValidMsg("")
-                        .userInfo(UserInfo.builder()
-                                .agent_id("*****60ZZ")
-                                .unionNum("FBLIFE-VP207")
-                                .email("*****65@training.fubon.com.tw")
-                                .id("******44654")
-                                .sales_id("******55006")
-                                .signed(false)
-                                .tested(false)
-                                .build())
-                        .build())
-                .build();
-
-        return fubonLoginResp;
+    // 在登入驗證時驗證使用者輸入的驗證碼
+    @PostMapping("/login")
+    public ResponseEntity<ApiRespDTO<FubonLoginResp>> login(@RequestBody LoginReq loginRequest) {
+        return null;
     }
 
 
@@ -118,19 +70,6 @@ public class AuthController {
                 .build();
         return ResponseEntity.status(status).body(response);
     }
-
-    private ResponseEntity<ApiRespDTO<FubonLoginResp>> createErrorResponse(HttpStatus status, StatusCodeEnum code) {
-        return createErrorResponse(status, code, null);
-    }
-
-    private ApiRespDTO<FubonLoginResp> createSuccessResponse(FubonLoginResp fubonLoginResp) {
-        ApiRespDTO<FubonLoginResp> response = ApiRespDTO.<FubonLoginResp>builder()
-                .data(fubonLoginResp)
-                .build();
-        return response;
-    }
-
-
 
 }
 

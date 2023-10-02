@@ -3,109 +3,87 @@ package com.fubon.ecplatformapi.model;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.Random;
 
-import static javax.swing.plaf.basic.BasicGraphicsUtils.drawString;
+@Slf4j
 @Service
 public class VerificationUtil {
-    private int CODE_SIZE = 4;
-    private int WIDTH = 165;
-    private int HEIGHT = 45;
-    private int LINES = 30;
-    private int FONT_SIZE = 40;
-    private static final Random random = new Random();
-    private String randomString = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWSYZ";
-    private final String sessionKey = "JCCODE";
+    private static final int CODE_SIZE = 4;
+    private static final int WIDTH = 165;
+    private static final int HEIGHT = 45;
+    private static final int LINES = 30;
+    private static final int FONT_SIZE = 40;
+    private static final String RANDOM_STRING = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWSYZ";
+    private static final Random RANDOM = new Random();
+    private static final String SESSION_KEY = "captcha";
+    private static final int CAPTCHA_EXPIRY_SECONDS = 1200;  // 驗證碼有效期限（20分鐘）
 
+    private static final Font FONT = new Font("Times New Roman", Font.BOLD + Font.ITALIC, FONT_SIZE);
 
-    // 字體
-    Font font = new Font("Times New Roman", Font.BOLD + Font.ITALIC, FONT_SIZE);
-
-    // 顏色
     private static Color getRandomColor() {
-//        int fc, int bc
-//        fc = Math.min(fc, 255);
-//        bc = Math.min(bc, 255);
-//
-//        int r = fc + random.nextInt(bc - fc - 16);
-//        int g = fc + random.nextInt(bc - fc - 14);
-//        int b = fc + random.nextInt(bc - fc - 12);
-//
-//        return new Color(r, g, b);
         Random ran = new Random();
         Color color = new Color(ran.nextInt(256), ran.nextInt(256), ran.nextInt(256));
         return color;
     }
 
-//    //干扰线的绘制
-//    private void drawLine(Graphics g) {
-//        int x = random.nextInt(WIDTH);
-//        int y = random.nextInt(HEIGHT);
-//        int xl = random.nextInt(20);
-//        int yl = random.nextInt(10);
-//        g.drawLine(x, y, x + xl, y + yl);
-//
-//    }
-
-
-
-    //随机字符的获取
-    private  String getRandomString(int num){
-        num = num > 0 ? num : randomString.length();
-        return String.valueOf(randomString.charAt(random.nextInt(num)));
+    // 生成隨機驗證碼字串
+    private static String getRandomString(int num) {
+        num = Math.max(num, 0);
+        num = Math.min(num, RANDOM_STRING.length());
+        return String.valueOf(RANDOM_STRING.charAt(RANDOM.nextInt(num)));
     }
 
-    //字符串的绘制
-    private String drawString(Graphics g, String randomStr, int i) {
-        g.setFont(font);
-//        g.setColor(getRandomColor(108, 190));
+    // 在圖片上繪製驗證碼
+    private static String drawString(Graphics g, String randomStr, int i) {
+        g.setFont(FONT);
         g.setColor(getRandomColor());
-        //System.out.println(random.nextInt(randomString.length()));
-        String rand = getRandomString(random.nextInt(randomString.length()));
+        String rand = getRandomString(RANDOM.nextInt(RANDOM_STRING.length()));
         randomStr += rand;
-        g.translate(random.nextInt(3), random.nextInt(6));
+        g.translate(RANDOM.nextInt(3), RANDOM.nextInt(6));
         g.drawString(rand, 40 * i + 10, 25);
         return randomStr;
     }
 
-    //生成随机图片的base64编码字符串
-    public String getRandomCodeBase64(HttpServletRequest request, HttpServletResponse response) {
-        HttpSession session = request.getSession();
+
+    // 產生驗證碼圖片，傳回未編碼的驗證碼字串到session，產生隨機圖片的 base64 編碼字串
+    public String getRandomCodeBase64(HttpServletRequest request) {
         BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_BGR);
         Graphics g = image.getGraphics();
         g.fillRect(0, 0, WIDTH, HEIGHT);
-//        g.setColor(getRandomColor(105, 189));
         g.setColor(getRandomColor());
-        g.setFont(font);
-        // 干擾線
+        g.setFont(FONT);
+
+        //干擾線
         for (int i = 0; i < LINES; i++) {
-//            drawLine(g);
             g.setColor(getRandomColor());
-            g.drawLine(random.nextInt(WIDTH), random.nextInt(HEIGHT),
-                       random.nextInt(WIDTH), random.nextInt(HEIGHT));
+            g.drawLine(RANDOM.nextInt(WIDTH), RANDOM.nextInt(HEIGHT),
+                    RANDOM.nextInt(WIDTH), RANDOM.nextInt(HEIGHT));
         }
 
-        //隨機字串驗證碼
+        // 隨機位數驗證碼
         String randomStr = "";
         for (int i = 0; i < CODE_SIZE; i++) {
             randomStr = drawString(g, randomStr, i);
         }
-        System.out.println("驗證碼：" + randomStr);
-        g.dispose();
-        session.removeAttribute(sessionKey);
-        session.setAttribute(sessionKey, randomStr);
+        //log.info("驗證碼：" + randomStr);
+
+        // 將驗證碼字串儲存在會話中
+        HttpSession session = request.getSession();
+        session.removeAttribute(SESSION_KEY);
+        session.setAttribute(SESSION_KEY, randomStr);
+        session.setMaxInactiveInterval(CAPTCHA_EXPIRY_SECONDS);
+
         String base64String = "";
         try {
-            //  直接返回图片
-            //  ImageIO.write(image, "PNG", response.getOutputStream());
-            //返回 base64
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ImageIO.write(image, "PNG", bos);
 
@@ -113,11 +91,11 @@ public class VerificationUtil {
             Base64.Encoder encoder = Base64.getEncoder();
             base64String = encoder.encodeToString(bytes);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            //log.info("base64: " + base64String);
 
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
         return base64String;
     }
-
 }
