@@ -1,0 +1,9 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: b2b-EcPlatform-API
+  profiles:
+    active: dev
+
