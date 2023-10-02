@@ -1,60 +1,45 @@
-package com.fubon.ecplatformapi;
+package com.fubon.ecplatformapi.FubonApi;
 
-import com.fubon.ecplatformapi.model.dto.req.FbecRequest;
-import com.fubon.ecplatformapi.model.dto.resp.FbecResponse;
-import com.fubon.ecplatformapi.model.dto.req.LoginRequest;
-import com.fubon.ecplatformapi.model.dto.resp.LoginResponse;
-import com.fubon.ecplatformapi.model.entity.UserInfo;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-@Slf4j
-@Service
-public class FubonApiService {
+import org.springframework.web.client.RestTemplate;
 
-    private final WebClient webClient;
-    private static final String FAKE_URL = "https://jsonplaceholder.typicode.com/todos/1";
-
-
-    public FubonApiService() {
-        this.webClient = WebClient.create();
-    }
-    public UserInfo testWebClient(){
-        Mono<UserInfo> mono = WebClient.create()
-                .get()
-                .uri(FAKE_URL)
-                .retrieve()
-                .bodyToMono(UserInfo.class);
-        return mono.block();
-    }
-
-    public Mono<LoginResponse> login(LoginRequest request) {
-
-        FbecRequest fbecRequest = FbecRequest.builder()
-                .returnPfx("0")
-                .identify(request.getIdentify())
-                .empNo(request.getAccount())
-                .verificationCode(request.getVerificationCode())
-                .token(request.getToken())
-                .build();
-
-
-        return webClient.post()
-                .uri(FAKE_URL)
-                .header("Content-Type", "application/json")
-                .body(BodyInserters.fromValue(fbecRequest))
-                .retrieve()
-                .bodyToMono(FbecResponse.class)
-                .map(apiResponse -> {
-                    // 從 API 響應中提取訊息並建構登錄響應
-                    return LoginResponse.builder()
-                            .code(String.valueOf(apiResponse.isStaffValid()))
-                            .message(apiResponse.getStaffValidMsg())
-                            .data(apiResponse.getUserInfo())
-                            .build();
-                });
-
-    }
-}
+//@Service
+//public class FubonApiService {
+//
+//    private final RestTemplate restTemplate;
+//
+////    @Value("${fubon.api.url}") // 富邦 API 的基本 URL，可以配置在 application.properties 中
+//    private String fubonApiUrl;
+//
+//    @Autowired
+//    public FubonApiService(RestTemplate restTemplate) {
+//        this.restTemplate = restTemplate;
+//    }
+//
+//    public FbecResponse login() {
+//        fubonApiUrl = "https://localhost:8080";
+//        // 創建富邦 API 的請求參數對象
+//        LoginRequest apiRequest = new LoginRequest();
+//
+//        // 設置富邦 API 的 Header
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//        // 創建富邦 API 的請求實體
+//        HttpEntity<LoginRequest> httpEntity = new HttpEntity<>(apiRequest, headers);
+//
+//        // 發送 POST 請求到富邦 API
+//        ResponseEntity<FbecResponse> response = restTemplate.exchange(
+//                fubonApiUrl + "/login", // 富邦 API 的 URL
+//                HttpMethod.POST,
+//                httpEntity,
+//                FbecResponse.class
+//        );
+//
+//        // 返回富邦 API 的響應
+//        return response.getBody();
+//    }
+//
+//}

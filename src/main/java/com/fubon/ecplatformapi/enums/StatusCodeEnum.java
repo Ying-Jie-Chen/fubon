@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum StatusCodeEnum {
+
     Err10001("系統錯誤");
 
     private final String message;

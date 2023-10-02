@@ -9,6 +9,7 @@ import lombok.Value;
 @Entity
 @Data
 public class UserInfo {
+
     private String agent_name;
     private String agent_id;
     private String admin_num;
