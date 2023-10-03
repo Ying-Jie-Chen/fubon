@@ -1,23 +1,17 @@
 package com.fubon.ecplatformapi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
+import com.fubon.ecplatformapi.captcha.CaptchaUtil;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
-import com.fubon.ecplatformapi.model.entity.UserInfo;
-import com.fubon.ecplatformapi.service.VerificationService;
+import com.fubon.ecplatformapi.captcha.VerificationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,17 +20,21 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+    @Autowired
+    VerificationService verificationService;
+    @Autowired
+    CaptchaUtil captchaUtil;
 
     // 取得登入頁面中的圖形驗證碼，還沒寫如何生成token!!
     @GetMapping("/getVerificationImage")
     public ResponseEntity<ApiRespDTO<Map<String, Object>>>  getVerificationImage(HttpServletRequest request, HttpServletResponse response) {
         try {
                 response.setContentType("image/png");
-                //String base64String = verificationService.generateCaptchaBase64(request);
+                String base64String = captchaUtil.generateCaptchaBase64();
                 String token = "token123456";
 
                 Map<String, Object> responseData = new HashMap<>();
-                //responseData.put("verificationImage", base64String);
+                responseData.put("verificationImage", base64String);
                 responseData.put("token", token);
 
                 ApiRespDTO<Map<String, Object>> successResponse = ApiRespDTO.<Map<String, Object>>builder()

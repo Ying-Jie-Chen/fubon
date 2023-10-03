@@ -1,12 +1,12 @@
 package com.fubon.ecplatformapi.controller;
 
 
-import com.fubon.ecplatformapi.FubonLoginReq;
+import com.fubon.ecplatformapi.FubonLoginResp;
+import com.fubon.ecplatformapi.LoginService;
+import com.fubon.ecplatformapi.captcha.CaptchaUtil;
+import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
-import com.fubon.ecplatformapi.model.dto.resp.VerificationRes;
-import com.fubon.ecplatformapi.service.VerificationService;
-import com.fubon.ecplatformapi.enums.StatusCodeEnum;
-import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
+import com.fubon.ecplatformapi.captcha.VerificationService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,12 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -32,10 +26,11 @@ import java.util.Map;
 @RestController
 public class VerificationController {
     @Autowired
-    private WebClient.Builder webClientBuilder;
-
-    @Autowired
     VerificationService verificationService;
+    @Autowired
+    CaptchaUtil captchaUtil;
+    @Autowired
+    LoginService loginService;
 
     @GetMapping("/GetVerificationImage")
     public ResponseEntity<String> getCaptchaBase64(@RequestBody VerificationReq verificationReq,
@@ -46,9 +41,9 @@ public class VerificationController {
         String verificationTypes = verificationReq.getFBECCOMSTA1032RQ().getVerificationTypes();
 
         response.setContentType("image/png");
-        String base64String = verificationService.generateCaptchaBase64(request);
+        String base64String = captchaUtil.generateCaptchaBase64();
         String token = "the function how to generate token";
-        log.info("base64 String: " + base64String);
+
         String jsonResponse = verificationService.generateResponseJson(system, insureType, verificationTypes,token, base64String);
 
         HttpHeaders headers = new HttpHeaders();
@@ -59,7 +54,8 @@ public class VerificationController {
     }
 
     @PostMapping("/Login")
-    public ResponseEntity<String> getCaptchaBase64(@RequestBody FubonLoginReq fubonLoginReq) {
+    public FubonLoginResp getCaptchaBase64(@RequestBody LoginReq loginReq) {
+        return  loginService.login(loginReq);
     }
 
 }
