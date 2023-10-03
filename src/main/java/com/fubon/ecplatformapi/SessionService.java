@@ -1,5 +1,6 @@
 package com.fubon.ecplatformapi;
 
+import com.fubon.ecplatformapi.model.entity.UserInfo;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,19 @@ public class SessionService {
         } else {
             return null;
         }
+
+    }
+
+    // 儲存登入者資訊
+    public void saveUserInfo(UserInfo userInfo){
+        log.info("儲存登入者資訊#Start");
+
+        MapSessionRepository repository = sessionConfig.sessionRepository();
+        MapSession mapSession = new MapSession(SESSION_ID);
+
+        mapSession.setAttribute("UserInfoKey", userInfo);
+        mapSession.setMaxInactiveInterval(Duration.ofMinutes(20));
+        repository.save(mapSession);
 
     }
 }

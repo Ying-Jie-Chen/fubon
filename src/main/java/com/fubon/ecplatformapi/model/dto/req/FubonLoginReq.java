@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi;
+package com.fubon.ecplatformapi.model.dto.req;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,8 +1,9 @@
 package com.fubon.ecplatformapi.controller;
 
 
-import com.fubon.ecplatformapi.FubonLoginResp;
+import com.fubon.ecplatformapi.AuthenticationService;
 import com.fubon.ecplatformapi.LoginService;
+import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
 import com.fubon.ecplatformapi.captcha.CaptchaUtil;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
@@ -30,7 +31,8 @@ public class VerificationController {
     @Autowired
     CaptchaUtil captchaUtil;
     @Autowired
-    LoginService loginService;
+    AuthenticationService authenticationService;
+
 
     @GetMapping("/GetVerificationImage")
     public ResponseEntity<String> getCaptchaBase64(@RequestBody VerificationReq verificationReq,
@@ -54,8 +56,9 @@ public class VerificationController {
     }
 
     @PostMapping("/Login")
-    public FubonLoginResp getCaptchaBase64(@RequestBody LoginReq loginReq) {
-        return  loginService.login(loginReq);
+    public FubonLoginResp login(@RequestBody LoginReq loginReq) {
+        authenticationService.login(loginReq);
+        return  null;
     }
 
 }
