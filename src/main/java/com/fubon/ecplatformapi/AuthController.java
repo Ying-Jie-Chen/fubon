@@ -52,17 +52,7 @@ public class AuthController {
     // 在登入驗證時驗證使用者輸入的驗證碼
     @PostMapping("/login")
     public ResponseEntity<ApiRespDTO<Map<String, Object>>> login(@RequestBody LoginReq loginRequest) {
-        loginService.authLogin(loginRequest);
-
-        UserInfo userInfo = new UserInfo();
-        Map<String, Object> responseData = new HashMap<>();
-
-        /*
-         * responseData = UserInfo
-         * UserInfo = FubonApi Response
-         */
-
-        ApiRespDTO<Map<String, Object>> responseDto = successResponse(responseData);
+        ApiRespDTO<Map<String, Object>> responseDto = loginService.authLogin(loginRequest);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 

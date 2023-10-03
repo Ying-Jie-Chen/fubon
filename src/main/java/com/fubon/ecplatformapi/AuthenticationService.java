@@ -22,19 +22,10 @@ import java.util.Map;
 public class AuthenticationService {
     @Autowired
     private ObjectMapper objectMapper;
-    private static final String FUBON_API_URL = "http://localhost:8080";
-
-    private final WebClient webClient;
-    @Autowired
-    public AuthenticationService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl(FUBON_API_URL).build();
-    }
 
 
+    public FubonLoginResp login(LoginReq loginReq) {
 
-    public Mono<FubonLoginResp> login(LoginReq loginReq) {
-        // Fubon API 的回應
-        FubonLoginResp fubonloginResp = buildFubonLoginResponse();
 
         try {
             // 建立富邦API FBECAPPCERT1001 的請求
@@ -44,26 +35,67 @@ public class AuthenticationService {
             Mono<Boolean> authenticationResult = authenticateWithFubon(fubonLoginReq);
 
             // 使用 doOnNext 操作符來記錄身份驗證結果
-            authenticationResult.doOnNext(isValid -> {
+//                authenticationResult.doOnNext(isValid -> {
+//                    if (isValid) {
+//                        log.info("身份驗證成功");
+//
+//                    } else {
+//                        log.error("身份驗證失敗");
+//                        FubonLoginResp response = FubonLoginResp.builder()
+//                                .Header(FubonLoginResp.Header.builder()
+//                                        .StatusCode(StatusCodeEnum.Err10001.name())
+//                                        .StatusDesc(StatusCodeEnum.Err10001.getMessage())
+//                                        .build())
+//                                .Any(FubonLoginResp.Any.builder()
+//                                        .staffValid(false)
+//                                        .staffValidMsg("身份驗證碼失敗！")
+//                                        .build())
+//                                .build();
+//
+//                    }
+//                }).subscribe(); // 訂閱以觸發執行
+
+            /* 要寫 isValid 和登入資訊做比對邏輯 */
+
+            authenticationResult.flatMap(isValid -> {
                 if (isValid) {
                     log.info("身份驗證成功");
+                    FubonLoginResp response = FubonLoginResp.builder()
+                            .Header(FubonLoginResp.Header.builder()
+                                    .StatusCode("0000")
+                                    .StatusDesc("成功")
+                                    .build())
+                            .Any(FubonLoginResp.Any.builder()
+                                    .staffValid(true)
+                                    .staffValidMsg("身份驗證成功！")
+                                    .build())
+                            .build();
+
+                    objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
+                    String jsonRequest = null;
+                    try {
+                        jsonRequest = objectMapper.writeValueAsString(response);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                    System.out.println(jsonRequest);
+
+                    return Mono.just(response);
                 } else {
                     log.error("身份驗證失敗");
+                    throw new IllegalArgumentException();
                 }
-            }).subscribe(); // 訂閱以觸發執行
-
-            return authenticationResult.flatMap(isValid -> {
-                if (isValid) {
-                    return Mono.just(successResponse(fubonloginResp));
-                } else {
-                    throw new IllegalArgumentException("身份驗證失敗");
-                }
-            }).map(ApiRespDTO::getData); // 提取成功回應的數據
-
-        } catch (Exception e) {
-            log.error(e.toString());
-            return Mono.error(e);
-        }
+            });
+            return FubonLoginResp.builder()
+                    .Header(FubonLoginResp.Header.builder()
+                            .StatusCode("0000")
+                            .StatusDesc("成功")
+                            .build())
+                    .build();
+            } catch (Exception e){
+                log.error(e.getMessage());
+                throw e;
+            }
     }
 
     // 取得 Fubon API 的回應結果
@@ -82,7 +114,7 @@ public class AuthenticationService {
     }
 
     private FubonLoginReq buildFubonLoginRequest(LoginReq loginRequest) {
-        log.info("建立富邦API FBECAPPCERT1001 的請求 #Start");
+        log.info("建立 FubonAPI FBECAPPCERT1001 的請求 #Start");
 
         FubonLoginReq req = FubonLoginReq.builder()
                 .Header(FubonLoginReq.Header.builder()
