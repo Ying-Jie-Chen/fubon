@@ -31,6 +31,7 @@ public class CaptchaUtil {
 
     private static Color getRandomColor() {
         Random ran = new Random();
+
         Color color = new Color(ran.nextInt(256), ran.nextInt(256), ran.nextInt(256));
         return color;
     }
@@ -39,9 +40,12 @@ public class CaptchaUtil {
      *
      */
     private static String getRandomString(int num) {
+        if (num <= 0) {
+            throw new IllegalArgumentException("Try again!");
+        }
         num = Math.max(num, 0);
-
         num = Math.min(num, RANDOM_STRING.length());
+
         return String.valueOf(RANDOM_STRING.charAt(RANDOM.nextInt(num)));
     }
 

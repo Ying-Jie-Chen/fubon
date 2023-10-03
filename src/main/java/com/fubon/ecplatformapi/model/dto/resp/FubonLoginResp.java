@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi;
+package com.fubon.ecplatformapi.model.dto.resp;
 
 import com.fubon.ecplatformapi.model.entity.UserInfo;
 import lombok.Builder;
@@ -26,7 +26,7 @@ public class FubonLoginResp {
     @Data
     @Builder
     public static class Any {
-        private boolean staffValid;
+        private boolean staffValid ;
         private String staffValidMsg;
         private UserInfo userInfo;
     }
