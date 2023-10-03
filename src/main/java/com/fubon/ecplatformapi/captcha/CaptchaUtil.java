@@ -1,9 +1,8 @@
-package com.fubon.ecplatformapi.model;
+package com.fubon.ecplatformapi.captcha;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import com.fubon.ecplatformapi.SessionService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -16,18 +15,19 @@ import java.util.Random;
 
 @Slf4j
 @Service
-public class VerificationUtil {
-    private static final int CODE_SIZE = 4;
-    private static final int WIDTH = 165;
-    private static final int HEIGHT = 45;
-    private static final int LINES = 30;
+public class CaptchaUtil {
+    @Autowired
+    SessionService sessionService;
+
+    private final int CODE_SIZE = 4;
+    private final int WIDTH = 165;
+    private final int HEIGHT = 45;
+    private final int LINES = 30;
     private static final int FONT_SIZE = 40;
     private static final String RANDOM_STRING = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWSYZ";
+    private static final Font FONT = new Font("Times New Roman", Font.BOLD + Font.ITALIC, FONT_SIZE);;
     private static final Random RANDOM = new Random();
-    private static final String SESSION_KEY = "captcha";
-    private static final int CAPTCHA_EXPIRY_SECONDS = 1200;  // 驗證碼有效期限（20分鐘）
 
-    private static final Font FONT = new Font("Times New Roman", Font.BOLD + Font.ITALIC, FONT_SIZE);
 
     private static Color getRandomColor() {
         Random ran = new Random();
@@ -35,14 +35,19 @@ public class VerificationUtil {
         return color;
     }
 
-    // 生成隨機驗證碼字串
+    /** 生成隨機驗證碼字串
+     *
+     */
     private static String getRandomString(int num) {
         num = Math.max(num, 0);
+
         num = Math.min(num, RANDOM_STRING.length());
         return String.valueOf(RANDOM_STRING.charAt(RANDOM.nextInt(num)));
     }
 
-    // 在圖片上繪製驗證碼
+    /** 在圖片上繪製驗證碼
+     *
+     */
     private static String drawString(Graphics g, String randomStr, int i) {
         g.setFont(FONT);
         g.setColor(getRandomColor());
@@ -53,10 +58,10 @@ public class VerificationUtil {
         return randomStr;
     }
 
-
-    // 產生驗證碼圖片，傳回未編碼的驗證碼字串到session，產生隨機圖片的 base64 編碼字串
-    public String getRandomCodeBase64(HttpServletRequest request) {
-        BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_BGR);
+    /** 產生驗證碼圖片，傳回未編碼的驗證碼字串到session
+     *
+     */
+    public byte[] getRandomCode(BufferedImage image) {
         Graphics g = image.getGraphics();
         g.fillRect(0, 0, WIDTH, HEIGHT);
         g.setColor(getRandomColor());
@@ -74,28 +79,34 @@ public class VerificationUtil {
         for (int i = 0; i < CODE_SIZE; i++) {
             randomStr = drawString(g, randomStr, i);
         }
-        //log.info("驗證碼：" + randomStr);
 
         // 將驗證碼字串儲存在會話中
-        HttpSession session = request.getSession();
-        session.removeAttribute(SESSION_KEY);
-        session.setAttribute(SESSION_KEY, randomStr);
-        session.setMaxInactiveInterval(CAPTCHA_EXPIRY_SECONDS);
+        //log.info("驗證碼：" + randomStr);
+        sessionService.saveSession(randomStr);
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(image, "PNG", bos);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return bos.toByteArray();
+    }
+
+    /**
+     * 產生隨機圖片的 base64 編碼字串
+     *
+     */
+    public String generateCaptchaBase64() {
+        BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_BGR);
+        byte[] captcha = getRandomCode(image);
 
         String base64String = "";
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ImageIO.write(image, "PNG", bos);
+        Base64.Encoder encoder = Base64.getEncoder();
+        base64String = encoder.encodeToString(captcha);
 
-            byte[] bytes = bos.toByteArray();
-            Base64.Encoder encoder = Base64.getEncoder();
-            base64String = encoder.encodeToString(bytes);
+        log.info("驗證碼 Base64 : " + base64String);
 
-            //log.info("base64: " + base64String);
-
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
         return base64String;
     }
 }

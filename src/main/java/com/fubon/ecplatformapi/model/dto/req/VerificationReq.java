@@ -6,7 +6,7 @@ import lombok.Data;
 @Builder
 public class VerificationReq {
         private Header Header;
-        private FBECCOMSTA1032RQ FBECCOMSTA1032RQ;
+        private FBECCOMSTA1032 FBECCOMSTA1032RQ;
 
         @Data
         @Builder
@@ -17,7 +17,7 @@ public class VerificationReq {
         }
         @Data
         @Builder
-        public static class FBECCOMSTA1032RQ {
+        public static class FBECCOMSTA1032 {
                 private String system;
                 private String insureType;
                 private String verificationTypes;
