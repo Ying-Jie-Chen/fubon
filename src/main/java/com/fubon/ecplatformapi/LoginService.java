@@ -9,6 +9,7 @@ import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.captcha.VerificationService;
 import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
+import com.fubon.ecplatformapi.model.entity.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
 import java.util.Map;
 @Slf4j
 @Service
@@ -24,13 +26,15 @@ public class LoginService {
     private ObjectMapper objectMapper;
     @Autowired
     private VerificationService verificationService;
-    private final WebClient webClient;
+
+    private static final String FUBON_API_URL = "http://localhost:8080";
     @Autowired
     public LoginService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8080").build();;
+        WebClient webClient = webClientBuilder.baseUrl(FUBON_API_URL).build();
+        ;
     }
 
-    public FubonLoginResp authLogin(LoginReq loginReq){
+    public ApiRespDTO<Map<String, Object>> authLogin(LoginReq loginReq){
 
         try {
             String userInputCaptcha = loginReq.getVerificationCode();
@@ -41,78 +45,34 @@ public class LoginService {
 
             if (!captchaValid) {
                 log.error("圖形驗證碼驗證失敗");
-                return FubonLoginResp.builder()
-                        .Header(FubonLoginResp.Header.builder()
-                                .StatusCode(StatusCodeEnum.Err10001.name())
-                                .StatusDesc(StatusCodeEnum.Err10001.getMessage())
-                                .build())
+//                FubonLoginResp.builder()
+//                        .Header(FubonLoginResp.Header.builder()
+//                                .StatusCode(StatusCodeEnum.Err10001.name())
+//                                .StatusDesc(StatusCodeEnum.Err10001.getMessage())
+//                                .build())
+//                        .build();
+                return ApiRespDTO.<Map<String, Object>>builder()
+                        .code(StatusCodeEnum.Err10001.name())
+                        .message(StatusCodeEnum.Err10001.getMessage())
                         .build();
-            }else {
+
+            } else {
                 log.info("圖形驗證碼驗證成功");
 
-                // 建立富邦API FBECAPPCERT1001 的請求
-                FubonLoginReq fubonLoginReq = buildFubonLoginRequest(loginReq);
+                /* 呼叫 POST http://localhost:8080/Login 取得 Fubon API 的回應結果 */
 
-                // 使用 Mono 的 cache 操作符來確保只呼叫一次外部 API
-                Mono<Boolean> authenticationResult = authenticateWithFubon(fubonLoginReq).cache();
+                /* 判斷 isValid, 回傳狀態碼 */
 
-                // 使用 doOnNext 操作符來記錄身份驗證結果
-//                authenticationResult.doOnNext(isValid -> {
-//                    if (isValid) {
-//                        log.info("身份驗證成功");
-//
-//                    } else {
-//                        log.error("身份驗證失敗");
-//                        FubonLoginResp response = FubonLoginResp.builder()
-//                                .Header(FubonLoginResp.Header.builder()
-//                                        .StatusCode(StatusCodeEnum.Err10001.name())
-//                                        .StatusDesc(StatusCodeEnum.Err10001.getMessage())
-//                                        .build())
-//                                .Any(FubonLoginResp.Any.builder()
-//                                        .staffValid(false)
-//                                        .staffValidMsg("身份驗證碼失敗！")
-//                                        .build())
-//                                .build();
-//
-//                    }
-//                }).subscribe(); // 訂閱以觸發執行
+                UserInfo userInfo = new UserInfo();
+                Map<String, Object> responseData = new HashMap<>();
 
-                /* 要寫 isValid 和登入資訊做比對邏輯 */
+                /*
+                 * responseData = UserInfo
+                 * UserInfo = FubonApi Response
+                 */
 
-                authenticationResult.flatMap(isValid -> {
-                    if (isValid) {
-                        log.info("身份驗證成功");
-                        FubonLoginResp response = FubonLoginResp.builder()
-                                .Header(FubonLoginResp.Header.builder()
-                                        .StatusCode("0000")
-                                        .StatusDesc("成功")
-                                        .build())
-                                .Any(FubonLoginResp.Any.builder()
-                                        .staffValid(true)
-                                        .staffValidMsg("身份驗證成功！")
-                                        .build())
-                                .build();
-
-                        objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
-                        String jsonRequest = null;
-                        try {
-                            jsonRequest = objectMapper.writeValueAsString(response);
-                        } catch (JsonProcessingException e) {
-                            throw new RuntimeException(e);
-                        }
-                        System.out.println(jsonRequest);
-
-                        return Mono.just(response);
-                    } else {
-                        log.error("身份驗證失敗");
-                        throw new IllegalArgumentException();
-                    }
-                });
-                return FubonLoginResp.builder()
-                        .Header(FubonLoginResp.Header.builder()
-                                .StatusCode("0000")
-                                .StatusDesc("成功")
-                                .build())
+                return ApiRespDTO.<Map<String, Object>>builder()
+                        .data(responseData)
                         .build();
             }
         } catch (Exception e){
@@ -121,49 +81,4 @@ public class LoginService {
         }
     }
 
-    // 取得 Fubon API 的回應結果
-    // POST http://localhost:8080/Login
-    // 請求主體 : FubonLoginReq , HTTP 響應的主體: FubonLoginResp
-    public Mono<Boolean> authenticateWithFubon(FubonLoginReq request) {
-        log.info("取得 FubonAPI Response #Start");
-
-        return webClient
-                .post()
-                .uri("/Login")
-                .body(BodyInserters.fromValue(request))
-                .retrieve()
-                .bodyToMono(FubonLoginResp.class)
-                .map(response -> response.getAny().isStaffValid())
-                .defaultIfEmpty(false);
-    }
-
-    private FubonLoginReq buildFubonLoginRequest(LoginReq loginRequest) {
-        log.info("建立 FubonAPI FBECAPPCERT1001 的請求 #Start");
-
-        FubonLoginReq req = FubonLoginReq.builder()
-                .Header(FubonLoginReq.Header.builder()
-                        .FromSys("B2A")
-                        .SysPwd("*****PW8SGg=")
-                        .FunctionCode("FBECAPPCERT1001")
-                        .build())
-                .FBECAPPCERT1001RQ(FubonLoginReq.FBECAPPCERT1001.builder()
-                        .returnPfx("0")
-                        .identify(loginRequest.getIdentify())
-                        .empNo(loginRequest.getAccount())
-                        .password(loginRequest.getPassword())
-                        .verificationCode(loginRequest.getVerificationCode())
-                        .token(loginRequest.getToken())
-                        .build())
-                .build();
-
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
-        String jsonRequest = null;
-        try {
-            jsonRequest = objectMapper.writeValueAsString(req);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println(jsonRequest);
-        return req;
-    }
 }
