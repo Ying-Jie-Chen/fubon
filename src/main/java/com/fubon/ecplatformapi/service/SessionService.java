@@ -1,7 +1,7 @@
-package com.fubon.ecplatformapi;
+package com.fubon.ecplatformapi.service;
 
+import com.fubon.ecplatformapi.model.config.SessionConfig;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.MapSession;

@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi;
+package com.fubon.ecplatformapi.model.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

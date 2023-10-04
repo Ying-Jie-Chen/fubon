@@ -5,9 +5,9 @@ import lombok.Data;
 
 @Data
 @Builder
-public class VerificationRes {
+public class VerificationResp {
     private Header Header;
-    private Any any;
+    private Any Any;
 
     @Data
     @Builder

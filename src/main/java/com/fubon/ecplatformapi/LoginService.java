@@ -1,13 +1,11 @@
 package com.fubon.ecplatformapi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fubon.ecplatformapi.Builber.BuildRequest;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.FubonLoginReq;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
-import com.fubon.ecplatformapi.captcha.VerificationService;
+import com.fubon.ecplatformapi.NoUse.captcha.CaptchaService;
 import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -17,31 +15,33 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
-import java.util.Map;
+import static org.springframework.web.reactive.function.server.RequestPredicates.queryParam;
+
 @Slf4j
 @Service
 public class LoginService {
     @Autowired
-    private ObjectMapper objectMapper;
+    private BuildRequest buildRequest;
+
     @Autowired
-    private VerificationService verificationService;
+    private CaptchaService captchaService;
 
     private static final String FUBON_API_URL = "http://localhost:8080";
+
+    private WebClient webClient;
     @Autowired
     public LoginService(WebClient.Builder webClientBuilder) {
-        WebClient webClient = webClientBuilder.baseUrl(FUBON_API_URL).build();
-        ;
+        this.webClient = webClientBuilder.baseUrl(FUBON_API_URL).build();
     }
 
-    public ApiRespDTO<Map<String, Object>> authLogin(LoginReq loginReq){
+    public ApiRespDTO<UserInfo> authLogin(LoginReq loginReq){
 
         try {
             String userInputCaptcha = loginReq.getVerificationCode();
             log.info("使用者輸入的驗證碼: " + userInputCaptcha);
 
             // 驗證圖形驗證碼
-            boolean captchaValid = verificationService.verifyCaptcha(userInputCaptcha);
+            boolean captchaValid = captchaService.verifyCaptcha(userInputCaptcha);
 
             if (!captchaValid) {
                 log.error("圖形驗證碼驗證失敗");
@@ -51,7 +51,7 @@ public class LoginService {
 //                                .StatusDesc(StatusCodeEnum.Err10001.getMessage())
 //                                .build())
 //                        .build();
-                return ApiRespDTO.<Map<String, Object>>builder()
+                return ApiRespDTO.<UserInfo>builder()
                         .code(StatusCodeEnum.Err10001.name())
                         .message(StatusCodeEnum.Err10001.getMessage())
                         .build();
@@ -60,18 +60,17 @@ public class LoginService {
                 log.info("圖形驗證碼驗證成功");
 
                 /* 呼叫 POST http://localhost:8080/Login 取得 Fubon API 的回應結果 */
+                FubonLoginResp fubonResponse = callFubonAPI(loginReq).block();
+
+                // 使用 Mono 的 cache 操作符來確保只呼叫一次外部 API
+                //Mono<Boolean> authenticationResult = authenticateWithFubon(fubonLoginReq);
+
+                /* 根據 Fubon API 回應 responseData */
+                UserInfo responseData = mapFubonResponseToUserInfo(fubonResponse);
 
                 /* 判斷 isValid, 回傳狀態碼 */
 
-                UserInfo userInfo = new UserInfo();
-                Map<String, Object> responseData = new HashMap<>();
-
-                /*
-                 * responseData = UserInfo
-                 * UserInfo = FubonApi Response
-                 */
-
-                return ApiRespDTO.<Map<String, Object>>builder()
+                return ApiRespDTO.<UserInfo>builder()
                         .data(responseData)
                         .build();
             }
@@ -80,5 +79,51 @@ public class LoginService {
             throw e;
         }
     }
+
+    public Mono<FubonLoginResp> callFubonAPI(LoginReq loginReq) {
+        log.info("建立 FubonAPI FBECAPPCERT1001 的請求 #Start");
+        FubonLoginReq fubonLoginReq = buildRequest.buildFubonLoginRequest(loginReq);
+
+        log.info("取得Fubon API的回應結果#Start");
+
+        return webClient
+                .post()
+                .uri("/Login")
+                .body(BodyInserters.fromValue(fubonLoginReq))
+                .retrieve()
+                .bodyToMono(FubonLoginResp.class);
+    }
+
+
+    public UserInfo mapFubonResponseToUserInfo(FubonLoginResp fubonResponse) {
+        UserInfo userInfo = new UserInfo();
+
+        if (fubonResponse != null) {
+            FubonLoginResp.Header header = fubonResponse.getHeader();
+            if (header != null) {
+
+            }
+
+            FubonLoginResp.Any any = fubonResponse.getAny();
+            if (any != null) {
+                userInfo.setAgent_name(any.getUserInfo().getAgent_name());
+                userInfo.setAgent_id(any.getUserInfo().getAgent_id());
+                userInfo.setAdmin_num(any.getUserInfo().getAdmin_num());
+                userInfo.setIdentify(any.getUserInfo().getIdentify());
+                userInfo.setEmail(any.getUserInfo().getEmail());
+                userInfo.setUnionNum(any.getUserInfo().getUnionNum());
+                userInfo.setId(any.getUserInfo().getId());
+                userInfo.setSigned(any.getUserInfo().isSigned());
+                userInfo.setTested2(any.getUserInfo().isTested2());
+                userInfo.setXrefInfo(any.getUserInfo().getXrefInfo());
+            }
+        }
+        return userInfo;
+    }
+
+
+
+
+
 
 }

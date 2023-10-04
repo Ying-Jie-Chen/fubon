@@ -14,8 +14,8 @@ public class UserInfo {
     private String agent_id;
     private String admin_num;
     private String identify;
+    private String email;
     private String unionNum;
-
     private String id;
     private boolean signed;
     private boolean tested2;

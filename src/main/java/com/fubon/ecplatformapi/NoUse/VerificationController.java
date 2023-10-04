@@ -1,13 +1,12 @@
-package com.fubon.ecplatformapi.controller;
+package com.fubon.ecplatformapi.NoUse;
 
 
-import com.fubon.ecplatformapi.AuthenticationService;
-import com.fubon.ecplatformapi.LoginService;
+import com.fubon.ecplatformapi.NoUse.AuthenticationService;
+import com.fubon.ecplatformapi.model.dto.req.FubonLoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
-import com.fubon.ecplatformapi.captcha.CaptchaUtil;
-import com.fubon.ecplatformapi.model.dto.req.LoginReq;
+import com.fubon.ecplatformapi.NoUse.captcha.CaptchaUtil;
 import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
-import com.fubon.ecplatformapi.captcha.VerificationService;
+import com.fubon.ecplatformapi.NoUse.captcha.CaptchaService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,14 +26,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class VerificationController {
     @Autowired
-    VerificationService verificationService;
+    CaptchaService captchaService;
     @Autowired
     CaptchaUtil captchaUtil;
     @Autowired
     AuthenticationService authenticationService;
 
 
-    @GetMapping("/GetVerificationImage")
+    //@GetMapping("/GetVerificationImage")
     public ResponseEntity<String> getCaptchaBase64(@RequestBody VerificationReq verificationReq,
                                                    HttpServletRequest request, HttpServletResponse response) {
 
@@ -46,7 +45,7 @@ public class VerificationController {
         String base64String = captchaUtil.generateCaptchaBase64();
         String token = "the function how to generate token";
 
-        String jsonResponse = verificationService.generateResponseJson(system, insureType, verificationTypes,token, base64String);
+        String jsonResponse = captchaService.generateResponseJson(system, insureType, verificationTypes,token, base64String);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -55,9 +54,9 @@ public class VerificationController {
 
     }
 
-    @PostMapping("/Login")
-    public FubonLoginResp login(@RequestBody LoginReq loginReq) {
-        authenticationService.login(loginReq);
+    //@PostMapping("/Login")
+    public FubonLoginResp login(@RequestBody FubonLoginReq request) {
+        authenticationService.login(request);
         return  null;
     }
 

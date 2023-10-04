@@ -22,4 +22,5 @@ public class VerificationReq {
                 private String insureType;
                 private String verificationTypes;
         }
+
 }

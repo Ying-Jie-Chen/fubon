@@ -8,7 +8,7 @@ import lombok.Data;
 public class FubonLoginReq {
 
     private Header Header;
-    private FBECAPPCERT1001 FBECAPPCERT1001RQ;
+    private FunctionCode FBECAPPCERT1001RQ;
 
     @Data
     @Builder
@@ -19,7 +19,7 @@ public class FubonLoginReq {
     }
     @Data
     @Builder
-    public static class FBECAPPCERT1001 {
+    public static class FunctionCode {
         private String returnPfx;
         private String identify;
         private String empNo;

@@ -13,7 +13,7 @@ public class ApiRespDTO<T> {
     private String code = "0000";
 
     @Builder.Default
-    private String message = "Success!!";
+    private String message = "Success";
 
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

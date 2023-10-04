@@ -1,17 +1,16 @@
-package com.fubon.ecplatformapi.captcha;
+package com.fubon.ecplatformapi.NoUse.captcha;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fubon.ecplatformapi.SessionService;
+import com.fubon.ecplatformapi.service.SessionService;
 import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
-import com.fubon.ecplatformapi.model.dto.resp.VerificationRes;
+import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.session.MapSession;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class VerificationService {
+public class CaptchaService {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -57,12 +56,9 @@ public class VerificationService {
                             .build())
                     .build();
 
-//            objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
-//            String jsonRequest = objectMapper.writeValueAsString(req);
-//            System.out.println(jsonRequest);
 
-            VerificationRes resp = VerificationRes.builder()
-                    .Header(VerificationRes.Header.builder()
+            VerificationResp resp = VerificationResp.builder()
+                    .Header(VerificationResp.Header.builder()
                             .MsgId("033ef14f-345e-42a9-9114-fbfdd562909f")
                             .FromSys("ECWS")
                             .ToSys(req.getHeader().getFromSys())
@@ -71,7 +67,7 @@ public class VerificationService {
                             .StatusCode("0000")
                             .StatusDesc("成功")
                             .build())
-                    .any(VerificationRes.Any.builder()
+                    .Any(VerificationResp.Any.builder()
                             .token(token)
                             .verificationImageBase64(base64String)
                             .build())

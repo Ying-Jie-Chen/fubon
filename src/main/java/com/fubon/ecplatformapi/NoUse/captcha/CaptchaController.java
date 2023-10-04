@@ -1,15 +1,11 @@
-package com.fubon.ecplatformapi;
+package com.fubon.ecplatformapi.NoUse.captcha;
 
+import com.fubon.ecplatformapi.LoginService;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
-import com.fubon.ecplatformapi.captcha.CaptchaUtil;
-import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
-import com.fubon.ecplatformapi.captcha.VerificationService;
-import com.fubon.ecplatformapi.model.entity.UserInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,20 +16,25 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/auth")
-public class AuthController {
+public class CaptchaController {
     @Autowired
     CaptchaUtil captchaUtil;
     @Autowired
     LoginService loginService;
 
-    // 取得登入頁面中的圖形驗證碼，還沒寫如何生成token!!
-    @GetMapping("/getVerificationImage")
+    /** 取得登入頁面中的圖形驗證碼
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+
+    //@GetMapping("/getVerificationImage")
     public ResponseEntity<ApiRespDTO<Map<String, Object>>>  getVerificationImage(HttpServletRequest request, HttpServletResponse response) {
         try {
                 response.setContentType("image/png");
                 String base64String = captchaUtil.generateCaptchaBase64();
-                String token = "token123456";
+                String token = "Get from Fubon API";
 
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("verificationImage", base64String);
@@ -48,14 +49,6 @@ public class AuthController {
             return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    // 在登入驗證時驗證使用者輸入的驗證碼
-    @PostMapping("/login")
-    public ResponseEntity<ApiRespDTO<Map<String, Object>>> login(@RequestBody LoginReq loginRequest) {
-        ApiRespDTO<Map<String, Object>> responseDto = loginService.authLogin(loginRequest);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
-    }
-
 
     private ApiRespDTO<Map<String, Object>> errorResponse() {
         return ApiRespDTO.<Map<String, Object>>builder()
