@@ -1,6 +1,6 @@
 package com.fubon.ecplatformapi.controller;
 
-import com.fubon.ecplatformapi.service.VerifyService;
+import com.fubon.ecplatformapi.service.CallFubonService;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
@@ -19,7 +19,7 @@ import java.util.Map;
 public class AuthController {
 
     @Autowired
-    private VerifyService verifyService;
+    private CallFubonService callFubonService;
 
     @PostMapping("/login")
     public ApiRespDTO<UserInfo> login(@RequestBody LoginReq loginRequest){
@@ -54,7 +54,7 @@ public class AuthController {
         String token = null;
 
         try {
-            VerificationResp verificationResp = verifyService.callFubonVerification().block();
+            VerificationResp verificationResp = callFubonService.FBECCOMSTA1032().block();
             imageBase64 = verificationResp.getAny().getVerificationImageBase64();
             token = verificationResp.getAny().getToken();
 
