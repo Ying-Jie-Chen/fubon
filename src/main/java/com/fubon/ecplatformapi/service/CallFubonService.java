@@ -13,18 +13,18 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 @Slf4j
 @Service
-public class VerifyService {
+public class CallFubonService {
     @Autowired
     private BuildRequest buildRequest;
     private static final String FUBON_API_URL = "http://localhost:8080";
 
     private WebClient webClient;
     @Autowired
-    public VerifyService(WebClient.Builder webClientBuilder) {
+    public CallFubonService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl(FUBON_API_URL).build();
     }
 
-    public Mono<VerificationResp> callFubonVerification() {
+    public Mono<VerificationResp> FBECCOMSTA1032() {
         log.info("建立 FubonAPI 的請求 #Start");
         //VerificationReq request = buildRequest.buildVerificationImageRequest();
 
@@ -36,7 +36,7 @@ public class VerifyService {
                 .bodyToMono(VerificationResp.class);
     }
 
-    public Mono<FubonLoginResp> callFubonLogin(LoginReq loginReq) {
+    public Mono<FubonLoginResp> FBECAPPCERT1001(LoginReq loginReq) {
         log.info("建立 FubonAPI 的請求 #Start");
         FubonLoginReq request = buildRequest.buildFubonLoginRequest(loginReq);
 
