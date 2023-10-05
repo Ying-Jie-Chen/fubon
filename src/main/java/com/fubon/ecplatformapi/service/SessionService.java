@@ -26,7 +26,6 @@ public class SessionService {
 
     /** 儲存登入者資訊
      *
-     * @param fubonLoginResp
      */
     public void saveSessionInfo(FubonLoginResp fubonLoginResp){
         log.info("儲存登入者資訊#Start");
@@ -60,7 +59,6 @@ public class SessionService {
     /**
      * 從會話中取得先前儲存的 Session Info
      *
-     * @return
      */
 
     public void getSessionInfo() {
@@ -111,7 +109,6 @@ public class SessionService {
     /**
      * 將驗證碼存儲在會話中
      *
-     * @param captcha
      */
     public void saveSession(String captcha) {
         log.info("將驗證碼存儲在會話中#Start");
@@ -128,7 +125,6 @@ public class SessionService {
     /**
      * 從會話中取得先前儲存的驗證碼
      *
-     * @return
      */
 
     public String getSession() {
