@@ -1,6 +1,8 @@
 package com.fubon.ecplatformapi.service;
 
 import com.fubon.ecplatformapi.model.config.SessionConfig;
+import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
+import com.fubon.ecplatformapi.model.entity.SessionInfo;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +11,10 @@ import org.springframework.session.MapSessionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 // ...
 @Slf4j
@@ -20,6 +25,67 @@ public class SessionService {
 
     private static final String SESSION_KEY = "captcha";
     private String SESSION_ID = UUID.randomUUID().toString();
+
+    /** 儲存登入者資訊
+     *
+     * @param sessionInfo
+     */
+    public void saveSessionInfo(SessionInfo sessionInfo){
+        log.info("儲存登入者資訊#Start");
+
+        MapSessionRepository repository = sessionConfig.sessionRepository();
+        MapSession mapSession = new MapSession(SESSION_ID);
+
+        mapSession.setAttribute("SessionManager", sessionInfo);
+        mapSession.setMaxInactiveInterval(Duration.ofMinutes(20));
+        repository.save(mapSession);
+
+    }
+
+    /**
+     * 從會話中取得先前儲存的 Session Info
+     *
+     * @return
+     */
+
+    public SessionInfo getSessionInfo() {
+        log.info("取得儲存在Session中的SessionInfo#Start");
+
+        MapSessionRepository repository = sessionConfig.sessionRepository();
+        MapSession storedInfo = repository.findById(SESSION_ID);
+
+        if (storedInfo != null) {
+            SessionInfo info = storedInfo.getAttribute("SessionManager");
+            return info;
+        } else {
+            return null;
+        }
+
+    }
+
+    public SessionInfo createSessionInfo(FubonLoginResp fubonLoginResp) {
+        UserInfo user = fubonLoginResp.getAny().getUserInfo();
+        List<UserInfo.XrefInfo> xrefInfoList = user.getXrefInfo();
+
+        List<SessionInfo.XrefInfo> sessionXrefInfoList = xrefInfoList.stream()
+                .map(xrefInfo -> SessionInfo.XrefInfo.builder()
+                        .xref(xrefInfo.getXref())
+                        .channel(xrefInfo.getChannel())
+                        .ascCrzSale(xrefInfo.getAscCrzSale())
+                        .admin(xrefInfo.getAdmin())
+                        .build())
+                .collect(Collectors.toList());
+
+        return SessionInfo.builder()
+                .identify(user.getIdentify())
+                .empNo(user.getAgent_id())
+                .empName(user.getAgent_name())
+                .fbid(user.getId())
+                .xrefInfos(sessionXrefInfoList)
+                .build();
+    }
+
+
 
     /**
      * 將驗證碼存儲在會話中
@@ -60,16 +126,5 @@ public class SessionService {
 
     }
 
-    // 儲存登入者資訊
-    public void saveUserInfo(UserInfo userInfo){
-        log.info("儲存登入者資訊#Start");
 
-        MapSessionRepository repository = sessionConfig.sessionRepository();
-        MapSession mapSession = new MapSession(SESSION_ID);
-
-        mapSession.setAttribute("UserInfoKey", userInfo);
-        mapSession.setMaxInactiveInterval(Duration.ofMinutes(20));
-        repository.save(mapSession);
-
-    }
 }

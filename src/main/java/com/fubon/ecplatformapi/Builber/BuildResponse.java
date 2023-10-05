@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fubon.ecplatformapi.model.dto.req.FubonLoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
+import com.fubon.ecplatformapi.model.entity.UserInfo;
+import com.fubon.ecplatformapi.service.SessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,9 +17,11 @@ public class BuildResponse {
 
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private SessionService sessionService;
 
     public VerificationResp buildVerificationImageResponse() {
-        log.info("建立 FubonAPI FBECCOMSTA1032 的回應 #Start");
+        log.info("建立 FubonAPI 取得圖形驗證的回應 #Start");
 
         VerificationResp response = VerificationResp.builder()
                 .Header(VerificationResp.Header.builder()
@@ -41,7 +45,9 @@ public class BuildResponse {
 
 
 
-    public FubonLoginResp buildLoginResponse() {
+    public FubonLoginResp buildLoginResponse(UserInfo userInfo) {
+        log.info("建立 FubonAPI 登入的回應 #Start");
+
         FubonLoginResp response = FubonLoginResp.builder()
                 .Header(FubonLoginResp.Header.builder()
                         .MsgId("7cdf926e-561a-43a7-bc52-ec947468fc66")
@@ -55,7 +61,7 @@ public class BuildResponse {
                 .Any(FubonLoginResp.Any.builder()
                         .staffValid(true)
                         .staffValidMsg("")
-                        //.userInfo()
+                        .userInfo(userInfo)
                         .build())
                 .build();
         printJSON(response);

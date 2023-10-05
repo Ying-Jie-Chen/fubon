@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fubon.ecplatformapi.model.dto.req.FubonLoginReq;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
+import com.fubon.ecplatformapi.model.entity.UserInfo;
+import com.fubon.ecplatformapi.service.SessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,8 +18,9 @@ public class BuildRequest {
     @Autowired
     private ObjectMapper objectMapper;
 
+
     public VerificationReq buildVerificationImageRequest() {
-        log.info("建立 FubonAPI FBECCOMSTA1032 的請求 #Start");
+        log.info("建立 FubonAPI 取得圖形驗證的請求 #Start");
 
         return  VerificationReq.builder()
                 .Header(VerificationReq.Header.builder()
@@ -32,8 +35,8 @@ public class BuildRequest {
                         .build())
                 .build();
     }
-    public FubonLoginReq buildFubonLoginRequest(LoginReq loginRequest) {
-        log.info("建立 FubonAPI FBECAPPCERT1001 的請求 #Start");
+    public FubonLoginReq buildFubonLoginRequest(LoginReq loginReq) {
+        log.info("建立 FubonAPI 登入的請求 #Start");
 
         FubonLoginReq req = FubonLoginReq.builder()
                 .Header(FubonLoginReq.Header.builder()
@@ -43,11 +46,11 @@ public class BuildRequest {
                         .build())
                 .FBECAPPCERT1001RQ(FubonLoginReq.FunctionCode.builder()
                         .returnPfx("0")
-                        .identify(loginRequest.getIdentify())
-                        .empNo(loginRequest.getAccount())
-                        .password(loginRequest.getPassword())
-                        .verificationCode(loginRequest.getVerificationCode())
-                        .token(loginRequest.getToken())
+                        .identify(loginReq.getIdentify())
+                        .empNo(loginReq.getAccount())
+                        .password(loginReq.getPassword())
+                        .verificationCode(loginReq.getVerificationCode())
+                        .token(loginReq.getToken())
                         .build())
                 .build();
 

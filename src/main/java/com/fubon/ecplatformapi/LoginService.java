@@ -66,13 +66,11 @@ public class LoginService {
                 //Mono<Boolean> authenticationResult = authenticateWithFubon(fubonLoginReq);
 
                 /* 根據 Fubon API 回應 responseData */
-                UserInfo responseData = mapFubonResponseToUserInfo(fubonResponse);
+
 
                 /* 判斷 isValid, 回傳狀態碼 */
 
-                return ApiRespDTO.<UserInfo>builder()
-                        .data(responseData)
-                        .build();
+                return null;
             }
         } catch (Exception e){
             log.error(e.getMessage());
@@ -94,32 +92,6 @@ public class LoginService {
                 .bodyToMono(FubonLoginResp.class);
     }
 
-
-    public UserInfo mapFubonResponseToUserInfo(FubonLoginResp fubonResponse) {
-        UserInfo userInfo = new UserInfo();
-
-        if (fubonResponse != null) {
-            FubonLoginResp.Header header = fubonResponse.getHeader();
-            if (header != null) {
-
-            }
-
-            FubonLoginResp.Any any = fubonResponse.getAny();
-            if (any != null) {
-                userInfo.setAgent_name(any.getUserInfo().getAgent_name());
-                userInfo.setAgent_id(any.getUserInfo().getAgent_id());
-                userInfo.setAdmin_num(any.getUserInfo().getAdmin_num());
-                userInfo.setIdentify(any.getUserInfo().getIdentify());
-                userInfo.setEmail(any.getUserInfo().getEmail());
-                userInfo.setUnionNum(any.getUserInfo().getUnionNum());
-                userInfo.setId(any.getUserInfo().getId());
-                userInfo.setSigned(any.getUserInfo().isSigned());
-                userInfo.setTested2(any.getUserInfo().isTested2());
-                userInfo.setXrefInfo(any.getUserInfo().getXrefInfo());
-            }
-        }
-        return userInfo;
-    }
 
 
 
