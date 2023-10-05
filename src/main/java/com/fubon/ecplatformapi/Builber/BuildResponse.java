@@ -3,7 +3,6 @@ package com.fubon.ecplatformapi.Builber;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fubon.ecplatformapi.model.dto.req.FubonLoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
@@ -44,7 +43,6 @@ public class BuildResponse {
     }
 
 
-
     public FubonLoginResp buildLoginResponse(UserInfo userInfo) {
         log.info("建立 FubonAPI 登入的回應 #Start");
 
@@ -67,6 +65,7 @@ public class BuildResponse {
         printJSON(response);
         return response;
     }
+
 
     public void printJSON(FubonLoginResp response){
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版

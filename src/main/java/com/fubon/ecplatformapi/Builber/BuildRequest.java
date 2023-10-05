@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fubon.ecplatformapi.model.dto.req.FubonLoginReq;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
-import com.fubon.ecplatformapi.model.entity.UserInfo;
-import com.fubon.ecplatformapi.service.SessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
