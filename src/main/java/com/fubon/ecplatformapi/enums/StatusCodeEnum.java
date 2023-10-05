@@ -20,14 +20,4 @@ public enum StatusCodeEnum {
         return Err10001;
     }
 
-//    SUCCESS("0000", "Succeed"),
-//    FAILED("1001", "Failed");
-//
-//    private final String code;
-//    private final String msg;
-//
-//    StatusCodeEnum(String code, String msg) {
-//        this.code = code;
-//        this.msg = msg;
-//    }
 }

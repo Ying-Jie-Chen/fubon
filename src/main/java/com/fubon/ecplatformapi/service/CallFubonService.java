@@ -25,10 +25,10 @@ public class CallFubonService {
     }
 
     public Mono<VerificationResp> FBECCOMSTA1032() {
-        log.info("建立 FubonAPI 的請求 #Start");
+        //log.info("建立 FubonAPI 的請求 #Start");
         //VerificationReq request = buildRequest.buildVerificationImageRequest();
 
-        log.info("取得Fubon API的回應結果#Start");
+        log.info("Fubon API /GetVerificationImage 的回應結果#Start");
         return webClient
                 .get()
                 .uri("/GetVerificationImage")
@@ -36,11 +36,11 @@ public class CallFubonService {
                 .bodyToMono(VerificationResp.class);
     }
 
-    public Mono<FubonLoginResp> FBECAPPCERT1001(LoginReq loginReq) {
+    public Mono<FubonLoginResp>     FBECAPPCERT1001(LoginReq loginReq) {
         log.info("建立 FubonAPI 的請求 #Start");
         FubonLoginReq request = buildRequest.buildFubonLoginRequest(loginReq);
 
-        log.info("取得Fubon API的回應結果#Start");
+        log.info("Fubon API /Login 的回應結果#Start");
         return webClient
                 .post()
                 .uri("/Login")

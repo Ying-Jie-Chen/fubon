@@ -2,7 +2,6 @@ package com.fubon.ecplatformapi.controller;
 
 import com.fubon.ecplatformapi.model.dto.VerificationImageDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
-import com.fubon.ecplatformapi.model.entity.SessionInfo;
 import com.fubon.ecplatformapi.service.CallFubonService;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
@@ -14,9 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -29,6 +25,24 @@ public class AuthController {
     @Autowired
     private SessionService sessionService;
 
+    @PostMapping("/logout")
+    public ApiRespDTO<String> logout(){
+        try {
+
+            //sessionService.getSessionInfo(); // 印出session中的值
+            sessionService.removeSession();
+
+            return ApiRespDTO.<String>builder()
+                    .build();
+        } catch (Exception e){
+            log.error(e.getMessage());
+            return  ApiRespDTO.<String>builder()
+                    .code(StatusCodeEnum.Err10001.name())
+                    .message(StatusCodeEnum.Err10001.getMessage())
+                    .build();
+        }
+    }
+
     @PostMapping("/login")
     public ApiRespDTO<UserInfo> login(@RequestBody LoginReq loginRequest){
 
@@ -36,9 +50,8 @@ public class AuthController {
             FubonLoginResp fubonLoginResp = callFubonService.FBECAPPCERT1001(loginRequest).block();
 
             assert fubonLoginResp != null;
-            SessionInfo sessionInfo = sessionService.createSessionInfo(fubonLoginResp);
-            sessionService.saveSessionInfo(sessionInfo);
-
+            sessionService.saveSessionInfo(fubonLoginResp);
+            //sessionService.getSessionInfo(); // 印出session中的值
             UserInfo responseData = fubonLoginResp.getAny().getUserInfo();
             return ApiRespDTO.<UserInfo>builder()
                     .data(responseData)
@@ -53,8 +66,6 @@ public class AuthController {
         }
     }
 
-
-
     @GetMapping("/getVerificationImage")
     public ApiRespDTO<VerificationImageDTO> getVerificationImage() {
         VerificationImageDTO verificationImageDTO = new VerificationImageDTO();
@@ -64,6 +75,7 @@ public class AuthController {
         try {
             VerificationResp verificationResp = callFubonService.FBECCOMSTA1032().block();
 
+            assert verificationResp != null;
             imageBase64 = verificationResp.getAny().getVerificationImageBase64();
             token = verificationResp.getAny().getToken();
 
