@@ -13,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @Slf4j
 @RestController
 @RequestMapping("/auth")
@@ -69,15 +67,13 @@ public class AuthController {
     @GetMapping("/getVerificationImage")
     public ApiRespDTO<VerificationImageDTO> getVerificationImage() {
         VerificationImageDTO verificationImageDTO = new VerificationImageDTO();
-        String imageBase64 = null;
-        String token = null;
 
         try {
             VerificationResp verificationResp = callFubonService.FBECCOMSTA1032().block();
 
             assert verificationResp != null;
-            imageBase64 = verificationResp.getAny().getVerificationImageBase64();
-            token = verificationResp.getAny().getToken();
+            String imageBase64 = verificationResp.getAny().getVerificationImageBase64();
+            String token = verificationResp.getAny().getToken();
 
             verificationImageDTO.setVerificationImage(imageBase64);
             verificationImageDTO.setToken(token);

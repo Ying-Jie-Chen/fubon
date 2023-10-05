@@ -16,8 +16,6 @@ public class BuildResponse {
 
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
-    private SessionService sessionService;
 
     public VerificationResp buildVerificationImageResponse() {
         log.info("建立 FubonAPI 取得圖形驗證的回應 #Start");
@@ -69,7 +67,7 @@ public class BuildResponse {
 
     public void printJSON(FubonLoginResp response){
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
-        String jsonRequest = null;
+        String jsonRequest;
         try {
             jsonRequest = objectMapper.writeValueAsString(response);
         } catch (JsonProcessingException e) {
@@ -80,7 +78,7 @@ public class BuildResponse {
 
     private void printJSON(VerificationResp response) {
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
-        String jsonRequest = null;
+        String jsonRequest;
         try {
             jsonRequest = objectMapper.writeValueAsString(response);
         } catch (JsonProcessingException e) {

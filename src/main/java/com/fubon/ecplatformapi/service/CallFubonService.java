@@ -18,7 +18,7 @@ public class CallFubonService {
     private BuildRequest buildRequest;
     private static final String FUBON_API_URL = "http://localhost:8080";
 
-    private WebClient webClient;
+    private final WebClient webClient;
     @Autowired
     public CallFubonService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl(FUBON_API_URL).build();
