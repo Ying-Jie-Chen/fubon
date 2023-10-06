@@ -42,7 +42,7 @@ public class PolicyController {
             }
 
             return ApiRespDTO.<QueryResultVO>builder()
-                    .data(resultData)
+                    //.data(resultData)
                     .build();
         } catch (Exception e) {
             log.error(e.getMessage());
