@@ -1,6 +1,6 @@
 package com.fubon.ecplatformapi.NoUse.captcha;
 
-import com.fubon.ecplatformapi.LoginService;
+import com.fubon.ecplatformapi.NoUse.LoginService;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import jakarta.servlet.http.HttpServletRequest;

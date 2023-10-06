@@ -1,8 +1,6 @@
 package com.fubon.ecplatformapi.NoUse;
 
 
-import com.fubon.ecplatformapi.model.dto.req.FubonLoginReq;
-import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.NoUse.captcha.CaptchaUtil;
 import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
 import com.fubon.ecplatformapi.NoUse.captcha.CaptchaService;
@@ -28,8 +26,6 @@ public class VerificationController {
     CaptchaService captchaService;
     @Autowired
     CaptchaUtil captchaUtil;
-    @Autowired
-    AuthenticationService authenticationService;
 
 
     //@GetMapping("/GetVerificationImage")
@@ -51,12 +47,6 @@ public class VerificationController {
 
         return new ResponseEntity<>(jsonResponse, headers, HttpStatus.OK);
 
-    }
-
-    //@PostMapping("/Login")
-    public FbLoginRespDTO login(@RequestBody FubonLoginReq request) {
-        authenticationService.login(request);
-        return  null;
     }
 
 }

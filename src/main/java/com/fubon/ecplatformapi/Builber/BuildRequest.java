@@ -3,12 +3,13 @@ package com.fubon.ecplatformapi.Builber;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fubon.ecplatformapi.model.dto.req.FubonLoginReq;
-import com.fubon.ecplatformapi.model.dto.req.LoginReq;
-import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
+import com.fubon.ecplatformapi.model.dto.req.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Calendar;
+
 @Slf4j
 @Service
 public class BuildRequest {
@@ -33,16 +34,16 @@ public class BuildRequest {
                         .build())
                 .build();
     }
-    public FubonLoginReq buildFubonLoginRequest(LoginReq loginReq) {
+    public FbLoginReq buildFubonLoginRequest(LoginReq loginReq) {
         log.info("建立 FubonAPI 登入的請求 #Start");
 
-        FubonLoginReq req = FubonLoginReq.builder()
-                .Header(FubonLoginReq.Header.builder()
+        FbLoginReq req = FbLoginReq.builder()
+                .Header(FbLoginReq.Header.builder()
                         .FromSys("B2A")
                         .SysPwd("*****PW8SGg=")
                         .FunctionCode("FBECAPPCERT1001")
                         .build())
-                .FBECAPPCERT1001RQ(FubonLoginReq.FunctionCode.builder()
+                .FBECAPPCERT1001RQ(FbLoginReq.FunctionCode.builder()
                         .returnPfx("0")
                         .identify(loginReq.getIdentify())
                         .empNo(loginReq.getAccount())
@@ -57,8 +58,33 @@ public class BuildRequest {
 
     }
 
+    public FbQueryReq buildFbQueryRequest(QueryReqDTO queryReq) {
+        log.info("建立 FubonAPI Query 的請求 #Start");
 
-    public void printJSON(FubonLoginReq request){
+        FbQueryReq req = FbQueryReq.builder()
+                .clsGrp(queryReq.getInsType())
+                .module("POL")
+                .seeFormatid(queryReq.getPolicyNum())
+                .rmaClinamel(queryReq.getInsurerName())
+                .rmaUidI(queryReq.getInsurerId())
+                .rmaClinameA(queryReq.getInsurerName())
+                .rmaUidA(queryReq.getManagerId())
+                .mohPlatno(queryReq.getPlate())
+                //.secTradeNo(queryReq.transNum)
+                .ascAdmin(null)
+                .ascIscXref(null)
+                .fbId(null)
+                .dataType("secEffdate")
+                .dateFr(queryReq.getEffectDateStart())
+                .dateTo(queryReq.getEffectDateEnd())
+                //.sourcePage()
+                .build();
+        return req;
+
+    }
+
+
+    public void printJSON(FbLoginReq request){
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
         String jsonRequest = null;
         try {
@@ -68,5 +94,6 @@ public class BuildRequest {
         }
         System.out.println(jsonRequest);
     }
+
 
 }

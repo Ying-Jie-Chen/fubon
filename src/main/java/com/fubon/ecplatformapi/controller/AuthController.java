@@ -1,6 +1,6 @@
 package com.fubon.ecplatformapi.controller;
 
-import com.fubon.ecplatformapi.model.dto.VerificationImageDTO;
+import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.service.CallFubonService;
@@ -87,8 +87,8 @@ public class AuthController {
     }
 
     @GetMapping("/getVerificationImage")
-    public ApiRespDTO<VerificationImageDTO> getVerificationImage() {
-        VerificationImageDTO verificationImageDTO = new VerificationImageDTO();
+    public ApiRespDTO<VerificationImageVO> getVerificationImage() {
+        VerificationImageVO VerificationImageVO = new VerificationImageVO();
 
         try {
             VerificationResp verificationResp = callFubonService.FBECCOMSTA1032().block();
@@ -97,16 +97,16 @@ public class AuthController {
             String imageBase64 = verificationResp.getAny().getVerificationImageBase64();
             String token = verificationResp.getAny().getToken();
 
-            verificationImageDTO.setVerificationImage(imageBase64);
-            verificationImageDTO.setToken(token);
+            VerificationImageVO.setVerificationImage(imageBase64);
+            VerificationImageVO.setToken(token);
 
-            return ApiRespDTO.<VerificationImageDTO>builder()
-                    .data(verificationImageDTO)
+            return ApiRespDTO.<VerificationImageVO>builder()
+                    .data(VerificationImageVO)
                     .build();
 
         } catch (Exception e) {
             log.error(e.getMessage());
-            return  ApiRespDTO.<VerificationImageDTO>builder()
+            return  ApiRespDTO.<VerificationImageVO>builder()
                     .code(StatusCodeEnum.Err10001.name())
                     .message(StatusCodeEnum.Err10001.getMessage())
                     .build();

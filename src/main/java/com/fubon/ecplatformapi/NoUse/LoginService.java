@@ -1,8 +1,8 @@
-package com.fubon.ecplatformapi;
+package com.fubon.ecplatformapi.NoUse;
 
 import com.fubon.ecplatformapi.Builber.BuildRequest;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
-import com.fubon.ecplatformapi.model.dto.req.FubonLoginReq;
+import com.fubon.ecplatformapi.model.dto.req.FbLoginReq;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.NoUse.captcha.CaptchaService;
@@ -80,14 +80,14 @@ public class LoginService {
 
     public Mono<FbLoginRespDTO> callFubonAPI(LoginReq loginReq) {
         log.info("建立 FubonAPI FBECAPPCERT1001 的請求 #Start");
-        FubonLoginReq fubonLoginReq = buildRequest.buildFubonLoginRequest(loginReq);
+        FbLoginReq fbLoginReq = buildRequest.buildFubonLoginRequest(loginReq);
 
         log.info("取得Fubon API的回應結果#Start");
 
         return webClient
                 .post()
                 .uri("/Login")
-                .body(BodyInserters.fromValue(fubonLoginReq))
+                .body(BodyInserters.fromValue(fbLoginReq))
                 .retrieve()
                 .bodyToMono(FbLoginRespDTO.class);
     }

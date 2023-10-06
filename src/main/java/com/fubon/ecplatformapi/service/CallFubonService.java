@@ -1,9 +1,12 @@
 package com.fubon.ecplatformapi.service;
 
 import com.fubon.ecplatformapi.Builber.BuildRequest;
-import com.fubon.ecplatformapi.model.dto.req.FubonLoginReq;
+import com.fubon.ecplatformapi.model.dto.req.FbLoginReq;
+import com.fubon.ecplatformapi.model.dto.req.FbQueryReq;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
+import com.fubon.ecplatformapi.model.dto.req.QueryReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.FbQueryResp;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
+import java.nio.channels.MembershipKey;
+
 @Slf4j
 @Service
 public class CallFubonService {
@@ -38,7 +44,7 @@ public class CallFubonService {
 
     public Mono<FbLoginRespDTO>     FBECAPPCERT1001(LoginReq loginReq) {
         log.info("建立 FubonAPI 的請求 #Start");
-        FubonLoginReq request = buildRequest.buildFubonLoginRequest(loginReq);
+        FbLoginReq request = buildRequest.buildFubonLoginRequest(loginReq);
 
         log.info("Fubon API /Login 的回應結果#Start");
         return webClient
@@ -50,4 +56,17 @@ public class CallFubonService {
     }
 
 
+    public Mono<FbQueryResp> queryResponse(QueryReqDTO queryReq) {
+        log.info("建立 FubonAPI 的請求 #Start");
+        FbQueryReq request = buildRequest.buildFbQueryRequest(queryReq);
+
+        log.info("Fubon API /QueryList 的回應結果#Start");
+        return webClient
+                .post()
+                .uri("/QueryList")
+                .body(BodyInserters.fromValue(request))
+                .retrieve()
+                .bodyToMono(FbQueryResp.class);
+
+    }
 }
