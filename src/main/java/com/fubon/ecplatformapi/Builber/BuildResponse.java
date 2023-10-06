@@ -3,7 +3,7 @@ package com.fubon.ecplatformapi.Builber;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
+import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -40,11 +40,11 @@ public class BuildResponse {
     }
 
 
-    public FubonLoginResp buildLoginResponse(UserInfo userInfo) {
+    public FbLoginRespDTO buildLoginResponse(UserInfo userInfo) {
         log.info("建立 FubonAPI 登入的回應 #Start");
 
-        FubonLoginResp response = FubonLoginResp.builder()
-                .Header(FubonLoginResp.Header.builder()
+        FbLoginRespDTO response = FbLoginRespDTO.builder()
+                .Header(FbLoginRespDTO.Header.builder()
                         .MsgId("7cdf926e-561a-43a7-bc52-ec947468fc66")
                         .FromSys("ECWS")
                         .ToSys("B2A")
@@ -53,7 +53,7 @@ public class BuildResponse {
                         .StatusCode("0000")
                         .StatusDesc("成功")
                         .build())
-                .Any(FubonLoginResp.Any.builder()
+                .Any(FbLoginRespDTO.Any.builder()
                         .staffValid(true)
                         .staffValidMsg("")
                         .userInfo(userInfo)
@@ -64,7 +64,7 @@ public class BuildResponse {
     }
 
 
-    public void printJSON(FubonLoginResp response){
+    public void printJSON(FbLoginRespDTO response){
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
         String jsonRequest;
         try {

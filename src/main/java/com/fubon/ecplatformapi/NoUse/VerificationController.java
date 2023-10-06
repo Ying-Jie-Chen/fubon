@@ -1,9 +1,8 @@
 package com.fubon.ecplatformapi.NoUse;
 
 
-import com.fubon.ecplatformapi.NoUse.AuthenticationService;
 import com.fubon.ecplatformapi.model.dto.req.FubonLoginReq;
-import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
+import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.NoUse.captcha.CaptchaUtil;
 import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
 import com.fubon.ecplatformapi.NoUse.captcha.CaptchaService;
@@ -55,7 +54,7 @@ public class VerificationController {
     }
 
     //@PostMapping("/Login")
-    public FubonLoginResp login(@RequestBody FubonLoginReq request) {
+    public FbLoginRespDTO login(@RequestBody FubonLoginReq request) {
         authenticationService.login(request);
         return  null;
     }

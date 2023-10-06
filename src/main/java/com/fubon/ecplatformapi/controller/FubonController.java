@@ -1,7 +1,7 @@
 package com.fubon.ecplatformapi.controller;
 
 import com.fubon.ecplatformapi.Builber.BuildResponse;
-import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
+import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +23,13 @@ public class FubonController {
     }
 
     @PostMapping("/Login")
-    public FubonLoginResp Login() {
+    public FbLoginRespDTO Login() {
 
         return buildResponse.buildLoginResponse(createUserInfo());
     }
 
     @PostMapping("/Logout")
-    public FubonLoginResp Logout() {
+    public FbLoginRespDTO Logout() {
 
         return buildResponse.buildLoginResponse(createUserInfo());
     }

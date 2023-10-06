@@ -2,7 +2,7 @@ package com.fubon.ecplatformapi.service;
 
 import com.fubon.ecplatformapi.enums.SessionManager;
 import com.fubon.ecplatformapi.model.config.SessionConfig;
-import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
+import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +27,13 @@ public class SessionService {
     /** 儲存登入者資訊
      *
      */
-    public void saveSessionInfo(FubonLoginResp fubonLoginResp){
+    public void saveSessionInfo(FbLoginRespDTO fbLoginRespDTO){
         log.info("儲存登入者資訊#Start");
 
         MapSessionRepository repository = sessionConfig.sessionRepository();
         MapSession mapSession = new MapSession(SESSION_ID);
 
-        UserInfo user = fubonLoginResp.getAny().getUserInfo();
+        UserInfo user = fbLoginRespDTO.getAny().getUserInfo();
         SessionManager.setAttribute(mapSession, SessionManager.IDENTITY, user.getIdentify());
         SessionManager.setAttribute(mapSession, SessionManager.EMP_NO, user.getAgent_id());
         SessionManager.setAttribute(mapSession, SessionManager.EMP_NAME, user.getAgent_name());
@@ -61,7 +61,7 @@ public class SessionService {
      *
      */
 
-    public void getSessionInfo() {
+    public UserInfo getSessionInfo() {
         log.info("取得儲存在Session中的Value#Start");
 
         MapSessionRepository repository = sessionConfig.sessionRepository();
@@ -73,8 +73,11 @@ public class SessionService {
             SessionManager.getAttribute(storedInfo, SessionManager.EMP_NAME);
             SessionManager.getAttribute(storedInfo, SessionManager.FBID);
             List<UserInfo.XrefInfo> xrefInfos = SessionManager.getXrefInfoAttribute(storedInfo);
+
+            printSession(storedInfo);
         }
-        printSession(storedInfo);
+            //user.setXrefInfo(xrefInfos);
+            return null;
     }
 
     public void printSession(Session session) {

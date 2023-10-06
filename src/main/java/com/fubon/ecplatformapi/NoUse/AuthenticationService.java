@@ -1,27 +1,15 @@
 package com.fubon.ecplatformapi.NoUse;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.FubonLoginReq;
-import com.fubon.ecplatformapi.model.dto.req.LoginReq;
-import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
+import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 @Slf4j
 @Service
 public class AuthenticationService {
 
-    public FubonLoginResp login(FubonLoginReq fubonLoginReq) {
+    public FbLoginRespDTO login(FubonLoginReq fubonLoginReq) {
         log.info("Into Fubon Service");
 
         /* 取得 LoginReq 並帶入 FubonReq */

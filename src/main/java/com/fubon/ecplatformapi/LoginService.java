@@ -6,7 +6,7 @@ import com.fubon.ecplatformapi.model.dto.req.FubonLoginReq;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.NoUse.captcha.CaptchaService;
-import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
+import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ public class LoginService {
                 log.info("圖形驗證碼驗證成功");
 
                 /* 呼叫 POST http://localhost:8080/Login 取得 Fubon API 的回應結果 */
-                FubonLoginResp fubonResponse = callFubonAPI(loginReq).block();
+                FbLoginRespDTO fubonResponse = callFubonAPI(loginReq).block();
 
                 // 使用 Mono 的 cache 操作符來確保只呼叫一次外部 API
                 //Mono<Boolean> authenticationResult = authenticateWithFubon(fubonLoginReq);
@@ -78,7 +78,7 @@ public class LoginService {
         }
     }
 
-    public Mono<FubonLoginResp> callFubonAPI(LoginReq loginReq) {
+    public Mono<FbLoginRespDTO> callFubonAPI(LoginReq loginReq) {
         log.info("建立 FubonAPI FBECAPPCERT1001 的請求 #Start");
         FubonLoginReq fubonLoginReq = buildRequest.buildFubonLoginRequest(loginReq);
 
@@ -89,7 +89,7 @@ public class LoginService {
                 .uri("/Login")
                 .body(BodyInserters.fromValue(fubonLoginReq))
                 .retrieve()
-                .bodyToMono(FubonLoginResp.class);
+                .bodyToMono(FbLoginRespDTO.class);
     }
 
 

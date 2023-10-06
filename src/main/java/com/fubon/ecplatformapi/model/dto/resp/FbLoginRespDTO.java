@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Builder
 @Data
-public class FubonLoginResp {
+public class FbLoginRespDTO {
 
     private Header Header;
     private Any Any;

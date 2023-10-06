@@ -3,7 +3,7 @@ package com.fubon.ecplatformapi.service;
 import com.fubon.ecplatformapi.Builber.BuildRequest;
 import com.fubon.ecplatformapi.model.dto.req.FubonLoginReq;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
-import com.fubon.ecplatformapi.model.dto.resp.FubonLoginResp;
+import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class CallFubonService {
                 .bodyToMono(VerificationResp.class);
     }
 
-    public Mono<FubonLoginResp>     FBECAPPCERT1001(LoginReq loginReq) {
+    public Mono<FbLoginRespDTO>     FBECAPPCERT1001(LoginReq loginReq) {
         log.info("建立 FubonAPI 的請求 #Start");
         FubonLoginReq request = buildRequest.buildFubonLoginRequest(loginReq);
 
@@ -46,7 +46,7 @@ public class CallFubonService {
                 .uri("/Login")
                 .body(BodyInserters.fromValue(request))
                 .retrieve()
-                .bodyToMono(FubonLoginResp.class);
+                .bodyToMono(FbLoginRespDTO.class);
     }
 
 
