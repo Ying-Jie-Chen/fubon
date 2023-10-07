@@ -1,7 +1,7 @@
 package com.fubon.ecplatformapi.service;
 
-import com.fubon.ecplatformapi.repository.CompanyRepository;
-import com.fubon.ecplatformapi.repository.LicenseInfoRepository;
+//import com.fubon.ecplatformapi.repository.CompanyRepository;
+//import com.fubon.ecplatformapi.repository.LicenseInfoRepository;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import com.fubon.ecplatformapi.model.entity.CompanyInfo;
 import com.fubon.ecplatformapi.model.entity.LicenseInfo;
@@ -24,10 +24,10 @@ import java.util.List;
 @Service
 public class SsoService {
 
-    @Autowired
-    LicenseInfoRepository licenseInfoRepository;
-    @Autowired
-    CompanyRepository companyRepository;
+//    @Autowired
+//    LicenseInfoRepository licenseInfoRepository;
+//    @Autowired
+//    CompanyRepository companyRepository;
 
     public Object perfornSsoLogin(SsoReqDTO sspReq) {
         String webServiceAcc;
@@ -56,18 +56,18 @@ public class SsoService {
             log.info("web service response: " + webserviceResp);
 
             log.info("檢核是否有考過保險證照 #Start");
-            List<LicenseInfo> licenseInfoList = licenseInfoRepository.findByLicenseIdAndCodeFlagNotIn(userId, Arrays.asList("C", "D", "S"));
+            //List<LicenseInfo> licenseInfoList = licenseInfoRepository.findByLicenseIdAndCodeFlagNotIn(userId, Arrays.asList("C", "D", "S"));
 
-            if (licenseInfoList.isEmpty()) {
-                log.error("用户 " + userId + " 未考取富邦產險保險證照");
-                throw new RuntimeException("此ID[" + userId + "]尚未登錄富邦產險");
-            }
+//            if (licenseInfoList.isEmpty()) {
+//                log.error("用户 " + userId + " 未考取富邦產險保險證照");
+//                throw new RuntimeException("此ID[" + userId + "]尚未登錄富邦產險");
+//            }
 
-            log.info("檢核產險公司別是否開跨售ID #Start");
-            if (!checkCrossSellingEligibility(unitCode)) {
-                log.error("產險EC公司別[" + unitCode + "]尚未開檔跨售ID[" + userId + "]，請洽產險窗口或電子商務部！");
-                throw new RuntimeException("產險EC公司別[" + unitCode + "]尚未開檔跨售ID[" + userId + "]，請洽產險窗口或電子商務部！");
-            }
+//            log.info("檢核產險公司別是否開跨售ID #Start");
+//            if (!checkCrossSellingEligibility(unitCode)) {
+//                log.error("產險EC公司別[" + unitCode + "]尚未開檔跨售ID[" + userId + "]，請洽產險窗口或電子商務部！");
+//                throw new RuntimeException("產險EC公司別[" + unitCode + "]尚未開檔跨售ID[" + userId + "]，請洽產險窗口或電子商務部！");
+//            }
 
 
 //            UserInfo user = sessionService.getSession();
@@ -126,8 +126,8 @@ public class SsoService {
         return jsonRequest;
     }
 
-    private boolean checkCrossSellingEligibility(String companyCode) {
-        CompanyInfo companyInfo = companyRepository.findById(companyCode).orElse(null);
-        return companyInfo != null && "B".equals(companyInfo.getCompanyType());
-    }
+//    private boolean checkCrossSellingEligibility(String companyCode) {
+//        CompanyInfo companyInfo = companyRepository.findById(companyCode).orElse(null);
+//        return companyInfo != null && "B".equals(companyInfo.getCompanyType());
+//    }
 }

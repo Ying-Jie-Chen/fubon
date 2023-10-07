@@ -86,7 +86,19 @@ public class BuildResponse {
                                 .build()
                 ))
                 .build();
+        printJSON(response);
         return response;
+    }
+
+    private void printJSON(FbQueryResp response) {
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
+        String jsonRequest;
+        try {
+            jsonRequest = objectMapper.writeValueAsString(response);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println(jsonRequest);
     }
 
 

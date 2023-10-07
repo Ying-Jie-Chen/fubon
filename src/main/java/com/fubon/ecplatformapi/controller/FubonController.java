@@ -18,7 +18,7 @@ public class FubonController {
     @Autowired
     private BuildResponse buildResponse;
 
-    @PostMapping("/QueryList")
+    @GetMapping("/QueryList")
     public FbQueryResp QueryList() {
 
         return buildResponse.buildQueryResponse();

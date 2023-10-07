@@ -62,9 +62,9 @@ public class CallFubonService {
 
         log.info("Fubon API /QueryList 的回應結果#Start");
         return webClient
-                .post()
+                .get()
                 .uri("/QueryList")
-                .body(BodyInserters.fromValue(request))
+                //.body(BodyInserters.fromValue(request))
                 .retrieve()
                 .bodyToMono(FbQueryResp.class);
 

@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -23,26 +24,44 @@ public class PolicyController {
     CallFubonService callFubonService;
 
     @GetMapping("/queryPolicyList")
-    public ApiRespDTO<QueryResultVO> queryPolicy(@RequestBody QueryReqDTO queryReq){
+    public ApiRespDTO<QueryResultVO> queryPolicy(
+            @RequestParam("insType") String insType,
+            @RequestParam("queryType") Integer queryType,
+            @RequestParam("insurerName") String insurerName,
+            @RequestParam("insurerId") String insurerId,
+            @RequestParam("effectDateStart") Date effectDateStart,
+            @RequestParam("effectDateEnd") Date effectDateEnd,
+            @RequestParam("managerId") String managerId,
+            @RequestParam("policyNum") String policyNum) {
 
         try {
-            FbQueryResp fbQueryResp = callFubonService.queryResponse(queryReq).block();
+            QueryReqDTO queryReqDTO = new QueryReqDTO();
+            queryReqDTO.setPolicyNum(insType);
+            queryReqDTO.setQueryType(queryType);
+            queryReqDTO.setInsurerName(insurerName);
+            queryReqDTO.setInsurerId(insurerId);
+            queryReqDTO.setEffectDateStart(effectDateStart);
+            queryReqDTO.setEffectDateEnd(effectDateEnd);
+            queryReqDTO.setManagerId(managerId);
+            queryReqDTO.setPolicyNum(policyNum);
+
+            FbQueryResp fbQueryResp = callFubonService.queryResponse(queryReqDTO).block();
+
+            assert fbQueryResp != null;
             List<FbQueryResp.PolicyResult> policyResults = fbQueryResp.getPolicyResults();
-            List<QueryResultVO> resultData = new ArrayList<>();
+            QueryResultVO resultData = new QueryResultVO();
 
             for (FbQueryResp.PolicyResult policyResult : policyResults) {
-                QueryResultVO queryResultVO = new QueryResultVO();
-                queryResultVO.setInsType(policyResult.getClsGrp());
-                queryResultVO.setPolicyNum(policyResult.getPolFormatid());
-                queryResultVO.setPremiums(policyResult.getUnPaidPrm());
-                queryResultVO.setInsuredName(policyResult.getRmaClinameI());
-                queryResultVO.setPlate(policyResult.getMohPlatno());
 
-                resultData.add(queryResultVO);
+                resultData.setInsType(policyResult.getClsGrp());
+                resultData.setPolicyNum(policyResult.getPolFormatid());
+                resultData.setPremiums(policyResult.getUnPaidPrm());
+                resultData.setInsuredName(policyResult.getRmaClinameI());
+                resultData.setPlate(policyResult.getMohPlatno());
             }
 
             return ApiRespDTO.<QueryResultVO>builder()
-                    //.data(resultData)
+                    .data(resultData)
                     .build();
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -51,6 +70,6 @@ public class PolicyController {
                     .message(StatusCodeEnum.Err10001.getMessage())
                     .build();
         }
-
     }
+
 }

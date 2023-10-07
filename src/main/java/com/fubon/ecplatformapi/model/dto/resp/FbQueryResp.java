@@ -1,5 +1,6 @@
 package com.fubon.ecplatformapi.model.dto.resp;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Data
 @Builder
+@JsonDeserialize
 public class FbQueryResp {
     private List<PolicyResult> policyResults;
 
