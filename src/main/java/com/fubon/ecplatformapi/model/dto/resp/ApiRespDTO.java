@@ -1,9 +1,12 @@
 package com.fubon.ecplatformapi.model.dto.resp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Builder(builderMethodName = "innerBuilder")
@@ -25,4 +28,5 @@ public class ApiRespDTO<T> {
     public static <T> ApiRespDTOBuilder<T> builder(StatusCodeEnum statusCode, String message) {
         return (ApiRespDTOBuilder<T>) innerBuilder().code(statusCode.name()).message(message);
     }
+
 }

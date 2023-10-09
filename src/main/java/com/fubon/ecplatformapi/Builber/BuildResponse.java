@@ -11,8 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 
 @Slf4j
 @Service
@@ -68,10 +71,11 @@ public class BuildResponse {
         return response;
     }
 
-    public FbQueryResp buildQueryResponse() {
+    public FbQueryResp buildQueryResponse(){
         log.info("建立 FubonAPI Query的回應 #Start");
+
         FbQueryResp response = FbQueryResp.builder()
-                .policyResults(Arrays.asList(
+                .policyResults(Collections.singletonList(
                         FbQueryResp.PolicyResult.builder()
                                 .clsGrp("險種1")
                                 .module("模組1")
