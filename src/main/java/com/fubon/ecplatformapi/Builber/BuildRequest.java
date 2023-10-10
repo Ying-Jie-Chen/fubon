@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
 
 @Slf4j
 @Service
@@ -54,31 +53,6 @@ public class BuildRequest {
                 .build();
 
         printJSON(req);
-        return req;
-
-    }
-
-    public FbQueryReq buildFbQueryRequest(QueryReqDTO queryReq) {
-        log.info("建立 FubonAPI Query 的請求 #Start");
-
-        FbQueryReq req = FbQueryReq.builder()
-                .clsGrp(queryReq.getInsType())
-                .module("POL")
-                .seeFormatid(queryReq.getPolicyNum())
-                .rmaClinamel(queryReq.getInsurerName())
-                .rmaUidI(queryReq.getInsurerId())
-                .rmaClinameA(queryReq.getInsurerName())
-                .rmaUidA(queryReq.getManagerId())
-                .mohPlatno(queryReq.getPlate())
-                //.secTradeNo(queryReq.transNum)
-                .ascAdmin(null)
-                .ascIscXref(null)
-                .fbId(null)
-                .dataType("secEffdate")
-                .dateFr(queryReq.getEffectDateStart())
-                .dateTo(queryReq.getEffectDateEnd())
-                //.sourcePage()
-                .build();
         return req;
 
     }

@@ -2,7 +2,6 @@ package com.fubon.ecplatformapi.service;
 
 import com.fubon.ecplatformapi.Builber.BuildRequest;
 import com.fubon.ecplatformapi.model.dto.req.FbLoginReq;
-import com.fubon.ecplatformapi.model.dto.req.FbQueryReq;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.req.QueryReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
@@ -15,7 +14,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.nio.channels.MembershipKey;
 
 @Slf4j
 @Service
@@ -42,7 +40,7 @@ public class CallFubonService {
                 .bodyToMono(VerificationResp.class);
     }
 
-    public Mono<FbLoginRespDTO>     FBECAPPCERT1001(LoginReq loginReq) {
+    public Mono<FbLoginRespDTO> FBECAPPCERT1001(LoginReq loginReq) {
         log.info("建立 FubonAPI 的請求 #Start");
         FbLoginReq request = buildRequest.buildFubonLoginRequest(loginReq);
 
@@ -58,13 +56,11 @@ public class CallFubonService {
 
     public Mono<FbQueryResp> queryResponse(QueryReqDTO queryReq) {
         log.info("建立 FubonAPI 的請求 #Start");
-        FbQueryReq request = buildRequest.buildFbQueryRequest(queryReq);
 
         log.info("Fubon API /QueryList 的回應結果#Start");
         return webClient
                 .get()
                 .uri("/QueryList")
-                //.body(BodyInserters.fromValue(request))
                 .retrieve()
                 .bodyToMono(FbQueryResp.class);
 
