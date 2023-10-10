@@ -11,11 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
+import java.time.Instant;
 import java.util.Collections;
+import java.util.Date;
 
 @Slf4j
 @Service
@@ -83,8 +81,8 @@ public class BuildResponse {
                                 .rmaClinameI("被保險人姓名1")
                                 .rmaUidI("被保險人身份證1")
                                 .mohPlatno("車牌1")
-                                .secEffdate(Calendar.getInstance())
-                                .secExpdate(Calendar.getInstance())
+                                .secEffdate(Date.from(Instant.now()))
+                                .secExpdate(Date.from(Instant.now()))
                                 .ascIscXref("經辦代號1")
                                 .unPaidPrm(1000)
                                 .build()
