@@ -22,7 +22,7 @@ public class FubonController {
     @GetMapping("/QueryList")
     public FbQueryResp QueryList() {
 
-        return buildResponse.buildQueryResponse();
+        return buildResponse.buildListResponse();
 
     }
 

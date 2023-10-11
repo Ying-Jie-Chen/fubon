@@ -69,7 +69,7 @@ public class BuildResponse {
         return response;
     }
 
-    public FbQueryResp buildQueryResponse(){
+    public FbQueryResp buildListResponse(){
         log.info("建立 FubonAPI Query的回應 #Start");
 
         FbQueryResp response = FbQueryResp.builder()

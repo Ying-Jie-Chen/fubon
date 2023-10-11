@@ -3,9 +3,7 @@ package com.fubon.ecplatformapi.service;
 import com.fubon.ecplatformapi.Builber.BuildRequest;
 import com.fubon.ecplatformapi.model.dto.req.FbLoginReq;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
-import com.fubon.ecplatformapi.model.dto.req.QueryReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.FbQueryResp;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +27,6 @@ public class CallFubonService {
     }
 
     public Mono<VerificationResp> FBECCOMSTA1032() {
-        //log.info("建立 FubonAPI 的請求 #Start");
-        //VerificationReq request = buildRequest.buildVerificationImageRequest();
-
         log.info("Fubon API /GetVerificationImage 的回應結果#Start");
         return webClient
                 .get()
@@ -54,15 +49,4 @@ public class CallFubonService {
     }
 
 
-    public Mono<FbQueryResp> queryResponse(QueryReqDTO queryReq) {
-        log.info("建立 FubonAPI 的請求 #Start");
-
-        log.info("Fubon API /QueryList 的回應結果#Start");
-        return webClient
-                .get()
-                .uri("/QueryList")
-                .retrieve()
-                .bodyToMono(FbQueryResp.class);
-
-    }
 }
