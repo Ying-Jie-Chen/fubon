@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @Builder
 public class FbQueryResp {
+
     private List<PolicyResult> policyResults;
 
     @Data

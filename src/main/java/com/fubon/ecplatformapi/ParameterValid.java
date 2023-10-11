@@ -13,4 +13,5 @@ public @interface ParameterValid {
     Class<? extends Payload>[] payload() default {};
 
     String[] values() default {};
+    int length();
 }

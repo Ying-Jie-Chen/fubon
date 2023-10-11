@@ -17,7 +17,7 @@ import java.util.Date;
 @Setter
 public class QueryReqDTO implements Serializable {
 
-    @ParameterValid(values = {"MOT", "CQCCX", "CHCRX", "CTX", "CGX", "FIR", "ENG", "MGO", "CAS"})
+    //@ParameterValid(values = {"MOT", "CQCCX", "CHCRX", "CTX", "CGX", "FIR", "ENG", "MGO", "CAS"})
     private String insType;
     private String plate;
     private Integer queryType;

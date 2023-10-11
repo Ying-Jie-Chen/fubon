@@ -5,10 +5,12 @@ import javax.validation.ConstraintValidatorContext;
 public class ParameterValidator implements ConstraintValidator<ParameterValid, String> {
     //private static Set<String> set = new HashSet<>();
     private String[] allowedValues;
+    private int length;
     @Override
     public void initialize(ParameterValid constraintAnnotation) {
         //set.addAll(Arrays.asList(constraintAnnotation.values()));
         allowedValues = constraintAnnotation.values();
+        this.length = constraintAnnotation.length();
     }
 
     @Override
@@ -17,11 +19,12 @@ public class ParameterValidator implements ConstraintValidator<ParameterValid, S
         if (value == null) {
             return false;
         }
-        for (String allowedValue : allowedValues) {
-            if (allowedValue.equals(value)) {
-                return true;
-            }
-        }
+        return value.length() == this.length;
+//        for (String allowedValue : allowedValues) {
+//            if (allowedValue.equals(value)) {
+//                return true;
+//            }
+//        }
 //
 //        String insType = request.getInsType();
 //        boolean isValidInsType = Arrays.asList("MOT", "CQCCX", "CHCRX", "CTX", "CGX", "FIR", "ENG", "MGO", "CAS").contains(insType);
@@ -44,7 +47,7 @@ public class ParameterValidator implements ConstraintValidator<ParameterValid, S
 //            return false;
 //        }
 //
-        return false;
+        //return false;
     }
 
     private void addErrorMessage(ConstraintValidatorContext context, String message) {

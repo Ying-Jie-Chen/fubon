@@ -1,10 +1,9 @@
 package com.fubon.ecplatformapi.service;
 
-import com.fubon.ecplatformapi.Builber.BuildResponse;
 import com.fubon.ecplatformapi.PolicyResultMapper;
 import com.fubon.ecplatformapi.model.dto.resp.FbQueryResp;
-import com.fubon.ecplatformapi.model.dto.vo.QueryResultVO;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fubon.ecplatformapi.model.dto.vo.DetailResultVO;
+import com.fubon.ecplatformapi.model.dto.vo.ListResultVO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,11 +13,16 @@ import java.util.stream.Collectors;
 public class PolicyService {
 
 
-    public List<QueryResultVO> getPolicyList(FbQueryResp fbQueryResp) {
+    public List<ListResultVO> getPolicyList(FbQueryResp fbQueryResp) {
 
         List<FbQueryResp.PolicyResult> policyResults = fbQueryResp.getPolicyResults();
         return policyResults.stream()
-                .map(PolicyResultMapper::mapToQueryResult)
+                .map(PolicyResultMapper::mapToListResult)
                 .collect(Collectors.toList());
+    }
+
+    public List<DetailResultVO> getPolicyDetail(String insType, String policyNum) {
+
+        return null;
     }
 }
