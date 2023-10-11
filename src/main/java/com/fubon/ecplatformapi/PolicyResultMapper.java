@@ -1,5 +1,6 @@
 package com.fubon.ecplatformapi;
 
+import com.fubon.ecplatformapi.model.dto.req.QueryReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbQueryResp;
 import com.fubon.ecplatformapi.model.dto.vo.QueryResultVO;
 
@@ -15,4 +16,5 @@ public class PolicyResultMapper {
                     policyResult.getSecEffdate(),
                     policyResult.getSecExpdate());
     }
+
 }

@@ -12,13 +12,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class PolicyService {
-    @Autowired
-    private BuildResponse buildResponse;
 
 
-    public List<QueryResultVO> getPolicyList() {
-
-        FbQueryResp fbQueryResp = buildResponse.buildQueryResponse();
+    public List<QueryResultVO> getPolicyList(FbQueryResp fbQueryResp) {
 
         List<FbQueryResp.PolicyResult> policyResults = fbQueryResp.getPolicyResults();
         return policyResults.stream()
