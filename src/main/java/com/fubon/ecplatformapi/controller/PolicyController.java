@@ -1,29 +1,30 @@
 package com.fubon.ecplatformapi.controller;
 
 import com.fubon.ecplatformapi.Builber.BuildResponse;
-import com.fubon.ecplatformapi.ParameterValid;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.QueryReqDTO;
-import com.fubon.ecplatformapi.model.dto.resp.FbQueryResp;
-import com.fubon.ecplatformapi.model.dto.vo.DetailResultVO;
-import com.fubon.ecplatformapi.model.dto.vo.ListResultVO;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.DetailResultDTO;
+import com.fubon.ecplatformapi.model.dto.resp.FbQueryResp;
+import com.fubon.ecplatformapi.model.dto.vo.CreateDetailResultVO;
+import com.fubon.ecplatformapi.model.dto.vo.QueryResultVO;
+import com.fubon.ecplatformapi.model.entity.QueryReq;
 import com.fubon.ecplatformapi.service.CallFubonService;
 import com.fubon.ecplatformapi.service.PolicyService;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.Max;
-import java.util.Date;
 import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/policy")
 public class PolicyController {
+    @Autowired
+    private ModelMapper modelMapper;
     @Autowired
     private BuildResponse buildResponse;
     @Autowired
@@ -33,23 +34,24 @@ public class PolicyController {
 
     @GetMapping("/queryPolicyList")
     @Validated
-    public ApiRespDTO<List<ListResultVO>> queryList(@RequestParam String insType, @RequestParam(required = false) String plate,
-            @RequestParam(required = true) Integer queryType, @RequestParam String insurerName, @RequestParam String insurerId,
-            @RequestParam Date effectDateStart, @RequestParam Date effectDateEnd, @RequestParam String managerId, @RequestParam String policyNum) {
+    public ApiRespDTO<List<QueryResultVO>> queryList(@RequestBody QueryReqDTO req) {
         try {
+            //QueryReq queryReq = policyService.createQueryReq(convertToEntity(req));
+            //QueryResultVO resultVO = new QueryResultVO();
+            //resultVO.setQueryReq(queryReq);
 
             log.info("Fubon API /QueryList 的回應結果#Start");
             FbQueryResp fbQueryResp = buildResponse.buildListResponse();
 
-            List<ListResultVO> queryResult = policyService.getPolicyList(fbQueryResp);
+            List<QueryResultVO> queryResult = policyService.getPolicyList(fbQueryResp);
 
-            return ApiRespDTO.<List<ListResultVO>>builder()
+            return ApiRespDTO.<List<QueryResultVO>>builder()
                     .data(queryResult)
                     .build();
 
         } catch (Exception e) {
             log.error(e.toString());
-            return ApiRespDTO.<List<ListResultVO>>builder()
+            return ApiRespDTO.<List<QueryResultVO>>builder()
                     .code(StatusCodeEnum.Err10001.name())
                     .message(StatusCodeEnum.Err10001.getMessage())
                     .build();
@@ -57,24 +59,30 @@ public class PolicyController {
     }
 
     @GetMapping("/queryPolicyDetail")
-    public ApiRespDTO<List<DetailResultVO>> queryDetail(@RequestParam @Max(5) String insType,
-                                                        @RequestParam @Max(14) String policyNum)
+    public ApiRespDTO<CreateDetailResultVO> queryDetail(@RequestParam String insType,
+                                                        @RequestParam String policyNum)
     {
         try {
             //FbQueryResp fbQueryResp = buildResponse.buildDetailResponse();
-            List<DetailResultVO> policyDetailResult = policyService.getPolicyDetail(insType, policyNum);
+            DetailResultDTO detailResult = policyService.getPolicyDetail(insType, policyNum);
+            CreateDetailResultVO resultVO = new CreateDetailResultVO();
+            resultVO.setDetailResult(detailResult);
 
-            return ApiRespDTO.<List<DetailResultVO>>builder()
-                    .data(policyDetailResult)
+            return ApiRespDTO.<CreateDetailResultVO>builder()
+                    .data(resultVO)
                     .build();
 
         } catch (Exception e) {
             log.error(e.toString());
-            return ApiRespDTO.<List<DetailResultVO>>builder()
+            return ApiRespDTO.<CreateDetailResultVO>builder()
                     .code(StatusCodeEnum.Err10001.name())
                     .message(StatusCodeEnum.Err10001.getMessage())
                     .build();
         }
+    }
+
+    private QueryReq convertToEntity(QueryReqDTO dto) {
+        return modelMapper.map(dto, QueryReq.class);
     }
 
 }

@@ -2,13 +2,13 @@ package com.fubon.ecplatformapi;
 
 import com.fubon.ecplatformapi.model.dto.resp.FbQueryResp;
 import com.fubon.ecplatformapi.model.dto.resp.FbDetailResp;
-import com.fubon.ecplatformapi.model.dto.vo.DetailResultVO;
-import com.fubon.ecplatformapi.model.dto.vo.ListResultVO;
+import com.fubon.ecplatformapi.model.dto.vo.CreateDetailResultVO;
+import com.fubon.ecplatformapi.model.dto.vo.QueryResultVO;
 
 public class PolicyResultMapper {
 
-    public static ListResultVO mapToListResult(FbQueryResp.PolicyResult policyResult){
-            return new ListResultVO(
+    public static QueryResultVO mapToListResult(FbQueryResp.PolicyResult policyResult){
+            return new QueryResultVO(
                     policyResult.getClsGrp(),
                     policyResult.getPolFormatid(),
                     policyResult.getUnPaidPrm(),
@@ -18,25 +18,50 @@ public class PolicyResultMapper {
                     policyResult.getSecExpdate());
     }
 
-    public static DetailResultVO.BasicInfo mapToDetailResult(FbDetailResp.EcAppInsure ecAppInsure){
-        return new DetailResultVO.BasicInfo(
-                //ecAppInsure.getSecEcAppWsBean().getSecFormatid(),
-                ecAppInsure.getSecEcAppWsBean().getSecEffdate(),
-                ecAppInsure.getSecEcAppWsBean().getSecExpdate(),
-                ecAppInsure.getSecEcAppWsBean().getSecAeffdate(),
-                ecAppInsure.getSecEcAppWsBean().getSecEffdate(),
-                ecAppInsure.getTotalPremium(),
-                ecAppInsure.getPolSt,
-                ecAppInsure.getVoltPremium,
-                ecAppInsure.getCompPremium,
-                ecAppInsure.getSecEcAppWsBean.getSecEip,
-                ecAppInsure.getSecEcAppWsBean.getSecFubonlifeAgree,
-                ecAppInsureEtp.getCgrCode,
-                ecAppInsureEtp.getClsCode,
-                ecAppInsureEtp.getPlnCode,
-                ecAppInsureEtp.getTotalPremium100,
-                ecAppInsureEtp.getOurshr,
-                ecAppInsure.getEcoEcAppWsBean.getEcoPtcptno);
-    }
+//    public static CreateDetailResultVO mapToDetailResult(FbDetailResp fbDetailResp) {
+//        FbDetailResp.EcAppInsure ecAppInsure = fbDetailResp.getEcAppInsure();
+//        FbDetailResp.EcAppInsureEtp ecAppInsureEtp = fbDetailResp.getEcAppInsureEtp();
+//
+//        DetailResult.InsuredInfo insuredInfo = new DetailResult.InsuredInfo(
+//                ecAppInsure.getRmalEcAppWsBean().getRmaCliname(),
+//                ecAppInsure.getRmalEcAppWsBean().getRmaUid(),
+//                ecAppInsure.getRmalEcAppWsBean().getRmaPBirth(),
+//                ecAppInsure.getRmalEcAppWsBean().getRmaAddr(),
+//                ecAppInsure.getRmalEcAppWsBean().getRmaTel1(),
+//                ecAppInsure.getRmalEcAppWsBean().getRmaTel2(),
+//                ecAppInsure.getRmalEcAppWsBean().getRmaEmail(),
+//                ecAppInsure.getRmalEcAppWsBean().getRmaMobTel(),
+//                null, null, null,
+//                null, null,
+//                ecAppInsure.getRmalEcAppWsBean().getRmaRepresentative(),
+//                ecAppInsure.getRmalEcAppWsBean().getRmaRepresentativeId()
+//
+//        );
 
+        //DetailResult.BasicInfo basicInfo = new DetailResult.BasicInfo(
+//        InsuranceInfo.BasicInfo basicInfo = new InsuranceInfo.BasicInfo(
+//                ecAppInsure.getSecEcAppWsBean().getSecFormatid(),
+//                ecAppInsure.getSecEcAppWsBean().getSecEffdate(),
+//                ecAppInsure.getSecEcAppWsBean().getSecExpdate(),
+//                ecAppInsure.getSecEcAppWsBean().getSecAeffdate(),
+//                ecAppInsure.getSecEcAppWsBean().getSecEffdate(),
+//                ecAppInsure.getTotalPremium(),
+//                ecAppInsure.getPolSt(),
+//                ecAppInsure.getVoltPremium(),
+//                ecAppInsure.getCompPremium(),
+//                ecAppInsure.getSecEcAppWsBean().getSecEip(),
+//                ecAppInsure.getSecEcAppWsBean().getSecFubonlifeAgree(),
+//                ecAppInsureEtp.getCgrCode(),
+//                ecAppInsureEtp.getClsCode(),
+//                ecAppInsureEtp.getPlnCode(),
+//                ecAppInsureEtp.getTotalPremium100(),
+//                ecAppInsureEtp.getOurshr(),
+//                ecAppInsure.getEcoEcAppWsBean().getEcoPtcptno()
+//        );
+
+//        CreateDetailResultVO resultVO = new CreateDetailResultVO();
+//        resultVO.getDetailResult().getInsuranceInfo().setBasicInfo(basicInfo);
+//        //resultVO.getDetailResult().getInsuranceInfo().setInsuredInfo(insuredInfo);
+//        return resultVO;
+//    }
 }

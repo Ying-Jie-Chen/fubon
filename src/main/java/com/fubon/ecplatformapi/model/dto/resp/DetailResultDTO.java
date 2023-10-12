@@ -1,6 +1,7 @@
-package com.fubon.ecplatformapi.model.dto.vo;
+package com.fubon.ecplatformapi.model.dto.resp;
 
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
@@ -9,8 +10,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+
 @Data
-public class DetailResultVO {
+@NoArgsConstructor
+public class DetailResultDTO {
+
     private InsuranceInfo insuranceInfo;
     private InsuranceSubject insuranceSubject;
     private List<EtpInsuranceSubject> etpInsuranceSubject;
@@ -24,6 +28,7 @@ public class DetailResultVO {
     private List<ConservationRecord> conservationRecord;
 
     @Data
+    @NoArgsConstructor
     public static class InsuranceInfo {
         private BasicInfo basicInfo;
         private InsuredInfo insuredInfo;
@@ -31,7 +36,10 @@ public class DetailResultVO {
         private ProposerInfo proposerInfo;
         private FlightInfo flightInfo;
     }
+
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class BasicInfo {
         @Size(max = 14)
         private String policyNum;
@@ -59,13 +67,18 @@ public class DetailResultVO {
         private Double totalPremium100;
         private Double ourshr;
         private String ptcptNo;
+
     }
+
     @Data
+    @AllArgsConstructor
     public static class InsuredInfo {
         @Size(max = 200)
         private String insuredName;
+
         @Size(max = 11)
         private String insuredId;
+
         private Calendar insuredBirthDate;
         @Size(max = 200)
         private String insuredAddr;
@@ -90,7 +103,9 @@ public class DetailResultVO {
         @Size(max = 10)
         private String insuredRepresentativeId;
     }
+
     @Data
+    @AllArgsConstructor
     public static class InsuredList {
         @Size(max = 200)
         private String insuredName;
@@ -120,7 +135,9 @@ public class DetailResultVO {
         @Size(max = 10)
         private String insuredRepresentativeId;
     }
+
     @Data
+    @AllArgsConstructor
     public static class ProposerInfo {
         @Size(max = 60)
         private String proposerName;
@@ -152,7 +169,9 @@ public class DetailResultVO {
         @Size(max = 10)
         private String proposerRepresentativeId;
     }
+
     @Data
+    @AllArgsConstructor
     public static class FlightInfo {
         @Size(max = 10)
         private Integer filghtSeq;
@@ -164,7 +183,9 @@ public class DetailResultVO {
         @Size(max = 10)
         private String filghtCity;
     }
+
     @Data
+    @AllArgsConstructor
     public static class InsuranceSubject {
         @Size(max = 11)
         private String plateNo;
@@ -219,17 +240,23 @@ public class DetailResultVO {
         @Size(max = 20)
         private String activityLoaction;
     }
+
     @Data
+    @NoArgsConstructor
     public static class EtpInsuranceSubject {
         private String content;
         private String desc;
     }
+
     @Data
+    @AllArgsConstructor
     public static class EtpInsuranceSubjectDetail{
         private Integer seq;
         private List<String> values;
     }
+
     @Data
+    @AllArgsConstructor
     public static class InsuranceItem{
         @Size(max = 500)
         private String bnfCode;
@@ -241,13 +268,17 @@ public class DetailResultVO {
         private String title;
         private Collection<String> values;
     }
+
     @Data
+    @AllArgsConstructor
     public static class PitEb0List{
         private String eb0TsiDesc;
         private String eb0TsiValue;
         private String eb0TsiUnit;
     }
+
     @Data
+    @AllArgsConstructor
     public static class InsuranceList{
         @Size(max = 10)
         private String bnfCode;
@@ -276,7 +307,9 @@ public class DetailResultVO {
         @Size(max = 1)
         private Integer petAge;
     }
+
     @Data
+    @AllArgsConstructor
     public static class PolicyDeliveryRecord{
         @Size(max = 100)
         private String prmDocName;
@@ -291,7 +324,9 @@ public class DetailResultVO {
 
         private Date prmPrintDate;
     }
+
     @Data
+    @AllArgsConstructor
     public static class UnpaidRecord{
         @Size(max = 3)
         private String insType;
@@ -311,7 +346,9 @@ public class DetailResultVO {
         @DecimalMax(value = "11")
         private BigDecimal premium;
     }
+
     @Data
+    @AllArgsConstructor
     public static class PaidRecord{
         @Size(max = 3)
         private String insType;
@@ -334,7 +371,9 @@ public class DetailResultVO {
         @Size(max = 30)
         private String payKind;
     }
+
     @Data
+    @AllArgsConstructor
     public static class ClaimRecord{
         private String insType;
         private Date acdate;
@@ -347,7 +386,9 @@ public class DetailResultVO {
         private String prcempNm;
         private String phone;
     }
+
     @Data
+    @AllArgsConstructor
     public static class ConservationRecord{
 
     }

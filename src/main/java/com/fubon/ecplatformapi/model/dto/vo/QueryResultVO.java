@@ -1,13 +1,17 @@
 package com.fubon.ecplatformapi.model.dto.vo;
 
+import com.fubon.ecplatformapi.model.entity.QueryReq;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
-public class ListResultVO {
+@NoArgsConstructor
+public class QueryResultVO {
+
         private String insType;
         private String policyNum;
         private Integer premiums;
