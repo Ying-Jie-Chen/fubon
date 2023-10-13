@@ -1,51 +1,46 @@
 package com.fubon.ecplatformapi.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
 
 @Entity
 @Data
+@Table(name = "list_req")
 @NoArgsConstructor
-@RequiredArgsConstructor
-public class QueryReq {
+public class PolicyListReq {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Integer Id;
+    private Integer id;
 
-    @NonNull
+    @Column(name = "ins_type")
     private String insType;
 
-    @NonNull
+    @Column(name = "plate")
     private String plate;
 
-    @NonNull
+    @Column(name = "query_type")
     private Integer queryType;
 
-    @NonNull
+    @Column(name = "insurer_name")
     private String insurerName;
 
-    @NonNull
+    @Column(name = "insurer_id")
     private String insurerId;
 
-    @NonNull
+    @Column(name = "effect_date_start")
     private Date effectDateStart;
 
-    @NonNull
+    @Column(name = "effect_date_end")
     private Date effectDateEnd;
 
-    @NonNull
+    @Column(name = "manager_id")
     private String managerId;
 
-    @NonNull
+    @Column(name = "policy_num")
     private String policyNum;
 
 }

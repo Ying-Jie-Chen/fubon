@@ -1,26 +1,20 @@
 package com.fubon.ecplatformapi.model.dto.req;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fubon.ecplatformapi.ParameterValid;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.io.Serializable;
 import java.util.Date;
 @Data
 @NoArgsConstructor
-public class QueryReqDTO implements Serializable {
+public class PolicyListReqDTO {
 
-    //@ParameterValid(values = {"MOT", "CQCCX", "CHCRX", "CTX", "CGX", "FIR", "ENG", "MGO", "CAS"})
+    private Integer id;
 
     @NotNull(message = "insType 不可為空值")
     private String insType;
 
-    @NotNull(message = "plate 不可為空值")
     private String plate;
 
     @NotNull(message = "queryType 不可為空值")

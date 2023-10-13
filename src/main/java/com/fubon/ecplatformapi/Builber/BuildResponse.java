@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.FbQueryResp;
+import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -69,12 +69,12 @@ public class BuildResponse {
         return response;
     }
 
-    public FbQueryResp buildListResponse(){
+    public FbQueryRespDTO buildListResponse(){
         log.info("建立 FubonAPI Query的回應 #Start");
 
-        FbQueryResp response = FbQueryResp.builder()
-                .policyResults(Collections.singletonList(
-                        FbQueryResp.PolicyResult.builder()
+        FbQueryRespDTO response = FbQueryRespDTO.builder()
+//                .policyResults(Collections.singletonList(
+//                        FbQueryRespDTO.PolicyResult.builder()
                                 .clsGrp("險種")
                                 .module("模組")
                                 .polFormatid("保單號碼")
@@ -85,14 +85,14 @@ public class BuildResponse {
                                 .secExpdate(Date.from(Instant.now()))
                                 .ascIscXref("經辦代號")
                                 .unPaidPrm(1000)
-                                .build()
-                ))
-                .build();
+                                .build();
+//                ))
+//                .build();
         printJSON(response);
         return response;
     }
 
-    private void printJSON(FbQueryResp response) {
+    private void printJSON(FbQueryRespDTO response) {
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
         String jsonRequest;
         try {

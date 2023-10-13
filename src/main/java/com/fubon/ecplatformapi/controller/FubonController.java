@@ -2,14 +2,13 @@ package com.fubon.ecplatformapi.controller;
 
 import com.fubon.ecplatformapi.Builber.BuildResponse;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.FbQueryResp;
+import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
 import java.util.Collections;
 
 @Slf4j
@@ -19,11 +18,9 @@ public class FubonController {
     @Autowired
     private BuildResponse buildResponse;
 
-    @GetMapping("/QueryList")
-    public FbQueryResp QueryList() {
-
+    @GetMapping("/queryPolicy")
+    public FbQueryRespDTO QueryList() {
         return buildResponse.buildListResponse();
-
     }
 
 
