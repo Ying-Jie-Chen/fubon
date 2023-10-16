@@ -1,5 +1,7 @@
 package com.fubon.ecplatformapi.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fubon.ecplatformapi.Builber.BuildResponse;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
@@ -19,7 +21,7 @@ public class FubonController {
     private BuildResponse buildResponse;
 
     @GetMapping("/queryPolicy")
-    public FbQueryRespDTO QueryList() {
+    public FbQueryRespDTO QueryList() throws JsonProcessingException {
         return buildResponse.buildListResponse();
     }
 

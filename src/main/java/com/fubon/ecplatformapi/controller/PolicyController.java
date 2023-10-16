@@ -1,5 +1,9 @@
 package com.fubon.ecplatformapi.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fubon.ecplatformapi.Builber.BuildResponse;
 import com.fubon.ecplatformapi.ValidationException;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
@@ -14,11 +18,17 @@ import com.fubon.ecplatformapi.service.CallFubonService;
 import com.fubon.ecplatformapi.service.PolicyService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -35,7 +45,7 @@ public class PolicyController {
     CallFubonService callFubonService;
 
     @GetMapping("/queryPolicyList")
-    public ApiRespDTO<PolicyListResultVO> queryList(@Valid @RequestBody  PolicyListReqDTO req) {
+    public ApiRespDTO<List<PolicyListResultVO>> queryList(@Valid @RequestBody  PolicyListReqDTO req) {
         try {
 
             //PolicyListReq policyListReq = policyService.createQueryReq(convertToEntity(req));
@@ -45,24 +55,33 @@ public class PolicyController {
 //            resultVO.setInsType(policyListReq.getInsType());
 //            String insType = policyListReq.getInsType();
 //            log.info("insType = " + insType);
-
+            ObjectMapper objectMapper = new ObjectMapper();
             log.info("Fubon API /QueryList 的回應結果#Start");
-            //FbQueryRespDTO fbQueryRespDTO = buildResponse.buildListResponse();
-            PolicyListResultVO queryResult = policyService.callQueryResp();
-            //List<PolicyListResultVO> queryResult = policyService.getPolicyList(fbQueryRespDTO);
+//            Mono<List<FbQueryRespDTO>> queryResp = policyService.callQueryResp();
+//            List<PolicyListResultVO> queryResult = queryResp
+//                    .map(fbQueryRespList -> fbQueryRespList.stream()
+//                            .map(this::mapToPolicyResultVo)
+//                            .collect(Collectors.toList()))
+//                    .block();
 
-            return ApiRespDTO.<PolicyListResultVO>builder()
+            List<PolicyListResultVO> queryResult = policyService.callQueryResp()
+                    .flatMapMany(Flux::fromIterable)
+                    .map(this::mapToPolicyResultVo)
+                    .collectList()
+                    .block();
+
+            return ApiRespDTO.<List<PolicyListResultVO>>builder()
                     .data(queryResult)
                     .build();
 
         } catch (ValidationException e) {
-            return  ApiRespDTO.<PolicyListResultVO>builder()
+            return  ApiRespDTO.<List<PolicyListResultVO>>builder()
                     .code(StatusCodeEnum.Err10001.name())
                     .message(e.getMessage())
                     .build();
         } catch (Exception e) {
             log.error(e.toString());
-            return  ApiRespDTO.<PolicyListResultVO>builder()
+            return  ApiRespDTO.<List<PolicyListResultVO>>builder()
                     .code(StatusCodeEnum.Err10001.name())
                     .message(StatusCodeEnum.Err10001.getMessage())
                     .build();
@@ -94,6 +113,23 @@ public class PolicyController {
 
     private PolicyListReq convertToEntity(PolicyListReqDTO dto) {
         return modelMapper.map(dto, PolicyListReq.class);
+    }
+
+
+    public PolicyListResultVO mapToPolicyResultVo(FbQueryRespDTO fbQueryResp) {
+        return modelMapper.map(fbQueryResp, PolicyListResultVO.class);
+    }
+    public List<PolicyListResultVO> mapToResults(List<FbQueryRespDTO.PolicyResult> fbQueryResults) {
+        List<PolicyListResultVO> results = new ArrayList<>();
+        for (FbQueryRespDTO.PolicyResult fbQueryResult : fbQueryResults) {
+            PolicyListResultVO policyResultVo = new PolicyListResultVO();
+
+            policyResultVo.setInsType(fbQueryResult.getClsGrp());
+            policyResultVo.setPolicyNum(fbQueryResult.getPolFormatid());
+
+            results.add(policyResultVo);
+        }
+        return results;
     }
 
 

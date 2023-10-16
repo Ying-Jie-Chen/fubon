@@ -1,39 +1,64 @@
 package com.fubon.ecplatformapi.model.dto.resp;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor
 public class FbQueryRespDTO {
 
-//    private List<PolicyResult> policyResults;
-//
-//    @Data
-//    @Builder
-//    public static class PolicyResult {
-        @JsonProperty("insType")
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+    private List<PolicyResult> policyResults;
+
+    @JsonCreator
+    public FbQueryRespDTO(@JsonProperty("policyResults") List<PolicyResult> policyResults) {
+        this.policyResults = policyResults;
+    }
+
+    @Data
+    @Builder
+    public static class PolicyResult {
+        @JsonProperty("clsGrp")
         private String clsGrp;
+
+        @JsonProperty("module")
         private String module;
-        @JsonProperty("policyNum")
+
+        @JsonProperty("polFormatid")
         private String polFormatid;
-        @JsonProperty("insuredName")
+
+        @JsonProperty("rmaClinameI")
         private String rmaClinameI;
+
+        @JsonProperty("rmaUidI")
         private String rmaUidI;
-        @JsonProperty("plate")
+
+        @JsonProperty("mohPlatno")
         private String mohPlatno;
-        @JsonProperty("effectDate")
+
+        @JsonProperty("secEffdate")
         private Date secEffdate;
-        @JsonProperty("expireDate")
+
+        @JsonProperty("secExpdate")
         private Date secExpdate;
+
+        @JsonProperty("ascIscXref")
         private String ascIscXref;
-        @JsonProperty("premiums")
+
+        @JsonProperty("unPaidPrm")
         private Integer unPaidPrm;
 
-    //}
+    }
 
 }
