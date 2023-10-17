@@ -24,20 +24,14 @@ public class SessionService {
 
     private final String SESSION_ID = UUID.randomUUID().toString();
 
-    /** 儲存登入者資訊
-     *
-     */
-    public void saveSessionInfo(FbLoginRespDTO fbLoginRespDTO){
-        log.info("儲存登入者資訊#Start");
-
-        MapSessionRepository repository = sessionConfig.sessionRepository();
-        MapSession mapSession = new MapSession(SESSION_ID);
-
-        UserInfo user = fbLoginRespDTO.getAny().getUserInfo();
+    private void setSessionAttributes(MapSession mapSession, UserInfo user) {
         SessionManager.setAttribute(mapSession, SessionManager.IDENTITY, user.getIdentify());
         SessionManager.setAttribute(mapSession, SessionManager.EMP_NO, user.getAgent_id());
         SessionManager.setAttribute(mapSession, SessionManager.EMP_NAME, user.getAgent_name());
         SessionManager.setAttribute(mapSession, SessionManager.FBID, user.getId());
+        SessionManager.setAttribute(mapSession, SessionManager.UNION_NUM, user.getUnionNum());
+        SessionManager.setAttribute(mapSession, SessionManager.ADMIN_NUM, user.getAdmin_num());
+        SessionManager.setAttribute(mapSession, SessionManager.EMAIL, user.getEmail());
         SessionManager.setAttribute(mapSession, SessionManager.XREF_INFOS, user.getXrefInfo());
 
         List<UserInfo.XrefInfo> userXrefInfoList = user.getXrefInfo().stream()
@@ -50,11 +44,27 @@ public class SessionService {
                 .toList();
 
         SessionManager.setAttribute(mapSession, SessionManager.XREF_INFOS, userXrefInfoList);
+    }
+
+
+    /** 儲存登入者資訊
+     *
+     */
+    public void saveSessionInfo(FbLoginRespDTO fbLoginRespDTO){
+        log.info("儲存登入者資訊#Start");
+
+        MapSessionRepository repository = sessionConfig.sessionRepository();
+        MapSession mapSession = new MapSession(SESSION_ID);
+
+        UserInfo user = fbLoginRespDTO.getAny().getUserInfo();
+        setSessionAttributes(mapSession, user);
 
         mapSession.setMaxInactiveInterval(Duration.ofMinutes(20));
         repository.save(mapSession);
 
     }
+
+
 
     /**
      * 從會話中取得先前儲存的 Session Info
@@ -65,16 +75,19 @@ public class SessionService {
         log.info("取得儲存在Session中的Value#Start");
 
         MapSessionRepository repository = sessionConfig.sessionRepository();
-        MapSession storedInfo = repository.findById(SESSION_ID);
+        MapSession session = repository.findById(SESSION_ID);
 
-        if (storedInfo != null) {
-            SessionManager.getAttribute(storedInfo, SessionManager.IDENTITY);
-            SessionManager.getAttribute(storedInfo, SessionManager.EMP_NO);
-            SessionManager.getAttribute(storedInfo, SessionManager.EMP_NAME);
-            SessionManager.getAttribute(storedInfo, SessionManager.FBID);
-            List<UserInfo.XrefInfo> xrefInfos = SessionManager.getXrefInfoAttribute(storedInfo);
+        if (session != null) {
+            for (SessionManager attribute : SessionManager.values()) {
+                SessionManager.getAttribute(session, attribute);
+            }
+//            SessionManager.getAttribute(storedInfo, SessionManager.IDENTITY);
+//            SessionManager.getAttribute(storedInfo, SessionManager.EMP_NO);
+//            SessionManager.getAttribute(storedInfo, SessionManager.EMP_NAME);
+//            SessionManager.getAttribute(storedInfo, SessionManager.FBID);
+//            List<UserInfo.XrefInfo> xrefInfos = SessionManager.getXrefInfoAttribute(session);
 
-            printSession(storedInfo);
+            printSession(session);
         }
             //user.setXrefInfo(xrefInfos);
             return null;
@@ -93,12 +106,9 @@ public class SessionService {
         MapSessionRepository repository = sessionConfig.sessionRepository();
         MapSession session = repository.findById(SESSION_ID);
         try {
-            SessionManager.removeAttribute(session, SessionManager.IDENTITY);
-            SessionManager.removeAttribute(session, SessionManager.EMP_NO);
-            SessionManager.removeAttribute(session, SessionManager.EMP_NAME);
-            SessionManager.removeAttribute(session, SessionManager.FBID);
-            SessionManager.removeAttribute(session, SessionManager.XREF_INFOS);
-
+            for (SessionManager attribute : SessionManager.values()) {
+                SessionManager.removeAttribute(session, attribute);
+            }
             printSession(session);
 
         } catch (Exception e) {
@@ -107,7 +117,6 @@ public class SessionService {
         }
 
     }
-
 
     /**
      * 將驗證碼存儲在會話中

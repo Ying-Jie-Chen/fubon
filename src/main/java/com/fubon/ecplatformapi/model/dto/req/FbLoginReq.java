@@ -1,5 +1,7 @@
 package com.fubon.ecplatformapi.model.dto.req;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +13,6 @@ public class FbLoginReq {
 
     private Header Header;
     private FunctionCode FBECAPPCERT1001RQ;
-
 
     @Builder
     public static class Header {

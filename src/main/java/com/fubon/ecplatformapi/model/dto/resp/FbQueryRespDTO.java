@@ -11,21 +11,16 @@ import java.util.List;
 @Data
 @Builder
 @NoArgsConstructor
-//@JsonInclude(JsonInclude.Include.NON_NULL)
+@AllArgsConstructor
 public class FbQueryRespDTO {
 
-    //@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     private List<PolicyResult> policyResults;
-
-    public FbQueryRespDTO(List<PolicyResult> policyResults) {
-        this.policyResults = policyResults;
-    }
 
     @Data
     @Builder
+    @NoArgsConstructor
     @AllArgsConstructor
     public static class PolicyResult {
-        public PolicyResult() { }
 
         private String clsGrp;
 

@@ -23,7 +23,6 @@ import java.util.List;
 @RequestMapping("/policy")
 public class PolicyController {
 
-
     @Autowired
     private ResultMapper resultMapper;
     @Autowired
@@ -36,13 +35,7 @@ public class PolicyController {
 
         try {
 
-            //PolicyListReq policyListReq = policyService.createQueryReq(convertToEntity(req));
-
-//            policyService.isRequestValid(policyListReq);
-//            PolicyListResultVO resultVO = new PolicyListResultVO();
-//            resultVO.setInsType(policyListReq.getInsType());
-//            String insType = policyListReq.getInsType();
-//            log.info("insType = " + insType);
+            policyService.isRequestValid(req);
 
             log.info("Fubon API /QueryList 的回應結果#Start");
             List<PolicyListResultVO> queryResult = policyService.callQueryResp()

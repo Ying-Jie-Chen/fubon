@@ -1,10 +1,10 @@
 package com.fubon.ecplatformapi.service;
 
+import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
 import com.fubon.ecplatformapi.repository.PolicyListRepository;
 import com.fubon.ecplatformapi.ValidationException;
 import com.fubon.ecplatformapi.model.dto.resp.DetailResultDTO;
-import com.fubon.ecplatformapi.model.entity.PolicyListReq;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,15 +22,23 @@ public class PolicyService {
     @Autowired
     private PolicyListRepository policyListRepository;
 
+    private static final String FUBON_API_URL = "http://localhost:8080";
+
+    private final WebClient webClient;
+    @Autowired
+    public PolicyService(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder.baseUrl(FUBON_API_URL).build();
+    }
+
 //    public PolicyListReq createQueryReq(PolicyListReq policyListReq) {
 //        return policyListRepository.save(policyListReq);
 //    }
 
 
     public Mono<FbQueryRespDTO> callQueryResp() {
-        return WebClient.create()
+        return webClient
                 .get()
-                .uri("http://localhost:8080/queryPolicy")
+                .uri("/queryPolicy")
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<FbQueryRespDTO>() {})
@@ -46,7 +54,7 @@ public class PolicyService {
 //                .collect(Collectors.toList());
     }
 
-    public boolean isRequestValid(PolicyListReq request) {
+    public void isRequestValid(PolicyListReqDTO request) {
         String insType = request.getInsType();
         String plate = request.getPlate();
         Integer queryType = request.getQueryType();
@@ -62,7 +70,6 @@ public class PolicyService {
         if (queryType == null || (queryType != 0 && queryType != 1)) {
             throw new ValidationException("QueryType parameter must be 0 or 1");
         }
-        return true;
     }
 
 }

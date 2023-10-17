@@ -18,6 +18,12 @@ public enum SessionManager {
 
     FBID("fbid"),
 
+    UNION_NUM("unionNum"),
+
+    ADMIN_NUM("adminNum"),
+
+    EMAIL("email"),
+
     XREF_INFOS("xrefInfos");
 
     private final String attributeName;
@@ -42,8 +48,5 @@ public enum SessionManager {
             return Collections.emptyList();
         }
     }
-
-
-
 
 }

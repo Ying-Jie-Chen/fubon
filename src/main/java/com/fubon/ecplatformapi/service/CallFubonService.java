@@ -4,9 +4,12 @@ import com.fubon.ecplatformapi.Builber.BuildRequest;
 import com.fubon.ecplatformapi.model.dto.req.FbLoginReq;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -43,9 +46,13 @@ public class CallFubonService {
         return webClient
                 .post()
                 .uri("/Login")
+                .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(request))
                 .retrieve()
-                .bodyToMono(FbLoginRespDTO.class);
+                .bodyToMono(new ParameterizedTypeReference<FbLoginRespDTO>() {})
+                .log();
+                //.bodyToMono(FbLoginRespDTO.class);
+
     }
 
 
