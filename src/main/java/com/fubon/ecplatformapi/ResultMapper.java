@@ -2,30 +2,21 @@ package com.fubon.ecplatformapi;
 
 import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import static com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO.*;
-@Mapper
-public interface PolicyResultMapper {
+public class ResultMapper {
 
-//    public static PolicyListResultVO mapToListResult(FbQueryRespDTO policyResult){
-//        return new PolicyListResultVO(
-//                policyResult.getClsGrp(),
-//                policyResult.getPolFormatid(),
-//                policyResult.getUnPaidPrm(),
-//                policyResult.getRmaClinameI(),
-//                policyResult.getMohPlatno(),
-//                policyResult.getSecEffdate(),
-//                policyResult.getSecExpdate()
-//        );
-//
-//    }
-
+    public PolicyListResultVO mapToResultVO(FbQueryRespDTO.PolicyResult policyResult) {
+        return new PolicyListResultVO(
+                policyResult.getClsGrp(),
+                policyResult.getPolFormatid(),
+                policyResult.getUnPaidPrm(),
+                policyResult.getRmaClinameI(),
+                policyResult.getMohPlatno(),
+                policyResult.getSecEffdate(),
+                policyResult.getSecExpdate()
+        );
+    }
 
 //    public static CreateDetailResultVO mapToDetailResult(FbDetailResp fbDetailResp) {
 //        FbDetailResp.EcAppInsure ecAppInsure = fbDetailResp.getEcAppInsure();

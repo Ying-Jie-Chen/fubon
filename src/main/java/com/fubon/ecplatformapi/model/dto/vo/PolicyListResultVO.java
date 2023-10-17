@@ -1,46 +1,27 @@
 package com.fubon.ecplatformapi.model.dto.vo;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PolicyListResultVO implements Serializable{
+public class PolicyListResultVO {
 
-        @JsonProperty("clsGrp")
-        private String insType;
+    private String insType;
 
-        @JsonProperty("polFormatid")
-        private String policyNum;
+    private String policyNum;
 
-        @JsonProperty("unPaidPrm")
-        private Integer premiums;
+    private Integer premiums;
 
-        @JsonProperty("rmaClinameI")
-        private String insuredName;
+    private String insuredName;
 
-        @JsonProperty("mohPlatno")
-        private String plate;
+    private String plate;
 
-        @JsonProperty("secEffdate")
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        private Date effectDate;
+    private Date effectDate;
 
-        @JsonProperty("secExpdate")
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        private Date expireDate;
-
-
+    private Date expireDate;
 }
 

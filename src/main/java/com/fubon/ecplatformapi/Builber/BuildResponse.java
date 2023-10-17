@@ -10,11 +10,9 @@ import com.fubon.ecplatformapi.model.entity.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.junit.jupiter.api.Assertions;
 
-import java.time.Instant;
-import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -70,31 +68,41 @@ public class BuildResponse {
         return response;
     }
 
-    public FbQueryRespDTO buildListResponse() throws JsonProcessingException {
+    public FbQueryRespDTO buildListResponse(){
         log.info("建立 FubonAPI Query的回應 #Start");
-
         FbQueryRespDTO response = FbQueryRespDTO.builder()
-                .policyResults(Collections.singletonList(
+                .policyResults(List.of(
                         FbQueryRespDTO.PolicyResult.builder()
-                                .clsGrp("險種")
-                                .module("模組")
-                                .polFormatid("保單號碼")
-                                .rmaClinameI("被保險人姓名")
-                                .rmaUidI("被保險人身份證")
-                                .mohPlatno("車牌")
-                                .secEffdate(Date.from(Instant.now()))
-                                .secExpdate(Date.from(Instant.now()))
-                                .ascIscXref("經辦代號")
+                                .clsGrp("險種1")
+                                .module("模組1")
+                                .polFormatid("保單號碼1")
+                                .rmaClinameI("被保險人姓名1")
+                                .rmaUidI("被保險人身份證1")
+                                .mohPlatno("車牌1")
+                                .secEffdate(new Date())
+                                .secExpdate(new Date())
+                                .ascIscXref("經辦代號1")
+                                .unPaidPrm(1000)
+                                .build(),
+                        FbQueryRespDTO.PolicyResult.builder()
+                                .clsGrp("險種2")
+                                .module("模組2")
+                                .polFormatid("保單號碼2")
+                                .rmaClinameI("被保險人姓名2")
+                                .rmaUidI("被保險人身份證2")
+                                .mohPlatno("車牌2")
+                                .secEffdate(new Date())
+                                .secExpdate(new Date())
+                                .ascIscXref("經辦代號2")
                                 .unPaidPrm(1000)
                                 .build()
                 ))
                 .build();
         printJSON(response);
-        //jsonStringToPojo(response);
         return response;
     }
 
-    private String printJSON(FbQueryRespDTO response) {
+    private void printJSON(FbQueryRespDTO response) {
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
         String jsonRequest;
         try {
@@ -103,16 +111,7 @@ public class BuildResponse {
             throw new RuntimeException(e);
         }
         System.out.println(jsonRequest);
-        return jsonRequest;
     }
-
-    private void jsonStringToPojo(FbQueryRespDTO response) throws JsonProcessingException {
-        String expectedJson = printJSON(response);
-        FbQueryRespDTO fbQueryRespDTO = objectMapper.readValue(expectedJson, FbQueryRespDTO.class);
-        System.out.println(fbQueryRespDTO);
-        Assertions.assertEquals(fbQueryRespDTO.getPolicyResults(), "policyResults");
-    }
-
 
     public void printJSON(FbLoginRespDTO response){
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
