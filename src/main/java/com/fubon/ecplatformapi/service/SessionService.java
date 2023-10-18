@@ -1,7 +1,7 @@
 package com.fubon.ecplatformapi.service;
 
 import com.fubon.ecplatformapi.enums.SessionManager;
-import com.fubon.ecplatformapi.model.config.SessionConfig;
+import com.fubon.ecplatformapi.config.SessionConfig;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
-// ...
 @Slf4j
 @Service
 public class SessionService {
@@ -68,10 +67,9 @@ public class SessionService {
 
     /**
      * 從會話中取得先前儲存的 Session Info
-     *
      */
 
-    public UserInfo getSessionInfo() {
+    public void getSessionInfo() {
         log.info("取得儲存在Session中的Value#Start");
 
         MapSessionRepository repository = sessionConfig.sessionRepository();
@@ -81,16 +79,8 @@ public class SessionService {
             for (SessionManager attribute : SessionManager.values()) {
                 SessionManager.getAttribute(session, attribute);
             }
-//            SessionManager.getAttribute(storedInfo, SessionManager.IDENTITY);
-//            SessionManager.getAttribute(storedInfo, SessionManager.EMP_NO);
-//            SessionManager.getAttribute(storedInfo, SessionManager.EMP_NAME);
-//            SessionManager.getAttribute(storedInfo, SessionManager.FBID);
-//            List<UserInfo.XrefInfo> xrefInfos = SessionManager.getXrefInfoAttribute(session);
-
             printSession(session);
         }
-            //user.setXrefInfo(xrefInfos);
-            return null;
     }
 
     public void printSession(Session session) {

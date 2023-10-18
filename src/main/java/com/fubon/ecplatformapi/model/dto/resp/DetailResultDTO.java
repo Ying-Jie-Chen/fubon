@@ -1,9 +1,12 @@
 package com.fubon.ecplatformapi.model.dto.resp;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Collection;

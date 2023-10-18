@@ -3,7 +3,7 @@ package com.fubon.ecplatformapi.controller;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
-import com.fubon.ecplatformapi.service.CallFubonService;
+import com.fubon.ecplatformapi.service.AuthServiceImpl;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     @Autowired
-    private CallFubonService callFubonService;
+    private AuthServiceImpl authServiceImpl;
     @Autowired
     private SessionService sessionService;
     @Autowired
@@ -49,7 +49,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ApiRespDTO<String> logout(){
         try {
-            //sessionService.getSessionInfo(); // 印出session中的值
+            //sessionService.getSessionInfo(); // print session values
             sessionService.removeSession();
 
             return ApiRespDTO.<String>builder()
@@ -67,12 +67,9 @@ public class AuthController {
     public ApiRespDTO<UserInfo> login(@RequestBody LoginReq loginRequest){
 
         try {
-            FbLoginRespDTO fbLoginRespDTO = callFubonService.FBECAPPCERT1001(loginRequest).block();
 
-            assert fbLoginRespDTO != null;
-            sessionService.saveSessionInfo(fbLoginRespDTO);
-            //sessionService.getSessionInfo(); // 印出session中的值
-            UserInfo responseData = fbLoginRespDTO.getAny().getUserInfo();
+            UserInfo responseData = authServiceImpl.getUserInfo(loginRequest);
+
             return ApiRespDTO.<UserInfo>builder()
                     .data(responseData)
                     .build();
@@ -88,20 +85,12 @@ public class AuthController {
 
     @GetMapping("/getVerificationImage")
     public ApiRespDTO<VerificationImageVO> getVerificationImage() {
-        VerificationImageVO VerificationImageVO = new VerificationImageVO();
-
         try {
-            VerificationResp verificationResp = callFubonService.FBECCOMSTA1032().block();
 
-            assert verificationResp != null;
-            String imageBase64 = verificationResp.getAny().getVerificationImageBase64();
-            String token = verificationResp.getAny().getToken();
-
-            VerificationImageVO.setVerificationImage(imageBase64);
-            VerificationImageVO.setToken(token);
+            VerificationImageVO responseData = authServiceImpl.getVerificationImage();
 
             return ApiRespDTO.<VerificationImageVO>builder()
-                    .data(VerificationImageVO)
+                    .data(responseData)
                     .build();
 
         } catch (Exception e) {

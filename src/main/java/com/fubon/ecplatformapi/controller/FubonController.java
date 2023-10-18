@@ -2,6 +2,7 @@ package com.fubon.ecplatformapi.controller;
 
 
 import com.fubon.ecplatformapi.Builber.BuildResponse;
+import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
@@ -30,7 +31,7 @@ public class FubonController {
     }
 
     @PostMapping("/Login")
-    public FbLoginRespDTO Login() {
+    public FbLoginRespDTO Login(@RequestBody LoginReq loginReq) {
 
         return buildResponse.buildLoginResponse(createUserInfo());
     }

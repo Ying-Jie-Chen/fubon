@@ -4,11 +4,11 @@ import com.fubon.ecplatformapi.Builber.BuildRequest;
 import com.fubon.ecplatformapi.model.dto.req.FbLoginReq;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
+import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
+import com.fubon.ecplatformapi.model.entity.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -18,41 +18,62 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
-public class CallFubonService {
+public class AuthServiceImpl {
     @Autowired
     private BuildRequest buildRequest;
+    @Autowired
+    private SessionService sessionService;
     private static final String FUBON_API_URL = "http://localhost:8080";
 
     private final WebClient webClient;
     @Autowired
-    public CallFubonService(WebClient.Builder webClientBuilder) {
+    public AuthServiceImpl(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl(FUBON_API_URL).build();
     }
 
-    public Mono<VerificationResp> FBECCOMSTA1032() {
+    public VerificationImageVO getVerificationImage() {
+
         log.info("Fubon API /GetVerificationImage 的回應結果#Start");
-        return webClient
+
+        Mono<VerificationResp> mono = webClient
                 .get()
                 .uri("/GetVerificationImage")
                 .retrieve()
                 .bodyToMono(VerificationResp.class);
+
+        VerificationResp verificationResp = mono.block();
+
+        assert verificationResp != null;
+        String imageBase64 = verificationResp.getAny().getVerificationImageBase64();
+        String token = verificationResp.getAny().getToken();
+
+        VerificationImageVO verificationVO = new VerificationImageVO();
+        verificationVO.setVerificationImage(imageBase64);
+        verificationVO.setToken(token);
+
+        return verificationVO;
     }
 
-    public Mono<FbLoginRespDTO> FBECAPPCERT1001(LoginReq loginReq) {
-        log.info("建立 FubonAPI 的請求 #Start");
-        FbLoginReq request = buildRequest.buildFubonLoginRequest(loginReq);
+    public UserInfo getUserInfo(LoginReq loginReq) {
 
         log.info("Fubon API /Login 的回應結果#Start");
-        return webClient
+
+        Mono<FbLoginRespDTO> mono = webClient
                 .post()
                 .uri("/Login")
                 .accept(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(request))
+                .body(BodyInserters.fromValue(loginReq))
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<FbLoginRespDTO>() {})
-                .log();
-                //.bodyToMono(FbLoginRespDTO.class);
+                .bodyToMono(FbLoginRespDTO.class);
 
+        FbLoginRespDTO fbLoginRespDTO = mono.block();
+
+        assert fbLoginRespDTO != null;
+        sessionService.saveSessionInfo(fbLoginRespDTO);
+        //sessionService.getSessionInfo(); // print session values
+
+        UserInfo userInfo = fbLoginRespDTO.getAny().getUserInfo();
+        return userInfo;
     }
 
 
