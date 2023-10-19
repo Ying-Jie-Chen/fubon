@@ -1,0 +1,19 @@
+package com.fubon.ecplatformapi.model.dto.req;
+
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class PolicyDetailReqDTO {
+
+    @NotNull(message = "insType 不可為空值")
+    @Size(max = 5, message = "insType 最大長度為 5")
+    private String insType;
+
+    @NotNull(message = "policyNum 不可為空值")
+    @Size(max = 14, message = "policyNum 最大長度為 14")
+    private String policyNum;
+}
