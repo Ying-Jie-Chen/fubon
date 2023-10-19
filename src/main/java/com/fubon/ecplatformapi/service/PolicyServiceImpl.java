@@ -1,17 +1,18 @@
 package com.fubon.ecplatformapi.service;
 
-import com.fubon.ecplatformapi.ResultMapper;
-import com.fubon.ecplatformapi.enums.InsuranceType;
+import com.fubon.ecplatformapi.mapper.ResultMapper;
+import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
 import com.fubon.ecplatformapi.repository.PolicyListRepository;
-import com.fubon.ecplatformapi.model.dto.resp.DetailResultDTO;
+import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,6 +27,8 @@ public class PolicyServiceImpl {
     private PolicyListRepository policyListRepository;
     @Autowired
     private ResultMapper resultMapper;
+    @Autowired
+    private SessionService sessionService;
 
     private static final String FUBON_API_URL = "http://localhost:8080";
 
@@ -40,12 +43,13 @@ public class PolicyServiceImpl {
 //    }
 
 
-    public List<PolicyListResultVO> queryPolicyResults() {
-
+    public List<PolicyListResultVO> queryPolicyResults(PolicyListReqDTO req) {
+        sessionService.getSessionInfo();
         Mono<FbQueryRespDTO> mono = webClient
-                .get()
+                .post()
                 .uri("/queryPolicy")
                 .accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(req))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<FbQueryRespDTO>() {})
                 .log();
@@ -57,16 +61,39 @@ public class PolicyServiceImpl {
     }
 
 
-    public DetailResultDTO getPolicyDetail(String insType, String policyNum) {
-        return null;
-//        List<PolicyDetail> detailResp = policyDetailRepository.findByTypeAndNum(insType, policyNum);
+    public DetailResultVo getPolicyDetail(PolicyDetailReqDTO request) {
+        // 富邦API - 取得保單資訊
+        // API名稱：policyDetail
+//        Mono<FubonPolicyDetailRespDTO> mono = webClient
+//                .get()
+//                .uri("/policyDetail")
+//                .accept(MediaType.APPLICATION_JSON)
+//                .retrieve()
+//                .bodyToMono(new ParameterizedTypeReference<FubonPolicyDetailRespDTO>() {})
+//                .log();
+//        return  mono
+//                .flatMapMany()
+//                .map(resultMapper::mapToResultVO)
+//                .collectList()
+//                .block();
+
+        // 富邦API - 保單寄送紀錄查詢
+        // API名稱：getPrnDetail
+
+        // 富邦API - 理賠紀錄查詢
+        // 適用險種：全險種
+        // API名稱：ClmSalesAppWs/api101
+        // 測試API路徑：
+        // http://10.0.45.55:9080/fgisws/rest/ClmSalesAppWs/api101
+
+        // 富邦API - 保全紀錄查詢
+        // 適用險種：全險種
+        // API名稱：chkEnrData
+//        List<PolicyDetailReqDTO> detailResp = policyDetailRepository.findByTypeAndNum(insType, policyNum);
 //        return detailResp.stream()
 //                .map(ModelMapper::mapToDetailResult)
 //                .collect(Collectors.toList());
-    }
-
-    public void isRequestValid(PolicyListReqDTO request) {
-
+        return null;
     }
 
 

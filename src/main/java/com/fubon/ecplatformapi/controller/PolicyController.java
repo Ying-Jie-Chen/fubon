@@ -1,9 +1,10 @@
 package com.fubon.ecplatformapi.controller;
 
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
+import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.DetailResultDTO;
+import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import com.fubon.ecplatformapi.model.dto.vo.CreateDetailResultVO;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
 import com.fubon.ecplatformapi.service.AuthServiceImpl;
@@ -31,14 +32,13 @@ public class PolicyController {
         try {
 
             log.info("Fubon API /QueryList 的回應結果#Start");
-            List<PolicyListResultVO> queryResult = policyService.queryPolicyResults();
+            List<PolicyListResultVO> queryResult = policyService.queryPolicyResults(req);
 
             return ApiRespDTO.<List<PolicyListResultVO>>builder()
                     .data(queryResult)
                     .build();
 
         } catch (Exception e) {
-            log.error(e.toString());
             return  ApiRespDTO.<List<PolicyListResultVO>>builder()
                     .code(StatusCodeEnum.Err10001.name())
                     .message(StatusCodeEnum.Err10001.getMessage())
@@ -47,11 +47,10 @@ public class PolicyController {
     }
 
     @GetMapping("/queryPolicyDetail")
-    public ApiRespDTO<CreateDetailResultVO> queryDetail(@RequestParam String insType,
-                                                        @RequestParam String policyNum)
+    public ApiRespDTO<CreateDetailResultVO> queryDetail(@Valid @RequestBody PolicyDetailReqDTO request)
     {
         try {
-            DetailResultDTO detailResult = policyService.getPolicyDetail(insType, policyNum);
+            DetailResultVo detailResult = policyService.getPolicyDetail(request);
             CreateDetailResultVO resultVO = new CreateDetailResultVO();
             resultVO.setDetailResult(detailResult);
 
@@ -60,7 +59,6 @@ public class PolicyController {
                     .build();
 
         } catch (Exception e) {
-            log.error(e.toString());
             return ApiRespDTO.<CreateDetailResultVO>builder()
                     .code(StatusCodeEnum.Err10001.name())
                     .message(StatusCodeEnum.Err10001.getMessage())

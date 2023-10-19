@@ -44,7 +44,6 @@ public class BuildResponse {
         return response;
     }
 
-
     public FbLoginRespDTO buildLoginResponse(UserInfo userInfo) {
         log.info("建立 FubonAPI 登入的回應 #Start");
 

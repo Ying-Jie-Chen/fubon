@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi;
+package com.fubon.ecplatformapi.exception;
 
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;

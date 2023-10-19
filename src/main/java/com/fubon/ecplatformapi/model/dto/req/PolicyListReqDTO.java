@@ -1,7 +1,7 @@
 package com.fubon.ecplatformapi.model.dto.req;
 
-import com.fubon.ecplatformapi.InsTypeValidation;
-import com.fubon.ecplatformapi.PlateValidation;
+import com.fubon.ecplatformapi.validation.InsTypeValidation;
+import com.fubon.ecplatformapi.validation.PlateValidation;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

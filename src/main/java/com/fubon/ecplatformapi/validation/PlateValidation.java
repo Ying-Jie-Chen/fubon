@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi;
+package com.fubon.ecplatformapi.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

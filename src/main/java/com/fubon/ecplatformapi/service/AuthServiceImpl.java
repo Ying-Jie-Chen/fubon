@@ -7,6 +7,7 @@ import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -19,8 +20,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 public class AuthServiceImpl {
-    @Autowired
-    private BuildRequest buildRequest;
+
     @Autowired
     private SessionService sessionService;
     private static final String FUBON_API_URL = "http://localhost:8080";
@@ -70,7 +70,7 @@ public class AuthServiceImpl {
 
         assert fbLoginRespDTO != null;
         sessionService.saveSessionInfo(fbLoginRespDTO);
-        //sessionService.getSessionInfo(); // print session values
+        sessionService.getSessionInfo(); // print session values
 
         UserInfo userInfo = fbLoginRespDTO.getAny().getUserInfo();
         return userInfo;

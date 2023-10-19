@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi;
+package com.fubon.ecplatformapi.validation;
 
 import com.fubon.ecplatformapi.enums.InsuranceType;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;

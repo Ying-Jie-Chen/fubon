@@ -3,6 +3,7 @@ package com.fubon.ecplatformapi.controller;
 
 import com.fubon.ecplatformapi.Builber.BuildResponse;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
+import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
@@ -20,8 +21,8 @@ public class FubonController {
     @Autowired
     private BuildResponse buildResponse;
 
-    @GetMapping("/queryPolicy")
-    public FbQueryRespDTO QueryList(){
+    @PostMapping ("/queryPolicy")
+    public FbQueryRespDTO QueryList(@RequestBody PolicyListReqDTO req){
         return buildResponse.buildListResponse();
     }
 

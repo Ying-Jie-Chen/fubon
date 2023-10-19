@@ -1,7 +1,7 @@
 package com.fubon.ecplatformapi.config;
 
 import org.modelmapper.ModelMapper;
-import com.fubon.ecplatformapi.ResultMapper;
+import com.fubon.ecplatformapi.mapper.ResultMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -1,6 +1,7 @@
-package com.fubon.ecplatformapi;
+package com.fubon.ecplatformapi.validation;
 
 import com.fubon.ecplatformapi.enums.InsuranceType;
+import com.fubon.ecplatformapi.validation.InsTypeValidation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

@@ -1,6 +1,5 @@
-package com.fubon.ecplatformapi.model.dto.resp;
+package com.fubon.ecplatformapi.model.dto.vo;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -15,33 +14,34 @@ import java.util.List;
 
 
 @Data
-@NoArgsConstructor
-public class DetailResultDTO {
+@Builder
+public class DetailResultVo {
 
-    private InsuranceInfo insuranceInfo;
-    private InsuranceSubject insuranceSubject;
-    private List<EtpInsuranceSubject> etpInsuranceSubject;
-    private List<EtpInsuranceSubjectDetail> etpInsuranceSubjectDetail;
-    private List<InsuranceItem> insuranceItem;
-    private List<InsuranceList> insuranceList;
-    private List<PolicyDeliveryRecord> policyDeliveryRecord;
-    private List<UnpaidRecord> unpaidRecord;
-    private List<PaidRecord> paidRecord;
-    private List<ClaimRecord> claimRecord;
-    private List<ConservationRecord> conservationRecord;
+    private InsuranceInfo insuranceInfo; // 保單基本資料：富邦API - 取得保單資訊
+    private InsuranceSubject insuranceSubject; // 保險標的：富邦API - 取得保單資訊
+    private List<EtpInsuranceSubject> etpInsuranceSubject; // 企業險保險標的：富邦API - 取得保單資訊
+    private List<EtpInsuranceSubjectDetail> etpInsuranceSubjectDetail; // 企業險保險標的明細：富邦API - 取得保單資訊
+    private List<InsuranceItem> insuranceItem; // 保險項目：富邦API - 取得保單資訊
+    private List<InsuranceList> insuranceList; // 險種名冊：富邦API - 取得保單資訊
+    private List<InsuranceOtherList> insuranceOtherLis; // 其他險種名冊 個人傷害險的寵物險
+    private List<PolicyDeliveryRecord> policyDeliveryRecord; // 保單寄送記錄：富邦API - 保單寄送紀錄查詢
+    private List<UnpaidRecord> unpaidRecord; // 未繳保費
+    private List<PaidRecord> paidRecord; // 繳費紀錄：繳費記錄/未繳費記錄 未繳費記錄查詢條件：NFNV02.POLYNO ＝保單號碼 繳費記錄查詢條件：NFNV03.POLYNO ＝保單號碼
+    private List<ClaimRecord> claimRecord; // 理賠記錄：富邦API - 理賠紀錄查詢
+    private List<ConservationRecord> conservationRecord; // 保全紀錄：富邦API - 保全紀錄查詢
 
     @Data
-    @NoArgsConstructor
+    @Builder
     public static class InsuranceInfo {
         private BasicInfo basicInfo;
         private InsuredInfo insuredInfo;
         private List<InsuredList> insuredList;
         private ProposerInfo proposerInfo;
-        private FlightInfo flightInfo;
+        private List<FlightInfo> flightInfo;
     }
 
     @Data
-    @NoArgsConstructor
+    @Builder
     @AllArgsConstructor
     public static class BasicInfo {
         @Size(max = 14)
@@ -74,14 +74,13 @@ public class DetailResultDTO {
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     public static class InsuredInfo {
         @Size(max = 200)
         private String insuredName;
-
         @Size(max = 11)
         private String insuredId;
-
         private Calendar insuredBirthDate;
         @Size(max = 200)
         private String insuredAddr;
@@ -108,6 +107,7 @@ public class DetailResultDTO {
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     public static class InsuredList {
         @Size(max = 200)
@@ -137,9 +137,14 @@ public class DetailResultDTO {
         private String insuredRepresentative;
         @Size(max = 10)
         private String insuredRepresentativeId;
+        @Size(max = 20)
+        private String title;
+        @Size(max = 120)
+        private String beneficiary;
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     public static class ProposerInfo {
         @Size(max = 60)
@@ -174,6 +179,7 @@ public class DetailResultDTO {
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     public static class FlightInfo {
         @Size(max = 10)
@@ -182,6 +188,7 @@ public class DetailResultDTO {
         private String filghtCode;
         @Size(max = 200)
         private String filghtNo;
+
         private Calendar filghtDate;
         @Size(max = 10)
         private String filghtCity;
@@ -313,6 +320,21 @@ public class DetailResultDTO {
 
     @Data
     @AllArgsConstructor
+    private static class InsuranceOtherList {
+        @Size(max = 100)
+        private String petType;
+        private String petName;
+        @Size(max = 1)
+        private String petSex;
+        @Size(max = 10)
+        private Integer petSeq;
+        private Calendar petBirthDate;
+        @Size(max = 10)
+        private Integer petAge;
+    }
+
+    @Data
+    @AllArgsConstructor
     public static class PolicyDeliveryRecord{
         @Size(max = 100)
         private String prmDocName;
@@ -367,10 +389,13 @@ public class DetailResultDTO {
         private String platno;
 
         private String effdate;
-        @DecimalMax(value = "11") @DecimalMin(value = "2")
+
+        @DecimalMax(value = "13")
+        @DecimalMin(value = "2")
         private BigDecimal payamt;
 
         private Date pcllDate;
+
         @Size(max = 30)
         private String payKind;
     }

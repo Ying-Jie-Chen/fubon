@@ -13,6 +13,7 @@ import com.fubon.ecplatformapi.service.SessionService;
 import com.fubon.ecplatformapi.service.SsoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -49,7 +50,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ApiRespDTO<String> logout(){
         try {
-            //sessionService.getSessionInfo(); // print session values
+            sessionService.getSessionInfo(); // print session values
             sessionService.removeSession();
 
             return ApiRespDTO.<String>builder()
@@ -64,6 +65,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+
     public ApiRespDTO<UserInfo> login(@RequestBody LoginReq loginRequest){
 
         try {
