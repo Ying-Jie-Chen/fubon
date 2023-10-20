@@ -18,6 +18,8 @@ public class ApiRespDTO<T> {
     @Builder.Default
     private String message = "Success";
 
+    private String authToken;
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private transient T data;
 

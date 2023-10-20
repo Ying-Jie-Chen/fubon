@@ -7,6 +7,9 @@ import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
+import com.fubon.ecplatformapi.token.Token;
+import com.fubon.ecplatformapi.token.TokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,8 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import javax.crypto.SecretKey;
+
 
 @Slf4j
 @Service
@@ -23,6 +28,8 @@ public class AuthServiceImpl {
 
     @Autowired
     private SessionService sessionService;
+    @Autowired
+    TokenService tokenService;
     private static final String FUBON_API_URL = "http://localhost:8080";
 
     private final WebClient webClient;
@@ -54,7 +61,7 @@ public class AuthServiceImpl {
         return verificationVO;
     }
 
-    public UserInfo getUserInfo(LoginReq loginReq) {
+    public UserInfo getUserInfo(LoginReq loginReq, HttpServletRequest request) throws Exception {
 
         log.info("Fubon API /Login 的回應結果#Start");
 
@@ -69,8 +76,21 @@ public class AuthServiceImpl {
         FbLoginRespDTO fbLoginRespDTO = mono.block();
 
         assert fbLoginRespDTO != null;
-        sessionService.saveSessionInfo(fbLoginRespDTO);
-        sessionService.getSessionInfo(); // print session values
+
+        HttpSession httpSession = request.getSession();
+
+        String sessionId = httpSession.getId();
+        log.info("取得 session ID: " + sessionId);
+
+        sessionService.saveSessionInfo(fbLoginRespDTO, httpSession);
+
+        String empNo = loginReq.getAccount();
+        long timestamp = System.currentTimeMillis() / 1000;
+        SecretKey AESKey = tokenService.generateAES256Key();
+        Token token = tokenService.generateToken(sessionId, empNo, timestamp, AESKey);
+        log.info("Token: " + token.getToken());
+
+        sessionService.getSessionInfo(httpSession); // print session values
 
         UserInfo userInfo = fbLoginRespDTO.getAny().getUserInfo();
         return userInfo;

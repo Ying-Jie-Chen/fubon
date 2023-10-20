@@ -4,6 +4,7 @@ import com.fubon.ecplatformapi.enums.SessionManager;
 import com.fubon.ecplatformapi.config.SessionConfig;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.MapSession;
@@ -20,18 +21,39 @@ import java.util.UUID;
 public class SessionService {
     @Autowired
     private SessionConfig sessionConfig;
-
     private final String SESSION_ID = UUID.randomUUID().toString();
 
-    private void setSessionAttributes(MapSession mapSession, UserInfo user) {
-        SessionManager.setAttribute(mapSession, SessionManager.IDENTITY, user.getIdentify());
-        SessionManager.setAttribute(mapSession, SessionManager.EMP_NO, user.getAgent_id());
-        SessionManager.setAttribute(mapSession, SessionManager.EMP_NAME, user.getAgent_name());
-        SessionManager.setAttribute(mapSession, SessionManager.FBID, user.getId());
-        SessionManager.setAttribute(mapSession, SessionManager.UNION_NUM, user.getUnionNum());
-        SessionManager.setAttribute(mapSession, SessionManager.ADMIN_NUM, user.getAdmin_num());
-        SessionManager.setAttribute(mapSession, SessionManager.EMAIL, user.getEmail());
-        SessionManager.setAttribute(mapSession, SessionManager.XREF_INFOS, user.getXrefInfo());
+//    private void setSessionAttributes(MapSession mapSession, UserInfo user) {
+//        SessionManager.setAttribute(mapSession, SessionManager.IDENTITY, user.getIdentify());
+//        SessionManager.setAttribute(mapSession, SessionManager.EMP_NO, user.getAgent_id());
+//        SessionManager.setAttribute(mapSession, SessionManager.EMP_NAME, user.getAgent_name());
+//        SessionManager.setAttribute(mapSession, SessionManager.FBID, user.getId());
+//        SessionManager.setAttribute(mapSession, SessionManager.UNION_NUM, user.getUnionNum());
+//        SessionManager.setAttribute(mapSession, SessionManager.ADMIN_NUM, user.getAdmin_num());
+//        SessionManager.setAttribute(mapSession, SessionManager.EMAIL, user.getEmail());
+//        SessionManager.setAttribute(mapSession, SessionManager.XREF_INFOS, user.getXrefInfo());
+//
+//        List<UserInfo.XrefInfo> userXrefInfoList = user.getXrefInfo().stream()
+//                .map(xrefInfo -> UserInfo.XrefInfo.builder()
+//                        .xref(xrefInfo.getXref())
+//                        .channel(xrefInfo.getChannel())
+//                        .ascCrzSale(xrefInfo.getAscCrzSale())
+//                        .admin(xrefInfo.getAdmin())
+//                        .build())
+//                .toList();
+//
+//        SessionManager.setAttribute(mapSession, SessionManager.XREF_INFOS, userXrefInfoList);
+//    }
+
+    private void setSessionAttributes(HttpSession session, UserInfo user) {
+        session.setAttribute(String.valueOf(SessionManager.IDENTITY), user.getIdentify());
+        session.setAttribute(String.valueOf(SessionManager.EMP_NO), user.getAgent_id());
+        session.setAttribute(String.valueOf(SessionManager.EMP_NAME), user.getAgent_name());
+        session.setAttribute(String.valueOf(SessionManager.FBID), user.getId());
+        session.setAttribute(String.valueOf(SessionManager.UNION_NUM), user.getUnionNum());
+        session.setAttribute(String.valueOf(SessionManager.ADMIN_NUM), user.getAdmin_num());
+        session.setAttribute(String.valueOf(SessionManager.EMAIL), user.getEmail());
+        session.setAttribute(String.valueOf(SessionManager.XREF_INFOS), user.getXrefInfo());
 
         List<UserInfo.XrefInfo> userXrefInfoList = user.getXrefInfo().stream()
                 .map(xrefInfo -> UserInfo.XrefInfo.builder()
@@ -42,24 +64,24 @@ public class SessionService {
                         .build())
                 .toList();
 
-        SessionManager.setAttribute(mapSession, SessionManager.XREF_INFOS, userXrefInfoList);
+        session.setAttribute(String.valueOf(SessionManager.XREF_INFOS), userXrefInfoList);
     }
 
 
     /** 儲存登入者資訊
      *
      */
-    public void saveSessionInfo(FbLoginRespDTO fbLoginRespDTO){
+    public void saveSessionInfo(FbLoginRespDTO fbLoginRespDTO, HttpSession session){
         log.info("儲存登入者資訊#Start");
 
-        MapSessionRepository repository = sessionConfig.sessionRepository();
-        MapSession mapSession = new MapSession(SESSION_ID);
+        //MapSessionRepository repository = sessionConfig.sessionRepository();
+        //MapSession mapSession = new MapSession(httpSession.getId());
 
         UserInfo user = fbLoginRespDTO.getAny().getUserInfo();
-        setSessionAttributes(mapSession, user);
-
-        mapSession.setMaxInactiveInterval(Duration.ofMinutes(20));
-        repository.save(mapSession);
+        setSessionAttributes(session, user);
+        session.setMaxInactiveInterval(1200);
+        //mapSession.setMaxInactiveInterval(Duration.ofMinutes(20));
+        //repository.save(mapSession);
 
     }
 
@@ -69,37 +91,43 @@ public class SessionService {
      * 從會話中取得先前儲存的 Session Info
      */
 
-    public void getSessionInfo() {
+    public boolean getSessionInfo(HttpSession session) {
         log.info("取得儲存在Session中的Value#Start");
 
-        MapSessionRepository repository = sessionConfig.sessionRepository();
-        MapSession session = repository.findById(SESSION_ID);
-
-        if (session != null) {
-            for (SessionManager attribute : SessionManager.values()) {
-                SessionManager.getAttribute(session, attribute);
+        //MapSessionRepository repository = sessionConfig.sessionRepository();
+        //MapSession session = repository.findById(sessionId);
+        //log.info("ID: " + httpSession.getId());
+        for (SessionManager attribute : SessionManager.values()) {
+            Object value = session.getAttribute(attribute.name());
+            //SessionManager.getAttribute(session, attribute);
+            if (value != null) {
+                log.info(attribute.name() + ": " + value);
             }
-            printSession(session);
         }
+        return true;
+        //printSession(session);
     }
 
     public void printSession(Session session) {
         for (SessionManager attribute : SessionManager.values()) {
             Object value = SessionManager.getAttribute(session, attribute);
-            System.out.println("Attribute Name: " + attribute + ", Value: " + value);
+            log.info(attribute.name() + ": " + value.toString());
         }
     }
 
-    public void removeSession(){
+    public void removeSession(HttpSession session){
         log.info("清除Session#Start");
 
-        MapSessionRepository repository = sessionConfig.sessionRepository();
-        MapSession session = repository.findById(SESSION_ID);
+        //MapSessionRepository repository = sessionConfig.sessionRepository();
+        //MapSession session = repository.findById(sessionId);
         try {
             for (SessionManager attribute : SessionManager.values()) {
-                SessionManager.removeAttribute(session, attribute);
+                //SessionManager.removeAttribute(session, attribute);
+                session.removeAttribute(attribute.name());
+
+                log.info(attribute.name());
             }
-            printSession(session);
+
 
         } catch (Exception e) {
             log.error("Session 中沒有資料" + e.getMessage());

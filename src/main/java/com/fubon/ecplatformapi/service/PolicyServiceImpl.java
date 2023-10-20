@@ -44,7 +44,7 @@ public class PolicyServiceImpl {
 
 
     public List<PolicyListResultVO> queryPolicyResults(PolicyListReqDTO req) {
-        sessionService.getSessionInfo();
+
         Mono<FbQueryRespDTO> mono = webClient
                 .post()
                 .uri("/queryPolicy")

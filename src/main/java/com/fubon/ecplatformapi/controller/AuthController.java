@@ -11,9 +11,12 @@ import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
 import com.fubon.ecplatformapi.service.SessionService;
 import com.fubon.ecplatformapi.service.SsoService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
+import org.springframework.web.HttpMediaTypeException;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -27,11 +30,13 @@ public class AuthController {
     private SessionService sessionService;
     @Autowired
     private SsoService ssoService;
+    @Autowired
+    private HttpSession session;
 
     @PostMapping("/loginSSO")
     public ApiRespDTO<UserInfo> SSOLogin(@RequestBody SsoReqDTO ssoReq) {
         try {
-            sessionService.getSessionInfo(); // 印出session中的值
+            sessionService.getSessionInfo(session); // 印出session中的值
             //UserInfo responseData = ssoService.perfornSsoLogin(ssoReq);
             ssoService.perfornSsoLogin(ssoReq);
             return ApiRespDTO.<UserInfo>builder()
@@ -50,8 +55,8 @@ public class AuthController {
     @PostMapping("/logout")
     public ApiRespDTO<String> logout(){
         try {
-            sessionService.getSessionInfo(); // print session values
-            sessionService.removeSession();
+            sessionService.getSessionInfo(session); // print session values
+            sessionService.removeSession(session);
 
             return ApiRespDTO.<String>builder()
                     .build();
@@ -65,12 +70,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-
-    public ApiRespDTO<UserInfo> login(@RequestBody LoginReq loginRequest){
-
+    public ApiRespDTO<UserInfo> login(@RequestBody LoginReq loginRequest, HttpServletRequest request){
         try {
-
-            UserInfo responseData = authServiceImpl.getUserInfo(loginRequest);
+            UserInfo responseData = authServiceImpl.getUserInfo(loginRequest, request);
 
             return ApiRespDTO.<UserInfo>builder()
                     .data(responseData)

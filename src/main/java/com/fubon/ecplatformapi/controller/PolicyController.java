@@ -9,6 +9,8 @@ import com.fubon.ecplatformapi.model.dto.vo.CreateDetailResultVO;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
 import com.fubon.ecplatformapi.service.AuthServiceImpl;
 import com.fubon.ecplatformapi.service.PolicyServiceImpl;
+import com.fubon.ecplatformapi.token.Token;
+import com.fubon.ecplatformapi.token.TokenService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +27,18 @@ public class PolicyController {
     PolicyServiceImpl policyService;
     @Autowired
     AuthServiceImpl authServiceImpl;
+    @Autowired
+    TokenService tokenService;
 
-    @GetMapping("/queryPolicyList")
+    @GetMapping("/qu    eryPolicyList")
     public ApiRespDTO<List<PolicyListResultVO>> queryList(@Valid @RequestBody PolicyListReqDTO req) {
 
         try {
 
             log.info("Fubon API /QueryList 的回應結果#Start");
             List<PolicyListResultVO> queryResult = policyService.queryPolicyResults(req);
+            //String message = tokenService.validateToken(token, AESKey);
+			//log.info("message: " + message);
 
             return ApiRespDTO.<List<PolicyListResultVO>>builder()
                     .data(queryResult)
