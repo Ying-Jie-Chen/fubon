@@ -73,62 +73,58 @@ public class SessionService {
      */
     public void saveSessionInfo(FbLoginRespDTO fbLoginRespDTO, HttpSession session){
         log.info("儲存登入者資訊#Start");
+        log.info("Session ID: " + session.getId());
 
-        //MapSessionRepository repository = sessionConfig.sessionRepository();
-        //MapSession mapSession = new MapSession(httpSession.getId());
+//        MapSessionRepository repository = sessionConfig.sessionRepository();
+//        MapSession mapSession = new MapSession(sessionId);
 
         UserInfo user = fbLoginRespDTO.getAny().getUserInfo();
         setSessionAttributes(session, user);
+
+//        mapSession.setMaxInactiveInterval(Duration.ofMinutes(20));
+//        repository.save(mapSession);
+
+        setSessionAttributes(session, user);
         session.setMaxInactiveInterval(1200);
-        //mapSession.setMaxInactiveInterval(Duration.ofMinutes(20));
-        //repository.save(mapSession);
-
     }
-
 
 
     /**
      * 從會話中取得先前儲存的 Session Info
      */
 
-    public boolean getSessionInfo(HttpSession session) {
+    public void getSessionInfo(HttpSession session) {
         log.info("取得儲存在Session中的Value#Start");
+        log.info("Session ID: " + session.getId());
+//        MapSessionRepository repository = sessionConfig.sessionRepository();
+//        MapSession session = repository.findById(sessionId);
 
-        //MapSessionRepository repository = sessionConfig.sessionRepository();
-        //MapSession session = repository.findById(sessionId);
-        //log.info("ID: " + httpSession.getId());
-        for (SessionManager attribute : SessionManager.values()) {
-            Object value = session.getAttribute(attribute.name());
-            //SessionManager.getAttribute(session, attribute);
-            if (value != null) {
-                log.info(attribute.name() + ": " + value);
+            for (SessionManager attribute : SessionManager.values()) {
+                Object value = session.getAttribute(attribute.name());
+                //SessionManager.getAttribute(session, attribute);
+                log.info(attribute + ": " + value);
             }
-        }
-        return true;
-        //printSession(session);
+            //printSession(session);
     }
 
     public void printSession(Session session) {
         for (SessionManager attribute : SessionManager.values()) {
             Object value = SessionManager.getAttribute(session, attribute);
-            log.info(attribute.name() + ": " + value.toString());
+            log.info(attribute + ": " + value);
         }
     }
 
     public void removeSession(HttpSession session){
         log.info("清除Session#Start");
+        log.info("Session ID: " + session.getId());
 
-        //MapSessionRepository repository = sessionConfig.sessionRepository();
-        //MapSession session = repository.findById(sessionId);
+//        MapSessionRepository repository = sessionConfig.sessionRepository();
+//        MapSession session = repository.findById(sessionId);
         try {
             for (SessionManager attribute : SessionManager.values()) {
                 //SessionManager.removeAttribute(session, attribute);
                 session.removeAttribute(attribute.name());
-
-                log.info(attribute.name());
             }
-
-
         } catch (Exception e) {
             log.error("Session 中沒有資料" + e.getMessage());
             throw e;

@@ -5,7 +5,6 @@ import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
-import com.fubon.ecplatformapi.repository.PolicyListRepository;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +23,7 @@ import java.util.List;
 public class PolicyServiceImpl {
 
     @Autowired
-    private PolicyListRepository policyListRepository;
-    @Autowired
-    private ResultMapper resultMapper;
-    @Autowired
-    private SessionService sessionService;
+    ResultMapper resultMapper;
 
     private static final String FUBON_API_URL = "http://localhost:8080";
 

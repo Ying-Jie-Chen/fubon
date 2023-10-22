@@ -1,13 +1,8 @@
 package com.fubon.ecplatformapi.token;
 
 
-import com.fubon.ecplatformapi.config.SessionConfig;
-import com.fubon.ecplatformapi.service.SessionService;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.session.MapSession;
-import org.springframework.session.MapSessionRepository;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -17,54 +12,65 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Base64;
 
 @Slf4j
 @Service
 public class TokenServiceImpl implements TokenService {
+
     @Autowired
     TokenProperties tokenProperties;
-    @Autowired
-    SessionService sessionService;
-    @Autowired
-    HttpSession httpSession;
     private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
     private static final String SIGNATURE_ALGORITHM = "SHA-256";
+
+    private final SecretKey secretKey;
+    @Autowired
+    public TokenServiceImpl(SecretKey AESKey) {
+        this.secretKey = AESKey;
+    }
+
 
     /**
      *  生成 Token
      *
      */
     @Override
-    public Token generateToken(String sessionId, String empNo, long timestamp, SecretKey AESKey) throws Exception {
-
+    public Token generateToken(String sessionId, String empNo, long timestamp) throws Exception {
+        log.info("Generate Token #Start");
         String signature = SHA256Hash(sessionId + empNo + timestamp);
         String tokenContent = sessionId + "|" + empNo + "|" + timestamp + "|" + signature;
 
-        Token token = new Token();
-        token.setToken(encrypt(tokenContent, AESKey));
-        token.setRevoked(false);
-        token.setExpired(false);
+        log.info("Token 有效時間：" + tokenProperties.getExpirationMinutes());
+        long newTimestamp = System.currentTimeMillis() / 1000;
+
+
+        Token token = Token.builder()
+                .token(encrypt(tokenContent, secretKey))
+                .build();
+
+        // 更新 Token 的过期时间
+        token.setExpirationTime(tokenProperties.getExpirationMinutes());
+
+        log.info("Generate Token: " + token.getToken());
 
         return token;
     }
 
+
     /**
-     *  驗證 Token
-     *
+     * 驗證 Token
      */
     @Override
-    public String validateToken(Token token, SecretKey AESKey) throws Exception {
-
-        String decryptedToken = decrypt(token.getToken(), AESKey);
-        String[] tokenParts = decryptedToken.split("\\|");
+    public boolean isValidateToken(Token token) throws Exception {
+        log.info("驗證Token #Start");
+        String[] tokenParts = decrypt(token.getToken(), secretKey).split("\\|");
 
         if (tokenParts.length != 4) {
-            return "Invalid token format";
+            log.error("Invalid token format");
+            return false;
         }
-        log.info("http session ID: " + httpSession.getId());
+
         log.info(" tokenParts[0]: " + tokenParts[0]);
         log.info("在Session中找不到對應的資訊，則返回錯誤訊息");
 //        if (!sessionService.getSessionInfo(tokenParts[0])) {
@@ -73,8 +79,9 @@ public class TokenServiceImpl implements TokenService {
 
         log.info("驗證簽章#Start");
         if (!validateSignature(tokenParts[0], tokenParts[1], Long.parseLong(tokenParts[2]), tokenParts[3])) {
-            token.setRevoked(true);
-            return "Invalid signature";
+
+            log.error("Invalid signature");
+            return false;
         }
 
         long decryptedTimestamp = Long.parseLong(tokenParts[2]);
@@ -82,21 +89,62 @@ public class TokenServiceImpl implements TokenService {
         long tokenAge = currentTimestamp - decryptedTimestamp;
         Duration tokenExpirationTime = tokenProperties.getExpirationMinutes();
 
+
         log.info("驗證令牌是否過期#Start");
         if (tokenAge > tokenExpirationTime.toMillis()) {
-            token.setExpired(true);
+            //token.setExpired(true);
             //sessionService.removeSession(tokenParts[0]);
-            return "Token has expired";
+            log.error("Token has expired");
+            return false;
         }
-
-
-        return "Token is valid";
+        log.info("Token驗證成功 #End");
+        return true;
     }
 
     @Override
-    public Token updateToken(Token oldToken, SecretKey AESKey) throws Exception {
+    public boolean isTokenValid(String token) {
+        log.info("驗證Token #Start");
 
-        String decryptedToken = decrypt(oldToken.getToken(), AESKey);
+        if (token == null || secretKey == null) {
+            log.error("Token or AESKey is null");
+            return false;
+        }else {
+            log.info("token: " + token + "AESKey: " + secretKey);
+        }
+
+        try {
+            String[] tokenParts = decrypt(token, secretKey).split("\\|");
+
+            log.info("驗證簽章#Start");
+            if (!validateSignature(tokenParts[0], tokenParts[1], Long.parseLong(tokenParts[2]), tokenParts[3])) {
+
+                log.error("Invalid signature");
+                return false;
+            }
+            long decryptedTimestamp = Long.parseLong(tokenParts[2]);
+            long currentTimestamp = System.currentTimeMillis() / 1000;
+            long tokenAge = currentTimestamp - decryptedTimestamp;
+            Duration tokenExpirationTime = tokenProperties.getExpirationMinutes();
+
+            log.info("驗證令牌是否過期#Start");
+            if (tokenAge > tokenExpirationTime.toMillis()) {
+                //sessionService.removeSession(tokenParts[0]);
+                log.error("Token has expired");
+                return false;
+            }
+            generateToken(tokenParts[0], tokenParts[1], currentTimestamp);
+            log.info("Token驗證成功 #End");
+            return true;
+        } catch (Exception e) {
+            log.error("Token驗證失敗: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public Token updateToken(Token oldToken) throws Exception {
+
+        String decryptedToken = decrypt(oldToken.getToken(), secretKey);
         String[] tokenParts = decryptedToken.split("\\|");
 
         String sessionId = tokenParts[0];
@@ -108,20 +156,21 @@ public class TokenServiceImpl implements TokenService {
 
         long currentTimestamp = System.currentTimeMillis() / 1000;
 
-        Token newToken = generateToken(sessionId, empNo, currentTimestamp, AESKey);
-        oldToken.setRevoked(true);
+        Token newToken = generateToken(sessionId, empNo, currentTimestamp);
+        //oldToken.setRevoked(true);
 
-        log.info("Is Revoked?: " + oldToken.isRevoked());
+        //log.info("Is Revoked?: " + oldToken.isRevoked());
 
         return newToken;
     }
 
-    @Override
     public SecretKey generateAES256Key() throws Exception {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(ALGORITHM);
         keyGenerator.init(256);
         return keyGenerator.generateKey();
     }
+
+
 
     public static String encrypt(String data, SecretKey secretKey) throws Exception {
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);

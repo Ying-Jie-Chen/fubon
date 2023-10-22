@@ -1,13 +1,12 @@
 package com.fubon.ecplatformapi.controller;
 
+import com.fubon.ecplatformapi.model.dto.resp.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
-import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.service.AuthServiceImpl;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
 import com.fubon.ecplatformapi.service.SessionService;
 import com.fubon.ecplatformapi.service.SsoService;
@@ -15,9 +14,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
-import org.springframework.web.HttpMediaTypeException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 @Slf4j
 @RestController
@@ -25,18 +26,16 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     @Autowired
-    private AuthServiceImpl authServiceImpl;
+    AuthServiceImpl authServiceImpl;
     @Autowired
-    private SessionService sessionService;
+    SessionService sessionService;
     @Autowired
-    private SsoService ssoService;
-    @Autowired
-    private HttpSession session;
+    SsoService ssoService;
 
     @PostMapping("/loginSSO")
-    public ApiRespDTO<UserInfo> SSOLogin(@RequestBody SsoReqDTO ssoReq) {
+    public ApiRespDTO<UserInfo> SSOLogin(@RequestBody SsoReqDTO ssoReq, HttpServletRequest request) {
         try {
-            sessionService.getSessionInfo(session); // 印出session中的值
+            //sessionService.getSessionInfo(request.getSession()); // 印出session中的值
             //UserInfo responseData = ssoService.perfornSsoLogin(ssoReq);
             ssoService.perfornSsoLogin(ssoReq);
             return ApiRespDTO.<UserInfo>builder()
@@ -53,10 +52,12 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ApiRespDTO<String> logout(){
+    public ApiRespDTO<String> logout(HttpServletRequest request){
         try {
-            sessionService.getSessionInfo(session); // print session values
+            HttpSession session = request.getSession(false);
+
             sessionService.removeSession(session);
+            sessionService.getSessionInfo(session); // print session values
 
             return ApiRespDTO.<String>builder()
                     .build();
@@ -70,20 +71,30 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ApiRespDTO<UserInfo> login(@RequestBody LoginReq loginRequest, HttpServletRequest request){
-        try {
-            UserInfo responseData = authServiceImpl.getUserInfo(loginRequest, request);
+    public  ResponseEntity<ApiRespDTO<UserInfo>> login(@RequestBody LoginReq loginRequest, HttpServletRequest request){
 
-            return ApiRespDTO.<UserInfo>builder()
-                    .data(responseData)
-                    .build();
+        try {
+            HttpSession session = request.getSession(true);
+
+            LoginRespVo responseData = authServiceImpl.getUserInfo(loginRequest, session);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", "Bearer " + responseData.getToken());
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(ApiRespDTO.<UserInfo>builder()
+                            .data(responseData.getUserInfo())
+                            .authToken(responseData.getToken())
+                            .build());
 
         } catch (Exception e) {
             log.error(e.getMessage());
-            return  ApiRespDTO.<UserInfo>builder()
-                    .code(StatusCodeEnum.Err10001.name())
-                    .message(StatusCodeEnum.Err10001.getMessage())
-                    .build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiRespDTO.<UserInfo>builder()
+                            .code(StatusCodeEnum.Err10001.name())
+                            .message(StatusCodeEnum.Err10001.getMessage())
+                            .build());
         }
     }
 

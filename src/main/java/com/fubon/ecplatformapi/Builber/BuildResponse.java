@@ -19,7 +19,7 @@ import java.util.List;
 public class BuildResponse {
 
     @Autowired
-    private ObjectMapper objectMapper;
+    ObjectMapper objectMapper;
 
     public VerificationResp buildVerificationImageResponse() {
         log.info("建立 FubonAPI 取得圖形驗證的回應 #Start");
@@ -63,7 +63,7 @@ public class BuildResponse {
                         .userInfo(userInfo)
                         .build())
                 .build();
-        printJSON(response);
+        //printJSON(response);
         return response;
     }
 

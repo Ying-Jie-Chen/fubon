@@ -7,10 +7,8 @@ import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import com.fubon.ecplatformapi.model.dto.vo.CreateDetailResultVO;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
-import com.fubon.ecplatformapi.service.AuthServiceImpl;
 import com.fubon.ecplatformapi.service.PolicyServiceImpl;
-import com.fubon.ecplatformapi.token.Token;
-import com.fubon.ecplatformapi.token.TokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,30 +23,23 @@ public class PolicyController {
 
     @Autowired
     PolicyServiceImpl policyService;
-    @Autowired
-    AuthServiceImpl authServiceImpl;
-    @Autowired
-    TokenService tokenService;
 
-    @GetMapping("/qu    eryPolicyList")
-    public ApiRespDTO<List<PolicyListResultVO>> queryList(@Valid @RequestBody PolicyListReqDTO req) {
+    @GetMapping("/queryPolicyList")
+    public ApiRespDTO<List<PolicyListResultVO>> queryList(@Valid @RequestBody PolicyListReqDTO req, HttpServletRequest request) {
 
         try {
-
             log.info("Fubon API /QueryList 的回應結果#Start");
             List<PolicyListResultVO> queryResult = policyService.queryPolicyResults(req);
-            //String message = tokenService.validateToken(token, AESKey);
-			//log.info("message: " + message);
 
             return ApiRespDTO.<List<PolicyListResultVO>>builder()
                     .data(queryResult)
                     .build();
 
-        } catch (Exception e) {
-            return  ApiRespDTO.<List<PolicyListResultVO>>builder()
-                    .code(StatusCodeEnum.Err10001.name())
-                    .message(StatusCodeEnum.Err10001.getMessage())
-                    .build();
+        } catch(Exception e){
+                return ApiRespDTO.<List<PolicyListResultVO>>builder()
+                        .code(StatusCodeEnum.Err10001.name())
+                        .message(StatusCodeEnum.Err10001.getMessage())
+                        .build();
         }
     }
 
