@@ -6,6 +6,7 @@ import com.fubon.ecplatformapi.model.dto.resp.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
 import com.fubon.ecplatformapi.token.Token;
+import com.fubon.ecplatformapi.token.TokenRepository;
 import com.fubon.ecplatformapi.token.TokenService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,8 @@ public class AuthServiceImpl {
     SessionService sessionService;
     @Autowired
     TokenService tokenService;
+    @Autowired
+    TokenRepository tokenRepository;
     private static final String FUBON_API_URL = "http://localhost:8080";
     private final WebClient webClient;
     @Autowired
@@ -76,8 +79,8 @@ public class AuthServiceImpl {
         long timestamp = System.currentTimeMillis() / 1000;
 
 
-        Token token = tokenService.generateToken(session.getId(), empNo, timestamp);
-        String authToken = token.getToken();
+        String authToken = tokenService.generateToken(session.getId(), empNo, timestamp);
+        saveUserToken(authToken);
 
         //log.info("Session service 儲存的 session id: " + session.getId());
         //sessionService.getSessionInfo(session); // print session values
@@ -88,7 +91,14 @@ public class AuthServiceImpl {
                 .build();
     }
 
-
+    private void saveUserToken(String authToken) {
+        Token token = Token.builder()
+                .token(authToken)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
+    }
 
 
 }

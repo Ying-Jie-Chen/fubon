@@ -21,6 +21,8 @@ import java.util.Objects;
 public class HeaderAspect {
     @Autowired
     TokenService tokenService;
+    @Autowired
+    TokenRepository tokenRepository;
 
     @Pointcut("execution(* com.fubon.ecplatformapi.controller.PolicyController.*(..))")
     private void headerValidation() { }
@@ -40,10 +42,11 @@ public class HeaderAspect {
             String token = authHeader.substring(7);
             log.info("token: " + token);
 
+            Token storedToken = tokenRepository.findByToken(token).orElse(null);
+            log.info("storedToken: " + storedToken);
+
             if ( tokenService.isTokenValid(token) ) {
-                //Token oldToken = decodeToken(token);
-                //Token newToken = tokenService.generateNewToken(oldToken);
-                //oldToken.setExpired(true);
+
                 return joinPoint.proceed();
             }else {
                 return ApiRespDTO.builder()

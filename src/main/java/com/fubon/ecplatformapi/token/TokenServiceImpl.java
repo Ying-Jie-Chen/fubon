@@ -36,25 +36,15 @@ public class TokenServiceImpl implements TokenService {
      *
      */
     @Override
-    public Token generateToken(String sessionId, String empNo, long timestamp) throws Exception {
+    public String generateToken(String sessionId, String empNo, long timestamp) throws Exception {
         log.info("Generate Token #Start");
+
         String signature = SHA256Hash(sessionId + empNo + timestamp);
         String tokenContent = sessionId + "|" + empNo + "|" + timestamp + "|" + signature;
-
         log.info("Token 有效時間：" + tokenProperties.getExpirationMinutes());
-        long newTimestamp = System.currentTimeMillis() / 1000;
-
-
-        Token token = Token.builder()
-                .token(encrypt(tokenContent, secretKey))
-                .build();
-
-        // 更新 Token 的过期时间
-        token.setExpirationTime(tokenProperties.getExpirationMinutes());
-
-        log.info("Generate Token: " + token.getToken());
-
-        return token;
+        String authToken = encrypt(tokenContent, secretKey);
+        log.info("Generate Token: " + authToken);
+        return authToken;
     }
 
 
@@ -156,12 +146,13 @@ public class TokenServiceImpl implements TokenService {
 
         long currentTimestamp = System.currentTimeMillis() / 1000;
 
-        Token newToken = generateToken(sessionId, empNo, currentTimestamp);
+        String newToken = generateToken(sessionId, empNo, currentTimestamp);
         //oldToken.setRevoked(true);
 
         //log.info("Is Revoked?: " + oldToken.isRevoked());
 
-        return newToken;
+        //return newToken;
+        return null;
     }
 
     public SecretKey generateAES256Key() throws Exception {
