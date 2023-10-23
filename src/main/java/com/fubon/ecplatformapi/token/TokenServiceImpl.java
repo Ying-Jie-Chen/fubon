@@ -1,6 +1,7 @@
 package com.fubon.ecplatformapi.token;
 
 
+import com.fubon.ecplatformapi.service.SessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,10 @@ public class TokenServiceImpl implements TokenService {
 
     @Autowired
     TokenProperties tokenProperties;
+    @Autowired
+    TokenRepository tokenRepository;
+    @Autowired
+    SessionService sessionService;
     private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
     private static final String SIGNATURE_ALGORITHM = "SHA-256";
@@ -41,7 +46,7 @@ public class TokenServiceImpl implements TokenService {
 
         String signature = SHA256Hash(sessionId + empNo + timestamp);
         String tokenContent = sessionId + "|" + empNo + "|" + timestamp + "|" + signature;
-        log.info("Token 有效時間：" + tokenProperties.getExpirationMinutes());
+        //log.info("Token 有效時間：" + tokenProperties.getExpirationMinutes());
         String authToken = encrypt(tokenContent, secretKey);
         log.info("Generate Token: " + authToken);
         return authToken;
@@ -52,8 +57,10 @@ public class TokenServiceImpl implements TokenService {
      * 驗證 Token
      */
     @Override
-    public boolean isValidateToken(Token token) throws Exception {
+    public boolean isTokenValid(Token token) throws Exception {
         log.info("驗證Token #Start");
+        log.info("token: " + token + "AESKey: " + secretKey);
+
         String[] tokenParts = decrypt(token.getToken(), secretKey).split("\\|");
 
         if (tokenParts.length != 4) {
@@ -61,7 +68,7 @@ public class TokenServiceImpl implements TokenService {
             return false;
         }
 
-        log.info(" tokenParts[0]: " + tokenParts[0]);
+        log.info(" Session ID: " + tokenParts[0]);
         log.info("在Session中找不到對應的資訊，則返回錯誤訊息");
 //        if (!sessionService.getSessionInfo(tokenParts[0])) {
 //            return "Session ID does not match or doesn't exist in Session";
@@ -69,66 +76,39 @@ public class TokenServiceImpl implements TokenService {
 
         log.info("驗證簽章#Start");
         if (!validateSignature(tokenParts[0], tokenParts[1], Long.parseLong(tokenParts[2]), tokenParts[3])) {
-
+            token.setRevoked(true);
             log.error("Invalid signature");
             return false;
         }
 
         long decryptedTimestamp = Long.parseLong(tokenParts[2]);
-        long currentTimestamp = System.currentTimeMillis() / 1000;
+        long currentTimestamp = System.currentTimeMillis();
         long tokenAge = currentTimestamp - decryptedTimestamp;
         Duration tokenExpirationTime = tokenProperties.getExpirationMinutes();
 
-
         log.info("驗證令牌是否過期#Start");
         if (tokenAge > tokenExpirationTime.toMillis()) {
-            //token.setExpired(true);
+            token.setExpired(true);
             //sessionService.removeSession(tokenParts[0]);
             log.error("Token has expired");
             return false;
         }
         log.info("Token驗證成功 #End");
+        token.setRevoked(true);
+        token.setExpired(true);
+        tokenRepository.save(token);
+        // 更新 token 過期時間
+        //tokenProperties.setExpirationMinutes(tokenExpirationTime);
+        //log.info("Token 過期時間: " + tokenExpirationTime);
+        // 產生新 token
+        Token newToken = Token.builder()
+                .token(generateToken(tokenParts[0], tokenParts[1],currentTimestamp))
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(newToken);
+        log.info("New Token: " + newToken);
         return true;
-    }
-
-    @Override
-    public boolean isTokenValid(String token) {
-        log.info("驗證Token #Start");
-
-        if (token == null || secretKey == null) {
-            log.error("Token or AESKey is null");
-            return false;
-        }else {
-            log.info("token: " + token + "AESKey: " + secretKey);
-        }
-
-        try {
-            String[] tokenParts = decrypt(token, secretKey).split("\\|");
-
-            log.info("驗證簽章#Start");
-            if (!validateSignature(tokenParts[0], tokenParts[1], Long.parseLong(tokenParts[2]), tokenParts[3])) {
-
-                log.error("Invalid signature");
-                return false;
-            }
-            long decryptedTimestamp = Long.parseLong(tokenParts[2]);
-            long currentTimestamp = System.currentTimeMillis() / 1000;
-            long tokenAge = currentTimestamp - decryptedTimestamp;
-            Duration tokenExpirationTime = tokenProperties.getExpirationMinutes();
-
-            log.info("驗證令牌是否過期#Start");
-            if (tokenAge > tokenExpirationTime.toMillis()) {
-                //sessionService.removeSession(tokenParts[0]);
-                log.error("Token has expired");
-                return false;
-            }
-            generateToken(tokenParts[0], tokenParts[1], currentTimestamp);
-            log.info("Token驗證成功 #End");
-            return true;
-        } catch (Exception e) {
-            log.error("Token驗證失敗: " + e.getMessage());
-            return false;
-        }
     }
 
     @Override

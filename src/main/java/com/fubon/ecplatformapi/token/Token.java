@@ -1,30 +1,40 @@
 package com.fubon.ecplatformapi.token;
 
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.Duration;
 
+@Entity
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Token {
 
-    public String tokenHeader;
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private Long id;
 
+    @Column(name = "token")
     private String token;
 
-    @Builder.Default
-    public Boolean revoked = false;
+    @Column(name = "revoked")
+    public Boolean revoked;
 
-    @Builder.Default
-    public Boolean expired = false;
+    @Column(name = "expired")
+    public Boolean expired;
 
-    private Duration expirationTime;
+//    public String tokenHeader;
+//    private Duration expirationTime;
+//    private String sessionId;
+//    private String empNo;
+//    private long timestamp;
+//    private String signature;
 
-    private String sessionId;
-    private String empNo;
-    private long timestamp;
-    private String signature;
 
 }

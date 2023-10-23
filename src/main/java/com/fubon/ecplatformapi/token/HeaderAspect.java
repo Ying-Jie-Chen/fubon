@@ -45,8 +45,7 @@ public class HeaderAspect {
             Token storedToken = tokenRepository.findByToken(token).orElse(null);
             log.info("storedToken: " + storedToken);
 
-            if ( tokenService.isTokenValid(token) ) {
-
+            if ( tokenService.isTokenValid(storedToken) ) {
                 return joinPoint.proceed();
             }else {
                 return ApiRespDTO.builder()

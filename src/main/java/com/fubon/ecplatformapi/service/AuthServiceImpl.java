@@ -76,7 +76,7 @@ public class AuthServiceImpl {
         sessionService.saveSessionInfo(fbLoginRespDTO, session);
 
         String empNo = loginReq.getAccount();
-        long timestamp = System.currentTimeMillis() / 1000;
+        long timestamp = System.currentTimeMillis();
 
 
         String authToken = tokenService.generateToken(session.getId(), empNo, timestamp);
