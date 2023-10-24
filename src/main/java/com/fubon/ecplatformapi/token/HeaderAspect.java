@@ -2,6 +2,7 @@ package com.fubon.ecplatformapi.token;
 
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -32,6 +33,7 @@ public class HeaderAspect {
 
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         final String authHeader = request.getHeader("Authorization");
+        HttpSession session = request.getSession();
 
         try {
 
@@ -44,8 +46,7 @@ public class HeaderAspect {
 
             Token storedToken = tokenRepository.findByToken(token).orElse(null);
             log.info("storedToken: " + storedToken);
-
-            if ( tokenService.isTokenValid(storedToken) ) {
+            if ( tokenService.isTokenValid(storedToken, session)) {
                 return joinPoint.proceed();
             }else {
                 return ApiRespDTO.builder()

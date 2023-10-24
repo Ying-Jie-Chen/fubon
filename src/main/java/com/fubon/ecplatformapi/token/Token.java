@@ -29,12 +29,5 @@ public class Token {
     @Column(name = "expired")
     public Boolean expired;
 
-//    public String tokenHeader;
-//    private Duration expirationTime;
-//    private String sessionId;
-//    private String empNo;
-//    private long timestamp;
-//    private String signature;
-
 
 }

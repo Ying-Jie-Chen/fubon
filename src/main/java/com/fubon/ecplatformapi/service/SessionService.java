@@ -93,18 +93,23 @@ public class SessionService {
      * 從會話中取得先前儲存的 Session Info
      */
 
-    public void getSessionInfo(HttpSession session) {
+    public boolean getSessionInfo(HttpSession session) {
         log.info("取得儲存在Session中的Value#Start");
         log.info("Session ID: " + session.getId());
 //        MapSessionRepository repository = sessionConfig.sessionRepository();
 //        MapSession session = repository.findById(sessionId);
-
+        if(session.getId() != null) {
             for (SessionManager attribute : SessionManager.values()) {
                 Object value = session.getAttribute(attribute.name());
                 //SessionManager.getAttribute(session, attribute);
                 log.info(attribute + ": " + value);
+                return true;
             }
-            //printSession(session);
+        }else {
+            return false;
+        }
+        return true;
+        //printSession(session);
     }
 
     public void printSession(Session session) {

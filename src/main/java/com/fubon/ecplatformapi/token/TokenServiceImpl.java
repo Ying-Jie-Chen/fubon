@@ -2,6 +2,7 @@ package com.fubon.ecplatformapi.token;
 
 
 import com.fubon.ecplatformapi.service.SessionService;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class TokenServiceImpl implements TokenService {
      * 驗證 Token
      */
     @Override
-    public boolean isTokenValid(Token token) throws Exception {
+    public boolean isTokenValid(Token token, HttpSession session) throws Exception {
         log.info("驗證Token #Start");
         log.info("token: " + token + "AESKey: " + secretKey);
 
@@ -68,11 +69,13 @@ public class TokenServiceImpl implements TokenService {
             return false;
         }
 
-        log.info(" Session ID: " + tokenParts[0]);
+        log.info("token praise Session ID: " + tokenParts[0]);
+        log.info("session id: " + session.getId());
         log.info("在Session中找不到對應的資訊，則返回錯誤訊息");
-//        if (!sessionService.getSessionInfo(tokenParts[0])) {
-//            return "Session ID does not match or doesn't exist in Session";
-//        }
+        if (!sessionService.getSessionInfo(session)) {
+            log.error("Session ID does not match or doesn't exist in Session");
+            return false;
+        }
 
         log.info("驗證簽章#Start");
         if (!validateSignature(tokenParts[0], tokenParts[1], Long.parseLong(tokenParts[2]), tokenParts[3])) {
@@ -89,7 +92,7 @@ public class TokenServiceImpl implements TokenService {
         log.info("驗證令牌是否過期#Start");
         if (tokenAge > tokenExpirationTime.toMillis()) {
             token.setExpired(true);
-            //sessionService.removeSession(tokenParts[0]);
+            sessionService.removeSession(session);
             log.error("Token has expired");
             return false;
         }
@@ -100,6 +103,7 @@ public class TokenServiceImpl implements TokenService {
         // 更新 token 過期時間
         //tokenProperties.setExpirationMinutes(tokenExpirationTime);
         //log.info("Token 過期時間: " + tokenExpirationTime);
+
         // 產生新 token
         Token newToken = Token.builder()
                 .token(generateToken(tokenParts[0], tokenParts[1],currentTimestamp))
@@ -124,7 +128,7 @@ public class TokenServiceImpl implements TokenService {
             throw new IllegalArgumentException("Invalid old token");
         }
 
-        long currentTimestamp = System.currentTimeMillis() / 1000;
+        long currentTimestamp = System.currentTimeMillis();
 
         String newToken = generateToken(sessionId, empNo, currentTimestamp);
         //oldToken.setRevoked(true);
