@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 @Getter
 @AllArgsConstructor
-public enum SessionManager {
+public enum SessionAttribute {
     IDENTITY("identity"),
 
     EMP_NO("empNo"),
@@ -28,15 +28,15 @@ public enum SessionManager {
 
     private final String attributeName;
 
-    public static void setAttribute(Session session, SessionManager attribute, Object value) {
+    public static void setAttribute(Session session, SessionAttribute attribute, Object value) {
         session.setAttribute(attribute.getAttributeName(), value);
     }
 
-    public static Object getAttribute(Session session, SessionManager attribute) {
+    public static Object getAttribute(Session session, SessionAttribute attribute) {
         return session.getAttribute(attribute.getAttributeName());
     }
 
-    public static void removeAttribute(Session session, SessionManager attribute) {
+    public static void removeAttribute(Session session, SessionAttribute attribute) {
         session.removeAttribute(attribute.getAttributeName());
     }
 

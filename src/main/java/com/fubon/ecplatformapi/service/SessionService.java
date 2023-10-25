@@ -1,6 +1,6 @@
 package com.fubon.ecplatformapi.service;
 
-import com.fubon.ecplatformapi.enums.SessionManager;
+import com.fubon.ecplatformapi.enums.SessionAttribute;
 import com.fubon.ecplatformapi.config.SessionConfig;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
@@ -46,14 +46,14 @@ public class SessionService {
 //    }
 
     private void setSessionAttributes(HttpSession session, UserInfo user) {
-        session.setAttribute(String.valueOf(SessionManager.IDENTITY), user.getIdentify());
-        session.setAttribute(String.valueOf(SessionManager.EMP_NO), user.getAgent_id());
-        session.setAttribute(String.valueOf(SessionManager.EMP_NAME), user.getAgent_name());
-        session.setAttribute(String.valueOf(SessionManager.FBID), user.getId());
-        session.setAttribute(String.valueOf(SessionManager.UNION_NUM), user.getUnionNum());
-        session.setAttribute(String.valueOf(SessionManager.ADMIN_NUM), user.getAdmin_num());
-        session.setAttribute(String.valueOf(SessionManager.EMAIL), user.getEmail());
-        session.setAttribute(String.valueOf(SessionManager.XREF_INFOS), user.getXrefInfo());
+        session.setAttribute(String.valueOf(SessionAttribute.IDENTITY), user.getIdentify());
+        session.setAttribute(String.valueOf(SessionAttribute.EMP_NO), user.getAgent_id());
+        session.setAttribute(String.valueOf(SessionAttribute.EMP_NAME), user.getAgent_name());
+        session.setAttribute(String.valueOf(SessionAttribute.FBID), user.getId());
+        session.setAttribute(String.valueOf(SessionAttribute.UNION_NUM), user.getUnionNum());
+        session.setAttribute(String.valueOf(SessionAttribute.ADMIN_NUM), user.getAdmin_num());
+        session.setAttribute(String.valueOf(SessionAttribute.EMAIL), user.getEmail());
+        session.setAttribute(String.valueOf(SessionAttribute.XREF_INFOS), user.getXrefInfo());
 
         List<UserInfo.XrefInfo> userXrefInfoList = user.getXrefInfo().stream()
                 .map(xrefInfo -> UserInfo.XrefInfo.builder()
@@ -64,7 +64,7 @@ public class SessionService {
                         .build())
                 .toList();
 
-        session.setAttribute(String.valueOf(SessionManager.XREF_INFOS), userXrefInfoList);
+        session.setAttribute(String.valueOf(SessionAttribute.XREF_INFOS), userXrefInfoList);
     }
 
 
@@ -79,7 +79,6 @@ public class SessionService {
 //        MapSession mapSession = new MapSession(sessionId);
 
         UserInfo user = fbLoginRespDTO.getAny().getUserInfo();
-        setSessionAttributes(session, user);
 
 //        mapSession.setMaxInactiveInterval(Duration.ofMinutes(20));
 //        repository.save(mapSession);
@@ -99,7 +98,7 @@ public class SessionService {
 //        MapSessionRepository repository = sessionConfig.sessionRepository();
 //        MapSession session = repository.findById(sessionId);
         if(session.getId() != null) {
-            for (SessionManager attribute : SessionManager.values()) {
+            for (SessionAttribute attribute : SessionAttribute.values()) {
                 Object value = session.getAttribute(attribute.name());
                 //SessionManager.getAttribute(session, attribute);
                 log.info(attribute + ": " + value);
@@ -113,8 +112,8 @@ public class SessionService {
     }
 
     public void printSession(Session session) {
-        for (SessionManager attribute : SessionManager.values()) {
-            Object value = SessionManager.getAttribute(session, attribute);
+        for (SessionAttribute attribute : SessionAttribute.values()) {
+            Object value = SessionAttribute.getAttribute(session, attribute);
             log.info(attribute + ": " + value);
         }
     }
@@ -126,7 +125,7 @@ public class SessionService {
 //        MapSessionRepository repository = sessionConfig.sessionRepository();
 //        MapSession session = repository.findById(sessionId);
         try {
-            for (SessionManager attribute : SessionManager.values()) {
+            for (SessionAttribute attribute : SessionAttribute.values()) {
                 //SessionManager.removeAttribute(session, attribute);
                 session.removeAttribute(attribute.name());
             }

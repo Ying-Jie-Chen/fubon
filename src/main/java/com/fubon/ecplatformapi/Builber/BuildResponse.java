@@ -97,7 +97,7 @@ public class BuildResponse {
                                 .build()
                 ))
                 .build();
-        printJSON(response);
+        //printJSON(response);
         return response;
     }
 

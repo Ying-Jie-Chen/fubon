@@ -1,5 +1,6 @@
 package com.fubon.ecplatformapi.controller;
 
+import com.fubon.ecplatformapi.enums.SessionAttribute;
 import com.fubon.ecplatformapi.model.dto.resp.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
@@ -10,6 +11,7 @@ import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
 import com.fubon.ecplatformapi.service.SessionService;
 import com.fubon.ecplatformapi.service.SsoService;
+import com.fubon.ecplatformapi.token.SessionHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -52,12 +54,10 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ApiRespDTO<String> logout(HttpServletRequest request){
+    public ApiRespDTO<String> logout(HttpSession session){
         try {
-            HttpSession session = request.getSession(false);
 
             sessionService.removeSession(session);
-            sessionService.getSessionInfo(session); // print session values
 
             return ApiRespDTO.<String>builder()
                     .build();
@@ -71,18 +71,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public  ResponseEntity<ApiRespDTO<UserInfo>> login(@RequestBody LoginReq loginRequest, HttpServletRequest request){
+    public  ResponseEntity<ApiRespDTO<UserInfo>> login(@RequestBody LoginReq loginRequest, HttpSession session){
 
         try {
-            HttpSession session = request.getSession(true);
-
             LoginRespVo responseData = authServiceImpl.getUserInfo(loginRequest, session);
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", "Bearer " + responseData.getToken());
 
-            return ResponseEntity.ok()
-                    .headers(headers)
+            return ResponseEntity.ok().headers(headers)
                     .body(ApiRespDTO.<UserInfo>builder()
                             .data(responseData.getUserInfo())
                             .authToken(responseData.getToken())

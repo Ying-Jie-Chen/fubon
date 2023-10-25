@@ -5,6 +5,7 @@ import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
+import com.fubon.ecplatformapi.token.SessionHelper;
 import com.fubon.ecplatformapi.token.Token;
 import com.fubon.ecplatformapi.token.TokenRepository;
 import com.fubon.ecplatformapi.token.TokenService;
@@ -78,12 +79,10 @@ public class AuthServiceImpl {
         String empNo = loginReq.getAccount();
         long timestamp = System.currentTimeMillis();
 
-
         String authToken = tokenService.generateToken(session.getId(), empNo, timestamp);
         saveUserToken(authToken);
 
-        //log.info("Session service 儲存的 session id: " + session.getId());
-        //sessionService.getSessionInfo(session); // print session values
+        SessionHelper.getAllValue(session);
 
         return LoginRespVo.builder()
                 .token(authToken)

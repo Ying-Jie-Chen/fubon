@@ -11,7 +11,6 @@ public class LoginRespVo {
 
     @JsonProperty("token")
     private String token;
-
     private UserInfo userInfo;
 
 }

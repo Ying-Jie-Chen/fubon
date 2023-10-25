@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
 
 import java.util.List;
 

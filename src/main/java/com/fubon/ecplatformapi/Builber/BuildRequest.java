@@ -52,7 +52,7 @@ public class BuildRequest {
                         .build())
                 .build();
 
-        printJSON(req);
+        //printJSON(req);
         return req;
 
     }
