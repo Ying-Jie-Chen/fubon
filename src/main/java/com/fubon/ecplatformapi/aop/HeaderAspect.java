@@ -1,5 +1,6 @@
 package com.fubon.ecplatformapi.aop;
 
+import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.model.entity.Token;
 import com.fubon.ecplatformapi.repository.TokenRepository;
@@ -28,7 +29,7 @@ public class HeaderAspect {
     @Autowired
     TokenRepository tokenRepository;
 
-    @Pointcut("execution(* com.fubon.ecplatformapi.controller.PolicyController.*(..))")
+    @Pointcut("execution(* com.fubon.ecplatformapi.controller.other.*.*(..))")
     private void headerValidation() { }
 
     @Around("headerValidation()")
@@ -38,33 +39,30 @@ public class HeaderAspect {
         HttpSession session = request.getSession();
         try {
 
-            if (StringUtils.isEmpty(authHeader) || !authHeader.startsWith("Bearer")) {
-                return ApiRespDTO.builder()
-                        .code("UNAUTHORIZED")
-                        .message("Invalid or missing token")
-                        .build();
-            }
+            if (StringUtils.isEmpty(authHeader) || !authHeader.startsWith("Bearer")) { return errorResponse(); }
 
             String token = authHeader.substring(7);
             Token storedToken = tokenRepository.findByToken(token).orElse(null);
-            log.info("storedToken: " + storedToken);
 
             if (tokenService.isTokenValid(storedToken, session)) {
+
                 tokenService.updateToken(storedToken);
+
                 return joinPoint.proceed();
-            }else {
-                return ApiRespDTO.builder()
-                        .code("UNAUTHORIZED")
-                        .message("Unauthorized: Invalid token")
-                        .build();
-            }
+
+            }else { return errorResponse(); }
 
         } catch (Throwable e) {
             log.error("Error: " + e.getMessage());
-            return ApiRespDTO.builder()
-                    .code("INTERNAL_SERVER_ERROR")
-                    .message("Internal Server Error")
-                    .build();
+            return errorResponse();
         }
     }
+
+    private ApiRespDTO<?> errorResponse() {
+        return ApiRespDTO.builder()
+                .code(StatusCodeEnum.ERR02002.getCode())
+                .message(StatusCodeEnum.ERR02002.getMessage())
+                .build();
+    }
 }
+

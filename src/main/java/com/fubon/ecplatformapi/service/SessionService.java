@@ -11,4 +11,5 @@ public interface SessionService {
 
     void saveSessionInfo(FbLoginRespDTO fbLoginRespDTO, HttpSession session);
 
+    void removeSession(HttpSession session);
 }

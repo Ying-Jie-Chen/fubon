@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.MapSession;
 import org.springframework.session.MapSessionRepository;
-import org.springframework.session.Session;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -60,7 +59,7 @@ public class SessionServiceImpl implements SessionService {
         session.setMaxInactiveInterval(1200);
     }
 
-
+    @Override
     public void removeSession(HttpSession session){
         log.info("清除Session#Start");
 

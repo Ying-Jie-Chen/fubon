@@ -3,13 +3,13 @@ package com.fubon.ecplatformapi.controller;
 import com.fubon.ecplatformapi.model.dto.resp.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
-import com.fubon.ecplatformapi.service.impl.AuthServiceImpl;
+import com.fubon.ecplatformapi.service.AuthService;
+import com.fubon.ecplatformapi.service.SessionService;
+import com.fubon.ecplatformapi.service.SsoService;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
-import com.fubon.ecplatformapi.service.impl.SessionServiceImpl;
-import com.fubon.ecplatformapi.service.impl.SsoServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -24,20 +24,19 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
     @Autowired
-    AuthServiceImpl authServiceImpl;
+    AuthService authService;
     @Autowired
-    SessionServiceImpl sessionService;
+    SessionService sessionService;
     @Autowired
-    SsoServiceImpl ssoService;
+    SsoService ssoService;
 
     @PostMapping("/loginSSO")
     public ApiRespDTO<UserInfo> SSOLogin(@RequestBody SsoReqDTO ssoReq, HttpServletRequest request) {
         try {
             //sessionService.getSessionInfo(request.getSession()); // 印出session中的值
             //UserInfo responseData = ssoService.perfornSsoLogin(ssoReq);
-            ssoService.perfornSsoLogin(ssoReq);
+            //ssoService.perfornSsoLogin(ssoReq);
             return ApiRespDTO.<UserInfo>builder()
                     //.data(responseData)
                     .build();
@@ -54,7 +53,6 @@ public class AuthController {
     @PostMapping("/logout")
     public ApiRespDTO<String> logout(HttpSession session){
         try {
-
             sessionService.removeSession(session);
 
             return ApiRespDTO.<String>builder()
@@ -69,10 +67,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public  ResponseEntity<ApiRespDTO<UserInfo>> login(@RequestBody LoginReq loginRequest, HttpSession session){
+    public  ResponseEntity<ApiRespDTO<UserInfo>> login(@RequestBody LoginReq loginReq, HttpSession session){
 
         try {
-            LoginRespVo responseData = authServiceImpl.getUserInfo(loginRequest, session);
+            LoginRespVo responseData = authService.getUserInfo(loginReq, session);
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", "Bearer " + responseData.getToken());
@@ -97,7 +95,7 @@ public class AuthController {
     public ApiRespDTO<VerificationImageVO> getVerificationImage() {
         try {
 
-            VerificationImageVO responseData = authServiceImpl.getVerificationImage();
+            VerificationImageVO responseData = authService.getVerificationImage();
 
             return ApiRespDTO.<VerificationImageVO>builder()
                     .data(responseData)
