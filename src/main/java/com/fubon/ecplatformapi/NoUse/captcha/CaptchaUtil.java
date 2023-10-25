@@ -1,6 +1,6 @@
 package com.fubon.ecplatformapi.NoUse.captcha;
 
-import com.fubon.ecplatformapi.service.SessionService;
+import com.fubon.ecplatformapi.service.impl.SessionServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import java.util.Random;
 @Service
 public class CaptchaUtil {
     @Autowired
-    SessionService sessionService;
+    SessionServiceImpl sessionService;
 
     private final int CODE_SIZE = 4;
     private final int WIDTH = 165;

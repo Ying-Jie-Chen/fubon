@@ -1,17 +1,15 @@
 package com.fubon.ecplatformapi.controller;
 
-import com.fubon.ecplatformapi.enums.SessionAttribute;
 import com.fubon.ecplatformapi.model.dto.resp.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
-import com.fubon.ecplatformapi.service.AuthServiceImpl;
+import com.fubon.ecplatformapi.service.impl.AuthServiceImpl;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.model.entity.UserInfo;
-import com.fubon.ecplatformapi.service.SessionService;
-import com.fubon.ecplatformapi.service.SsoService;
-import com.fubon.ecplatformapi.token.SessionHelper;
+import com.fubon.ecplatformapi.service.impl.SessionServiceImpl;
+import com.fubon.ecplatformapi.service.impl.SsoServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +28,9 @@ public class AuthController {
     @Autowired
     AuthServiceImpl authServiceImpl;
     @Autowired
-    SessionService sessionService;
+    SessionServiceImpl sessionService;
     @Autowired
-    SsoService ssoService;
+    SsoServiceImpl ssoService;
 
     @PostMapping("/loginSSO")
     public ApiRespDTO<UserInfo> SSOLogin(@RequestBody SsoReqDTO ssoReq, HttpServletRequest request) {
@@ -47,8 +45,8 @@ public class AuthController {
         } catch (Exception e) {
             log.error(e.getMessage());
             return  ApiRespDTO.<UserInfo>builder()
-                    .code(StatusCodeEnum.Err10001.name())
-                    .message(StatusCodeEnum.Err10001.getMessage())
+                    .code(StatusCodeEnum.ERR00999.name())
+                    .message(StatusCodeEnum.ERR00999.getMessage())
                     .build();
         }
     }
@@ -64,8 +62,8 @@ public class AuthController {
         } catch (Exception e){
             log.error(e.getMessage());
             return  ApiRespDTO.<String>builder()
-                    .code(StatusCodeEnum.Err10001.name())
-                    .message(StatusCodeEnum.Err10001.getMessage())
+                    .code(StatusCodeEnum.ERR00999.name())
+                    .message(StatusCodeEnum.ERR00999.getMessage())
                     .build();
         }
     }
@@ -89,8 +87,8 @@ public class AuthController {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiRespDTO.<UserInfo>builder()
-                            .code(StatusCodeEnum.Err10001.name())
-                            .message(StatusCodeEnum.Err10001.getMessage())
+                            .code(StatusCodeEnum.ERR00999.name())
+                            .message(StatusCodeEnum.ERR00999.getMessage())
                             .build());
         }
     }
@@ -108,8 +106,8 @@ public class AuthController {
         } catch (Exception e) {
             log.error(e.getMessage());
             return  ApiRespDTO.<VerificationImageVO>builder()
-                    .code(StatusCodeEnum.Err10001.name())
-                    .message(StatusCodeEnum.Err10001.getMessage())
+                    .code(StatusCodeEnum.ERR00999.name())
+                    .message(StatusCodeEnum.ERR00999.getMessage())
                     .build();
         }
     }

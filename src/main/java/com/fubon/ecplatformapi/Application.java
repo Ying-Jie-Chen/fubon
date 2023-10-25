@@ -1,6 +1,6 @@
 package com.fubon.ecplatformapi;
 
-import com.fubon.ecplatformapi.token.TokenProperties;
+import com.fubon.ecplatformapi.properties.TokenProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

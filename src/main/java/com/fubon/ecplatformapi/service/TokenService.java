@@ -1,5 +1,6 @@
-package com.fubon.ecplatformapi.token;
+package com.fubon.ecplatformapi.service;
 
+import com.fubon.ecplatformapi.model.entity.Token;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 
@@ -7,6 +8,6 @@ import org.springframework.stereotype.Service;
 public interface TokenService {
     String generateToken(String sessionId, String empNo, long timestamp) throws Exception;
     boolean isTokenValid(Token token, HttpSession session) throws Exception;
-    String updateToken(Token oldToken) throws Exception;
+    void updateToken(Token oldToken) throws Exception;
 
 }

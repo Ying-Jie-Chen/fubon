@@ -1,7 +1,11 @@
-package com.fubon.ecplatformapi.token;
+package com.fubon.ecplatformapi.service.impl;
 
 
-import com.fubon.ecplatformapi.service.SessionService;
+import com.fubon.ecplatformapi.service.TokenService;
+import com.fubon.ecplatformapi.helper.SessionHelper;
+import com.fubon.ecplatformapi.model.entity.Token;
+import com.fubon.ecplatformapi.properties.TokenProperties;
+import com.fubon.ecplatformapi.repository.TokenRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +27,7 @@ public class TokenServiceImpl implements TokenService {
     @Autowired
     TokenRepository tokenRepository;
     @Autowired
-    SessionService sessionService;
+    SessionServiceImpl sessionService;
     private static final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
     private static final String SIGNATURE_ALGORITHM = "SHA-256";
     private final SecretKey secretKey;
@@ -57,24 +61,19 @@ public class TokenServiceImpl implements TokenService {
 
             String[] tokenParts = decrypt(token.getToken(), secretKey).split("\\|");
 
-            if (tokenParts.length != 4) {
-                //log.error("Invalid token format");
+            if (tokenParts.length != 4 || !tokenParts[0].equals(session.getId())) {
+                //log.error("在Session中找不到對應的資訊或是Invalid token format");
                 token.setRevoked(true);
             }
 
             Object value = SessionHelper.getAllValue(session);
-            log.info("value: " + value);
-
-            if (!tokenParts[0].equals(session.getId())) {
-                log.error("在Session中找不到對應的資訊");
-                token.setRevoked(true);
-            }
+            //log.info("value: " + value);
 
             log.info("驗證簽章#Start");
             if (!validateSignature(tokenParts[0], tokenParts[1], Long.parseLong(tokenParts[2]), tokenParts[3])) {
                 token.setRevoked(true);
                 sessionService.removeSession(session);
-                log.error("Invalid signature");
+                //log.error("Invalid signature");
             }
 
             long decryptedTimestamp = Long.parseLong(tokenParts[2]);
@@ -82,13 +81,11 @@ public class TokenServiceImpl implements TokenService {
             long tokenAge = currentTimestamp - decryptedTimestamp;
             Duration tokenExpirationTime = tokenProperties.getExpirationMinutes();
 
-            log.info("Token Age: " + tokenAge);
-
             log.info("驗證令牌是否過期#Start");
             if (tokenAge > tokenExpirationTime.toMillis()) {
                 token.setExpired(true);
                 sessionService.removeSession(session);
-                log.error("Token has expired");
+                //log.error("Token has expired");
             }
 
             if (token.getRevoked() || token.getExpired()){
@@ -96,7 +93,7 @@ public class TokenServiceImpl implements TokenService {
                 return false;
             }
 
-            log.info("Token驗證成功 #End");
+            //log.info("Token驗證成功 #End");
             return true;
 
         }catch (Exception e){
@@ -108,11 +105,9 @@ public class TokenServiceImpl implements TokenService {
 
     /**
      * 更新 Token
-     *
-     * @return
      */
     @Override
-    public String updateToken(Token oldToken) throws Exception {
+    public void updateToken(Token oldToken) throws Exception {
         oldToken.setRevoked(true);
         oldToken.setExpired(true);
         tokenRepository.save(oldToken);
@@ -126,9 +121,7 @@ public class TokenServiceImpl implements TokenService {
                 .revoked(false)
                 .build();
         tokenRepository.save(newToken);
-
-        log.info("New Token: " + newToken);
-        return newToken.getToken();
+        //log.info("New Token: " + newToken);
     }
 
     public static String encrypt(String data, SecretKey secretKey) throws Exception {

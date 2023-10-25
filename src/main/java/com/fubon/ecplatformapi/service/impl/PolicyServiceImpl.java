@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.service;
+package com.fubon.ecplatformapi.service.impl;
 
 import com.fubon.ecplatformapi.mapper.ResultMapper;
 import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
@@ -6,6 +6,7 @@ import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
+import com.fubon.ecplatformapi.service.PolicyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -20,7 +21,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class PolicyServiceImpl {
+public class PolicyServiceImpl implements PolicyService {
 
     @Autowired
     ResultMapper resultMapper;
@@ -37,7 +38,7 @@ public class PolicyServiceImpl {
 //        return policyListRepository.save(policyListReq);
 //    }
 
-
+    @Override
     public List<PolicyListResultVO> queryPolicyResults(PolicyListReqDTO req) {
 
         Mono<FbQueryRespDTO> mono = webClient
@@ -55,7 +56,7 @@ public class PolicyServiceImpl {
                 .block();
     }
 
-
+    @Override
     public DetailResultVo getPolicyDetail(PolicyDetailReqDTO request) {
         // 富邦API - 取得保單資訊
         // API名稱：policyDetail

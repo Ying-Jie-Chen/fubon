@@ -1,10 +1,10 @@
-package com.fubon.ecplatformapi.token;
+package com.fubon.ecplatformapi.repository;
 
+import com.fubon.ecplatformapi.model.entity.Token;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository

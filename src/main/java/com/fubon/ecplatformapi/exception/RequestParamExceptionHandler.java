@@ -21,7 +21,7 @@ public class RequestParamExceptionHandler {
                 .toList();
         return ApiRespDTO
                 .builder()
-                .code(StatusCodeEnum.Err10001.name())
+                .code(StatusCodeEnum.ERR00999.name())
                 .message(errors.toString())
                 .build();
 

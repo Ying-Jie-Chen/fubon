@@ -1,6 +1,9 @@
-package com.fubon.ecplatformapi.token;
+package com.fubon.ecplatformapi.aop;
 
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
+import com.fubon.ecplatformapi.model.entity.Token;
+import com.fubon.ecplatformapi.repository.TokenRepository;
+import com.fubon.ecplatformapi.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -9,8 +12,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import com.microsoft.sqlserver.jdbc.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -26,8 +27,6 @@ public class HeaderAspect {
     TokenService tokenService;
     @Autowired
     TokenRepository tokenRepository;
-    @Autowired
-    TokenProperties tokenProperties;
 
     @Pointcut("execution(* com.fubon.ecplatformapi.controller.PolicyController.*(..))")
     private void headerValidation() { }

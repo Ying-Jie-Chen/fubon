@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.token;
+package com.fubon.ecplatformapi.helper;
 
 import com.fubon.ecplatformapi.enums.SessionAttribute;
 import jakarta.servlet.http.HttpSession;

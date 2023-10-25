@@ -1,7 +1,7 @@
 package com.fubon.ecplatformapi.NoUse.captcha;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fubon.ecplatformapi.service.SessionService;
+import com.fubon.ecplatformapi.service.impl.SessionServiceImpl;
 import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import lombok.extern.slf4j.Slf4j;
@@ -14,13 +14,11 @@ public class CaptchaService {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private SessionService sessionService;
+    private SessionServiceImpl sessionService;
 
 
     /** 驗證用戶輸入的驗證碼是否匹配
      *
-     * @param userInput
-     * @return
      */
     public boolean verifyCaptcha(String userInput){
         log.info("驗證用戶輸入的驗證碼#Start");

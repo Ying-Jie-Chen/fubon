@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.token;
+package com.fubon.ecplatformapi.properties;
 
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;

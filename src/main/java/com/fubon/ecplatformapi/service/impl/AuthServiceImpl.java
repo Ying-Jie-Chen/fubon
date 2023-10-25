@@ -1,14 +1,15 @@
-package com.fubon.ecplatformapi.service;
+package com.fubon.ecplatformapi.service.impl;
 
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
-import com.fubon.ecplatformapi.token.SessionHelper;
-import com.fubon.ecplatformapi.token.Token;
-import com.fubon.ecplatformapi.token.TokenRepository;
-import com.fubon.ecplatformapi.token.TokenService;
+import com.fubon.ecplatformapi.service.AuthService;
+import com.fubon.ecplatformapi.helper.SessionHelper;
+import com.fubon.ecplatformapi.model.entity.Token;
+import com.fubon.ecplatformapi.repository.TokenRepository;
+import com.fubon.ecplatformapi.service.TokenService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +22,10 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
-public class AuthServiceImpl {
+public class AuthServiceImpl implements AuthService {
 
     @Autowired
-    SessionService sessionService;
+    SessionServiceImpl sessionService;
     @Autowired
     TokenService tokenService;
     @Autowired
@@ -36,6 +37,7 @@ public class AuthServiceImpl {
         this.webClient = webClientBuilder.baseUrl(FUBON_API_URL).build();
     }
 
+    @Override
     public VerificationImageVO getVerificationImage() {
 
         log.info("Fubon API /GetVerificationImage 的回應結果#Start");
@@ -59,6 +61,7 @@ public class AuthServiceImpl {
         return verificationVO;
     }
 
+    @Override
     public LoginRespVo getUserInfo(LoginReq loginReq, HttpSession session) throws Exception {
 
         log.info("Fubon API /Login 的回應結果#Start");
@@ -90,7 +93,8 @@ public class AuthServiceImpl {
                 .build();
     }
 
-    private void saveUserToken(String authToken) {
+    @Override
+    public void saveUserToken(String authToken) {
         Token token = Token.builder()
                 .token(authToken)
                 .expired(false)
@@ -98,6 +102,5 @@ public class AuthServiceImpl {
                 .build();
         tokenRepository.save(token);
     }
-
 
 }

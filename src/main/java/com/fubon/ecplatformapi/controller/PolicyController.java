@@ -7,9 +7,9 @@ import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import com.fubon.ecplatformapi.model.dto.vo.CreateDetailResultVO;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
-import com.fubon.ecplatformapi.service.PolicyServiceImpl;
-import com.fubon.ecplatformapi.token.*;
-import jakarta.servlet.http.HttpServletRequest;
+import com.fubon.ecplatformapi.model.entity.Token;
+import com.fubon.ecplatformapi.repository.TokenRepository;
+import com.fubon.ecplatformapi.service.impl.PolicyServiceImpl;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +44,8 @@ public class PolicyController {
 
         } catch(Exception e){
                 return ApiRespDTO.<List<PolicyListResultVO>>builder()
-                        .code(StatusCodeEnum.Err10001.name())
-                        .message(StatusCodeEnum.Err10001.getMessage())
+                        .code(StatusCodeEnum.ERR00999.name())
+                        .message(StatusCodeEnum.ERR00999.getMessage())
                         .build();
         }
     }
@@ -64,8 +64,8 @@ public class PolicyController {
 
         } catch (Exception e) {
             return ApiRespDTO.<CreateDetailResultVO>builder()
-                    .code(StatusCodeEnum.Err10001.name())
-                    .message(StatusCodeEnum.Err10001.getMessage())
+                    .code(StatusCodeEnum.ERR00999.name())
+                    .message(StatusCodeEnum.ERR00999.getMessage())
                     .build();
         }
     }

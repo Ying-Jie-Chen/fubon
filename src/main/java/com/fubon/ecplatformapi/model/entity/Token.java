@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.token;
+package com.fubon.ecplatformapi.model.entity;
 
 
 import jakarta.persistence.*;

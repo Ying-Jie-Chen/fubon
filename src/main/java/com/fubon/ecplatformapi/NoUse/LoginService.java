@@ -15,7 +15,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.web.reactive.function.server.RequestPredicates.queryParam;
 
 @Slf4j
 @Service
@@ -28,7 +27,7 @@ public class LoginService {
 
     private static final String FUBON_API_URL = "http://localhost:8080";
 
-    private WebClient webClient;
+    private final WebClient webClient;
     @Autowired
     public LoginService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl(FUBON_API_URL).build();
@@ -52,8 +51,8 @@ public class LoginService {
 //                                .build())
 //                        .build();
                 return ApiRespDTO.<UserInfo>builder()
-                        .code(StatusCodeEnum.Err10001.name())
-                        .message(StatusCodeEnum.Err10001.getMessage())
+                        .code(StatusCodeEnum.ERR00999.getCode())
+                        .message(StatusCodeEnum.ERR00999.getMessage())
                         .build();
 
             } else {

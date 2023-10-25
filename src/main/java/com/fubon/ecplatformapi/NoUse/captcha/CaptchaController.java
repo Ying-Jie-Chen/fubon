@@ -52,8 +52,8 @@ public class CaptchaController {
 
     private ApiRespDTO<Map<String, Object>> errorResponse() {
         return ApiRespDTO.<Map<String, Object>>builder()
-                .code(StatusCodeEnum.Err10001.name())
-                .message(StatusCodeEnum.Err10001.getMessage())
+                .code(StatusCodeEnum.ERR00999.name())
+                .message(StatusCodeEnum.ERR00999.getMessage())
                 .data(null)
                 .build();
     }
