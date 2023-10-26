@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.controller.other;
+package com.fubon.ecplatformapi.controller;
 
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
@@ -35,10 +35,10 @@ public class PolicyController {
             log.info("Fubon API /QueryList 的回應結果#Start");
             List<PolicyListResultVO> queryResult = policyService.queryPolicyResults(req);
 
-            Token storedToken = tokenRepository.findLatestToken();
-
             return ApiRespDTO.<List<PolicyListResultVO>>builder()
-                    .authToken(storedToken.getToken())
+                    .code(StatusCodeEnum.SUCCESS.getCode())
+                    .message(StatusCodeEnum.SUCCESS.getMessage())
+                    .authToken(tokenRepository.findLatestToken().getToken())
                     .data(queryResult)
                     .build();
 
@@ -59,6 +59,9 @@ public class PolicyController {
             resultVO.setDetailResult(detailResult);
 
             return ApiRespDTO.<CreateDetailResultVO>builder()
+                    .code(StatusCodeEnum.SUCCESS.getCode())
+                    .message(StatusCodeEnum.SUCCESS.getMessage())
+                    .authToken(tokenRepository.findLatestToken().getToken())
                     .data(resultVO)
                     .build();
 

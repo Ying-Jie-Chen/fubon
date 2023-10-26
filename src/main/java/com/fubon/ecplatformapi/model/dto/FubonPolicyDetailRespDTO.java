@@ -1,6 +1,9 @@
 package com.fubon.ecplatformapi.model.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -12,12 +15,14 @@ import java.util.List;
  *
  */
 @Data
+@Builder
 public class FubonPolicyDetailRespDTO {
 
     private EcAppInsure ecAppInsure;
     private EcAppInsureEtp ecAppInsureEtp;
 
     @Data
+    @Builder
     public static class EcAppInsure {
         private String voltPolicyNum;
         private String compPolicyNum;
@@ -44,6 +49,7 @@ public class FubonPolicyDetailRespDTO {
 
     }
     @Data
+    @Builder
     public static class EcAppInsureEtp {
         private String policyNum;
         private String clsCode;
@@ -57,10 +63,12 @@ public class FubonPolicyDetailRespDTO {
         private RmaEcAppWsBean rmaAEcAppWsBean;
         private Collection<RskEcAppEtpWsBean> rskEcAppWsBeans;
         private Collection<RskDEcAppEtpWsBean> rskDEcAppWsBeans;
+        //private 保險項目標題 pitColumnNames;
         private Collection<PitEcAppEtpWsBean> pitEcAppWsBean;
 
     }
     @Data
+    @Builder
     public static class SecEcAppWsBean {
         private String secFormatid;
         private String secEffdate;
@@ -71,6 +79,8 @@ public class FubonPolicyDetailRespDTO {
         private String secFubonlifeAgree;
         private String secPayMode;
         private String secPaymthd;
+        private String setMtg;
+        private String setMtg2;
         private Long secTotalnum;
         private String secCty1;
         private String secCty2;
@@ -78,11 +88,13 @@ public class FubonPolicyDetailRespDTO {
         private String secCty4;
     }
     @Data
+    @Builder
     public static class EecEcAppWsBean {
         private String eecMountain;
         private String eecActivity;
     }
     @Data
+    @Builder
     public static class RmaEcAppWsBean {
         private String rmaType;
         private String rmaCliname;
@@ -102,6 +114,7 @@ public class FubonPolicyDetailRespDTO {
         private String rmaQualification;
     }
     @Data
+    @Builder
     public static class EcoEcAppWsBeans {
         private Integer ecoSeq;
         private String ecoUid;
@@ -115,8 +128,10 @@ public class FubonPolicyDetailRespDTO {
         private String ecoCrcGrp;
         private String ecoPtcptno;
         private String ecoReltn;
+        private Integer ecoAge;
     }
     @Data
+    @Builder
     public static class MohEcAppWsBean {
         private String mohPlatno;
         private String mohMotCode;
@@ -128,11 +143,13 @@ public class FubonPolicyDetailRespDTO {
         private String mohVehTramak;
     }
     @Data
+    @Builder
     public static class CrdEcAppWsBean {
         private String crdCardno;
         private String crdExpdate;
     }
     @Data
+    @Builder
     public static class PitEcAppWsBean {
         private String pitBnfCode;
         private String pitEb0Name;
@@ -149,6 +166,7 @@ public class FubonPolicyDetailRespDTO {
         private String eb0TsiUnit;
     }
     @Data
+    @Builder
     public static class PitNecAppWsBeans {
         private String pitBnfCode;
         private String pitNUid;
@@ -158,11 +176,13 @@ public class FubonPolicyDetailRespDTO {
         private String pitNBeneficiary;
     }
     @Data
+    @Builder
     public static class RskEcAppWsBean {
         private String rskLocation;
         private String rskSection;
     }
     @Data
+    @Builder
     public static class BudEcAppWsBean {
         private String budBuildyear;
         private String budOccp;
@@ -176,16 +196,21 @@ public class FubonPolicyDetailRespDTO {
         private String budAddfeeMark;
     }
     @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class RmaMEcAppWsBean {
         private String rmaCliname;
     }
     @Data
+    @Builder
     public static class AscEcAppWsBean {
         private String ascAdmin;
         private String ascCrzSale;
         private String ascIscXref;
     }
     @Data
+    @Builder
     public static class MidEcAPpWsBean {
         private String midContent;
         private String midName;
@@ -195,6 +220,7 @@ public class FubonPolicyDetailRespDTO {
         private Integer midAge;
     }
     @Data
+    @Builder
     public static class FliEcAppWsBeans {
         private Integer fliRskSeq;
         private String fliFlightCode;
@@ -204,23 +230,27 @@ public class FubonPolicyDetailRespDTO {
         private String fliFlightCty;
     }
     @Data
-    private static class PitEcAppEtpWsBean {
+    @Builder
+    public static class PitEcAppEtpWsBean {
         private Integer pitRskSeq;
         private String pitRskType;
         private Collection<String> values;
     }
     @Data
-    private static class RskEcAppEtpWsBean {
+    @Builder
+    public static class RskEcAppEtpWsBean {
         private String content;
         private String desc;
     }
     @Data
-    private static class RskDEcAppEtpWsBean {
+    @Builder
+    public static class RskDEcAppEtpWsBean {
         private Integer seq;
         private Collection<String> values;
     }
     @Data
-    private static class BenEcAppWsBean {
+    @Builder
+    public static class BenEcAppWsBean {
         private String benRsktype;
         private Integer benRskSeq;
         private Integer benPitseq;

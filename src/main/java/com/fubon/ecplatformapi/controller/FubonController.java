@@ -1,13 +1,15 @@
-package com.fubon.ecplatformapi.controller.other;
+package com.fubon.ecplatformapi.controller;
 
 
 import com.fubon.ecplatformapi.Builber.BuildResponse;
+import com.fubon.ecplatformapi.model.dto.FubonPolicyDetailRespDTO;
+import com.fubon.ecplatformapi.model.dto.GetFubonSSOTokenRespDTO;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
-import com.fubon.ecplatformapi.model.entity.UserInfo;
+import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,10 +23,16 @@ public class FubonController {
     @Autowired
     private BuildResponse buildResponse;
 
+    @GetMapping("/GetSSOToken")
+    public GetFubonSSOTokenRespDTO getSSOToken(){return buildResponse.buildSSOTokenResponse();}
+
     @PostMapping ("/queryPolicy")
     public FbQueryRespDTO QueryList(@RequestBody PolicyListReqDTO req){
         return buildResponse.buildListResponse();
     }
+
+    @GetMapping("/policyDetail")
+    public FubonPolicyDetailRespDTO getPolicyDetail(){return  buildResponse.buildPolicyDetailResponse(); }
 
     @GetMapping ("/GetVerificationImage")
     public VerificationResp GetVerificationImage() {
@@ -44,15 +52,15 @@ public class FubonController {
     }
 
 
-    public UserInfo createUserInfo() {
-        UserInfo.XrefInfo xrefInfo = UserInfo.XrefInfo.builder()
+    public GetUserInfoVo createUserInfo() {
+        GetUserInfoVo.XrefInfo xrefInfo = GetUserInfoVo.XrefInfo.builder()
                 .xref("經辦代號")
                 .channel("通路號")
                 .ascCrzSale("業務員ID")
                 .admin("管理人員編")
                 .build();
 
-        return UserInfo.builder()
+        return GetUserInfoVo.builder()
                 .agent_name("姓名")
                 .agent_id("經辦代號")
                 .admin_num("管理人員編")

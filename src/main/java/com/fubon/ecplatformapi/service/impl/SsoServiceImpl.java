@@ -2,6 +2,8 @@ package com.fubon.ecplatformapi.service.impl;
 
 //import com.fubon.ecplatformapi.repository.CompanyRepository;
 //import com.fubon.ecplatformapi.repository.LicenseInfoRepository;
+import com.fubon.ecplatformapi.enums.SSOLoginEnum;
+import com.fubon.ecplatformapi.model.dto.GetFubonSSOTokenRespDTO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import com.fubon.ecplatformapi.service.SsoService;
 import lombok.extern.slf4j.Slf4j;
@@ -12,42 +14,70 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
 @Slf4j
 @Service
 public class SsoServiceImpl implements SsoService {
-
-//    @Autowired
+    private static final String DOMAIN_URL = "https://tb2b.518fb.com/ecws/json/service";
+    private final WebClient webClient;
+    @Autowired
+    public SsoServiceImpl(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder.baseUrl(DOMAIN_URL).build();
+    }
+    //    @Autowired
 //    LicenseInfoRepository licenseInfoRepository;
 //    @Autowired
 //    CompanyRepository companyRepository;
+    @Override
+    public String getSSOToken(){
 
-    public Object perfornSsoLogin(SsoReqDTO sspReq) {
+        Mono<GetFubonSSOTokenRespDTO> mono = webClient
+                .get()
+                .uri("/GetSSOToken")
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(GetFubonSSOTokenRespDTO.class);
+
+        GetFubonSSOTokenRespDTO respDTO = mono.block();
+        assert respDTO != null;
+        return respDTO.getAny().getSid();
+    }
+
+
+    @Override
+    public void performSSOLogin(SsoReqDTO sspReq) {
         String webServiceAcc;
         String webServicePwd;
 
         try {
 
             log.info("判斷請求參數 domain決定環境 #Start");
-            if(sspReq.getDomain().contains("/ttran.518fb.com/") || sspReq.getDomain().contains("/tb2b.518fb.com/")) {
+            if(DOMAIN_URL.contains("/ttran.518fb.com/") || DOMAIN_URL.contains("/tb2b.518fb.com/")) {
                 log.info(":測試環境");
-                webServiceAcc = "zAq1xSw2";
-                webServicePwd = "cDe3vFr4";
+                webServiceAcc = SSOLoginEnum.TEST.getWebServiceAcc();
+                webServicePwd = SSOLoginEnum.TEST.getWebServicePwd();
             } else {
                 log.info(":正式環境");
-                webServiceAcc = "zaq12wsxcde34rfV";
-                webServicePwd = "vfr43edcxsw21qaZ";
+                webServiceAcc = SSOLoginEnum.PRODUCTION.getWebServiceAcc();
+                webServicePwd = SSOLoginEnum.PRODUCTION.getWebServicePwd();
             }
 
             log.info("組成請求字串 #Start");
             String soapResp = sendAndReceiveSoapRequest(webServiceAcc, webServicePwd, sspReq.getToken());
+
+            log.info("發送 SOAP 請求，取得回覆資料 #Start");
             String[] webserviceResp = soapResp.split("\\|");
             String userId = webserviceResp[1].split("-")[0].trim();
             String userName = webserviceResp[1].split("-")[1].trim();
             String unitCode = webserviceResp[1].split("-")[2].trim();
+
             log.info("soap response: " + soapResp);
             log.info("web service response: " + webserviceResp);
 
@@ -72,7 +102,6 @@ public class SsoServiceImpl implements SsoService {
 //            user.setUnionNum(unitCode);
 //
 //            return user;
-            return null;
 
         } catch (IOException e) {
             log.error("SOAP 請求失敗: " + e.getMessage(), e);

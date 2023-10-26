@@ -1,16 +1,13 @@
 package com.fubon.ecplatformapi.controller;
 
-import com.fubon.ecplatformapi.model.dto.resp.LoginRespVo;
+import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
-import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import com.fubon.ecplatformapi.service.AuthService;
 import com.fubon.ecplatformapi.service.SessionService;
-import com.fubon.ecplatformapi.service.SsoService;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
-import com.fubon.ecplatformapi.model.entity.UserInfo;
-import jakarta.servlet.http.HttpServletRequest;
+import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,27 +25,8 @@ public class AuthController {
     AuthService authService;
     @Autowired
     SessionService sessionService;
-    @Autowired
-    SsoService ssoService;
 
-    @PostMapping("/loginSSO")
-    public ApiRespDTO<UserInfo> SSOLogin(@RequestBody SsoReqDTO ssoReq, HttpServletRequest request) {
-        try {
-            //sessionService.getSessionInfo(request.getSession()); // 印出session中的值
-            //UserInfo responseData = ssoService.perfornSsoLogin(ssoReq);
-            //ssoService.perfornSsoLogin(ssoReq);
-            return ApiRespDTO.<UserInfo>builder()
-                    //.data(responseData)
-                    .build();
 
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return  ApiRespDTO.<UserInfo>builder()
-                    .code(StatusCodeEnum.ERR00999.name())
-                    .message(StatusCodeEnum.ERR00999.getMessage())
-                    .build();
-        }
-    }
 
     @PostMapping("/logout")
     public ApiRespDTO<String> logout(HttpSession session){
@@ -56,6 +34,8 @@ public class AuthController {
             sessionService.removeSession(session);
 
             return ApiRespDTO.<String>builder()
+                    .code(StatusCodeEnum.SUCCESS.getCode())
+                    .message(StatusCodeEnum.SUCCESS.getMessage())
                     .build();
         } catch (Exception e){
             log.error(e.getMessage());
@@ -67,7 +47,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public  ResponseEntity<ApiRespDTO<UserInfo>> login(@RequestBody LoginReq loginReq, HttpSession session){
+    public  ResponseEntity<ApiRespDTO<GetUserInfoVo>> login(@RequestBody LoginReq loginReq, HttpSession session){
 
         try {
             LoginRespVo responseData = authService.getUserInfo(loginReq, session);
@@ -76,15 +56,17 @@ public class AuthController {
             headers.add("Authorization", "Bearer " + responseData.getToken());
 
             return ResponseEntity.ok().headers(headers)
-                    .body(ApiRespDTO.<UserInfo>builder()
-                            .data(responseData.getUserInfo())
+                    .body(ApiRespDTO.<GetUserInfoVo>builder()
+                            .code(StatusCodeEnum.SUCCESS.getCode())
+                            .message(StatusCodeEnum.SUCCESS.getMessage())
+                            .data(responseData.getGetUserInfoVo())
                             .authToken(responseData.getToken())
                             .build());
 
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiRespDTO.<UserInfo>builder()
+                    .body(ApiRespDTO.<GetUserInfoVo>builder()
                             .code(StatusCodeEnum.ERR00999.name())
                             .message(StatusCodeEnum.ERR00999.getMessage())
                             .build());

@@ -1,6 +1,7 @@
 package com.fubon.ecplatformapi.service.impl;
 
 import com.fubon.ecplatformapi.mapper.ResultMapper;
+import com.fubon.ecplatformapi.model.dto.FubonPolicyDetailRespDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
@@ -17,14 +18,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
 @Service
 public class PolicyServiceImpl implements PolicyService {
-
-    @Autowired
-    ResultMapper resultMapper;
 
     private static final String FUBON_API_URL = "http://localhost:8080";
 
@@ -51,7 +50,7 @@ public class PolicyServiceImpl implements PolicyService {
                 .log();
         return mono
                 .flatMapMany(fbQueryRespDTO -> Flux.fromIterable(fbQueryRespDTO.getPolicyResults()))
-                .map(resultMapper::mapToResultVO)
+                .map(ResultMapper::mapToResultVO)
                 .collectList()
                 .block();
     }
@@ -60,18 +59,19 @@ public class PolicyServiceImpl implements PolicyService {
     public DetailResultVo getPolicyDetail(PolicyDetailReqDTO request) {
         // 富邦API - 取得保單資訊
         // API名稱：policyDetail
-//        Mono<FubonPolicyDetailRespDTO> mono = webClient
-//                .get()
-//                .uri("/policyDetail")
-//                .accept(MediaType.APPLICATION_JSON)
-//                .retrieve()
-//                .bodyToMono(new ParameterizedTypeReference<FubonPolicyDetailRespDTO>() {})
-//                .log();
-//        return  mono
-//                .flatMapMany()
-//                .map(resultMapper::mapToResultVO)
-//                .collectList()
-//                .block();
+        Mono<FubonPolicyDetailRespDTO> mono = webClient
+                .get()
+                .uri("/policyDetail")
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<FubonPolicyDetailRespDTO>() {})
+                .log();
+        return  mono
+                //.flatMapMany(detailResultVo -> Flux.fromIterable(Collections.singletonList(detailResultVo)))
+                //.flatMap(detailResultVo -> Mono.just(Collections.singletonList(detailResultVo)))
+                .map(ResultMapper::mapToDetailResult)
+                //.collectList()
+                .block();
 
         // 富邦API - 保單寄送紀錄查詢
         // API名稱：getPrnDetail
@@ -89,7 +89,6 @@ public class PolicyServiceImpl implements PolicyService {
 //        return detailResp.stream()
 //                .map(ModelMapper::mapToDetailResult)
 //                .collect(Collectors.toList());
-        return null;
     }
 
 

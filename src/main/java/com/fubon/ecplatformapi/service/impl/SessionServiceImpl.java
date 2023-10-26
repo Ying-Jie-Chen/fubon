@@ -3,7 +3,7 @@ package com.fubon.ecplatformapi.service.impl;
 import com.fubon.ecplatformapi.enums.SessionAttribute;
 import com.fubon.ecplatformapi.config.SessionConfig;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
-import com.fubon.ecplatformapi.model.entity.UserInfo;
+import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
 import com.fubon.ecplatformapi.service.SessionService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class SessionServiceImpl implements SessionService {
     private final String SESSION_ID = UUID.randomUUID().toString();
 
     @Override
-    public void setSessionAttributes(HttpSession session, UserInfo user) {
+    public void setSessionAttributes(HttpSession session, GetUserInfoVo user) {
         session.setAttribute(String.valueOf(SessionAttribute.IDENTITY), user.getIdentify());
         session.setAttribute(String.valueOf(SessionAttribute.EMP_NO), user.getAgent_id());
         session.setAttribute(String.valueOf(SessionAttribute.EMP_NAME), user.getAgent_name());
@@ -34,8 +34,8 @@ public class SessionServiceImpl implements SessionService {
         session.setAttribute(String.valueOf(SessionAttribute.EMAIL), user.getEmail());
         session.setAttribute(String.valueOf(SessionAttribute.XREF_INFOS), user.getXrefInfo());
 
-        List<UserInfo.XrefInfo> userXrefInfoList = user.getXrefInfo().stream()
-                .map(xrefInfo -> UserInfo.XrefInfo.builder()
+        List<GetUserInfoVo.XrefInfo> userXrefInfoList = user.getXrefInfo().stream()
+                .map(xrefInfo -> GetUserInfoVo.XrefInfo.builder()
                         .xref(xrefInfo.getXref())
                         .channel(xrefInfo.getChannel())
                         .ascCrzSale(xrefInfo.getAscCrzSale())
@@ -54,7 +54,7 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public void saveSessionInfo(FbLoginRespDTO fbLoginRespDTO, HttpSession session){
         log.info("儲存登入者資訊#Start");
-        UserInfo user = fbLoginRespDTO.getAny().getUserInfo();
+        GetUserInfoVo user = fbLoginRespDTO.getAny().getGetUserInfoVo();
         setSessionAttributes(session, user);
         session.setMaxInactiveInterval(1200);
     }

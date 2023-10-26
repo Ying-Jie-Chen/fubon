@@ -23,7 +23,7 @@ public class DetailResultVo {
     private List<EtpInsuranceSubjectDetail> etpInsuranceSubjectDetail; // 企業險保險標的明細：富邦API - 取得保單資訊
     private List<InsuranceItem> insuranceItem; // 保險項目：富邦API - 取得保單資訊
     private List<InsuranceList> insuranceList; // 險種名冊：富邦API - 取得保單資訊
-    private List<InsuranceOtherList> insuranceOtherLis; // 其他險種名冊 個人傷害險的寵物險
+    private List<InsuranceOtherList> insuranceOtherList; // 其他險種名冊 個人傷害險的寵物險
     private List<PolicyDeliveryRecord> policyDeliveryRecord; // 保單寄送記錄：富邦API - 保單寄送紀錄查詢
     private List<UnpaidRecord> unpaidRecord; // 未繳保費
     private List<PaidRecord> paidRecord; // 繳費紀錄：繳費記錄/未繳費記錄 未繳費記錄查詢條件：NFNV02.POLYNO ＝保單號碼 繳費記錄查詢條件：NFNV03.POLYNO ＝保單號碼
@@ -141,6 +141,8 @@ public class DetailResultVo {
         private String title;
         @Size(max = 120)
         private String beneficiary;
+        @Size(max = 5)
+        private Integer age;
     }
 
     @Data
@@ -183,18 +185,20 @@ public class DetailResultVo {
     @AllArgsConstructor
     public static class FlightInfo {
         @Size(max = 10)
-        private Integer filghtSeq;
+        private Integer flightSeq;
         @Size(max = 10)
-        private String filghtCode;
-        @Size(max = 200)
-        private String filghtNo;
+        private String flightCode;
 
-        private Calendar filghtDate;
+        @Size(max = 200)
+        private String flightNo;
+
+        private Calendar flightDate;
         @Size(max = 10)
-        private String filghtCity;
+        private String flightCity;
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     public static class InsuranceSubject {
         @Size(max = 11)
@@ -208,6 +212,7 @@ public class DetailResultVo {
         @Digits(integer = 8, fraction = 2)
         private Double displa;
         @Digits(integer = 5, fraction = 1)
+        private Double peopno1;
         @Size(max = 20)
         private String engineNo;
         @Size(max = 8)
@@ -252,6 +257,8 @@ public class DetailResultVo {
     }
 
     @Data
+    @Builder
+    @AllArgsConstructor
     @NoArgsConstructor
     public static class EtpInsuranceSubject {
         private String content;
@@ -259,6 +266,7 @@ public class DetailResultVo {
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     public static class EtpInsuranceSubjectDetail{
         private Integer seq;
@@ -266,6 +274,7 @@ public class DetailResultVo {
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     public static class InsuranceItem{
         @Size(max = 500)
@@ -275,8 +284,9 @@ public class DetailResultVo {
         private Double finalPrm;
         @Digits(integer = 15, fraction = 2)
         private Double pex;
+        private Integer seq;
         private String title;
-        private Collection<String> values;
+        private List<List<String>> values;
     }
 
     @Data
@@ -288,6 +298,7 @@ public class DetailResultVo {
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     public static class InsuranceList{
         @Size(max = 10)
@@ -319,8 +330,9 @@ public class DetailResultVo {
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
-    private static class InsuranceOtherList {
+    public static class InsuranceOtherList {
         @Size(max = 100)
         private String petType;
         private String petName;
@@ -334,6 +346,7 @@ public class DetailResultVo {
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     public static class PolicyDeliveryRecord{
         @Size(max = 100)
@@ -351,6 +364,7 @@ public class DetailResultVo {
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     public static class UnpaidRecord{
         @Size(max = 3)
@@ -373,6 +387,7 @@ public class DetailResultVo {
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     public static class PaidRecord{
         @Size(max = 3)
@@ -401,6 +416,7 @@ public class DetailResultVo {
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     public static class ClaimRecord{
         private String insType;
@@ -416,6 +432,7 @@ public class DetailResultVo {
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     public static class ConservationRecord{
 

@@ -1,6 +1,6 @@
 package com.fubon.ecplatformapi.enums;
 
-import com.fubon.ecplatformapi.model.entity.UserInfo;
+import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.session.Session;
@@ -40,10 +40,10 @@ public enum SessionAttribute {
         session.removeAttribute(attribute.getAttributeName());
     }
 
-    public static List<UserInfo.XrefInfo> getXrefInfoAttribute(Session session) {
+    public static List<GetUserInfoVo.XrefInfo> getXrefInfoAttribute(Session session) {
         Object attribute = getAttribute(session, XREF_INFOS);
         if (attribute instanceof List) {
-            return (List<UserInfo.XrefInfo>) attribute;
+            return (List<GetUserInfoVo.XrefInfo>) attribute;
         } else {
             return Collections.emptyList();
         }

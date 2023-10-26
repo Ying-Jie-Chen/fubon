@@ -7,7 +7,7 @@ import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.NoUse.captcha.CaptchaService;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
-import com.fubon.ecplatformapi.model.entity.UserInfo;
+import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class LoginService {
         this.webClient = webClientBuilder.baseUrl(FUBON_API_URL).build();
     }
 
-    public ApiRespDTO<UserInfo> authLogin(LoginReq loginReq){
+    public ApiRespDTO<GetUserInfoVo> authLogin(LoginReq loginReq){
 
         try {
             String userInputCaptcha = loginReq.getVerificationCode();
@@ -50,7 +50,7 @@ public class LoginService {
 //                                .StatusDesc(StatusCodeEnum.Err10001.getMessage())
 //                                .build())
 //                        .build();
-                return ApiRespDTO.<UserInfo>builder()
+                return ApiRespDTO.<GetUserInfoVo>builder()
                         .code(StatusCodeEnum.ERR00999.getCode())
                         .message(StatusCodeEnum.ERR00999.getMessage())
                         .build();

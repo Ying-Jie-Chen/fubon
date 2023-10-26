@@ -1,19 +1,13 @@
-package com.fubon.ecplatformapi.model.entity;
+package com.fubon.ecplatformapi.model.dto.vo;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Value;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Builder
-public class UserInfo {
+public class GetUserInfoVo {
 
     private String agent_name;
     private String agent_id;

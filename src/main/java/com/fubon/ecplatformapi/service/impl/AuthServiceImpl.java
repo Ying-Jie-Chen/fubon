@@ -1,8 +1,9 @@
 package com.fubon.ecplatformapi.service.impl;
 
+import com.fubon.ecplatformapi.model.dto.GetFubonSSOTokenRespDTO;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
 import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.LoginRespVo;
+import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
 import com.fubon.ecplatformapi.service.AuthService;
@@ -89,7 +90,7 @@ public class AuthServiceImpl implements AuthService {
 
         return LoginRespVo.builder()
                 .token(authToken)
-                .userInfo(fbLoginRespDTO.getAny().getUserInfo())
+                .getUserInfoVo(fbLoginRespDTO.getAny().getGetUserInfoVo())
                 .build();
     }
 
@@ -102,5 +103,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         tokenRepository.save(token);
     }
+
+
 
 }

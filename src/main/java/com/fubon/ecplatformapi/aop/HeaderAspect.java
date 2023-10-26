@@ -60,8 +60,8 @@ public class HeaderAspect {
 
     private ApiRespDTO<?> errorResponse() {
         return ApiRespDTO.builder()
-                .code(StatusCodeEnum.ERR02002.getCode())
-                .message(StatusCodeEnum.ERR02002.getMessage())
+                .code(StatusCodeEnum.ERR00002.getCode())
+                .message(StatusCodeEnum.ERR00002.getMessage())
                 .build();
     }
 }
