@@ -1,10 +1,12 @@
 package com.fubon.ecplatformapi.service.impl;
 
 import com.fubon.ecplatformapi.mapper.ResultMapper;
-import com.fubon.ecplatformapi.model.dto.FubonPolicyDetailRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.fb.FubonClmSalesRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.fb.FubonPolicyDetailRespDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
-import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.fb.FbQueryRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.fb.FubonPrnDetailResp;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import com.fubon.ecplatformapi.service.PolicyService;
@@ -18,7 +20,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -57,39 +58,58 @@ public class PolicyServiceImpl implements PolicyService {
 
     @Override
     public DetailResultVo getPolicyDetail(PolicyDetailReqDTO request) {
-        // 富邦API - 取得保單資訊
-        // API名稱：policyDetail
-        Mono<FubonPolicyDetailRespDTO> mono = webClient
-                .get()
-                .uri("/policyDetail")
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<FubonPolicyDetailRespDTO>() {})
-                .log();
-        return  mono
-                //.flatMapMany(detailResultVo -> Flux.fromIterable(Collections.singletonList(detailResultVo)))
-                //.flatMap(detailResultVo -> Mono.just(Collections.singletonList(detailResultVo)))
-                .map(ResultMapper::mapToDetailResult)
-                //.collectList()
+
+        return Mono.zip(callPolicyDetail(), callPrnDetail(), callClmSales())
+                .map(tuple -> {
+                    FubonPolicyDetailRespDTO policyDetailResp = tuple.getT1();
+                    FubonPrnDetailResp prnDetailResp = tuple.getT2();
+                    FubonClmSalesRespDTO clmSalesResp = tuple.getT3();
+                    return ResultMapper.mapToDetailResult(policyDetailResp, prnDetailResp, clmSalesResp);
+                })
                 .block();
 
-        // 富邦API - 保單寄送紀錄查詢
-        // API名稱：getPrnDetail
-
-        // 富邦API - 理賠紀錄查詢
-        // 適用險種：全險種
-        // API名稱：ClmSalesAppWs/api101
-        // 測試API路徑：
-        // http://10.0.45.55:9080/fgisws/rest/ClmSalesAppWs/api101
-
-        // 富邦API - 保全紀錄查詢
-        // 適用險種：全險種
-        // API名稱：chkEnrData
+//         富邦API - 保全紀錄查詢
+//         適用險種：全險種
+//         API名稱：chkEnrData
 //        List<PolicyDetailReqDTO> detailResp = policyDetailRepository.findByTypeAndNum(insType, policyNum);
 //        return detailResp.stream()
 //                .map(ModelMapper::mapToDetailResult)
 //                .collect(Collectors.toList());
     }
+
+    private Mono<FubonPolicyDetailRespDTO> callPolicyDetail() {
+        // 富邦API - 取得保單資訊
+        return webClient
+                .get()
+                .uri("/policyDetail")
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(FubonPolicyDetailRespDTO.class)
+                .log();
+    }
+
+    private Mono<FubonPrnDetailResp> callPrnDetail() {
+        // 富邦API - 保單寄送紀錄查詢
+        return webClient
+                .get()
+                .uri("/getPrnDetail")
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(FubonPrnDetailResp.class)
+                .log();
+    }
+
+    private Mono<FubonClmSalesRespDTO> callClmSales() {
+        // 富邦API - 理賠紀錄查詢
+        return webClient
+                .get()
+                .uri("/ClmSalesAppWs/api101")
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(FubonClmSalesRespDTO.class)
+                .log();
+    }
+
 
 
 }

@@ -1,14 +1,12 @@
-package com.fubon.ecplatformapi.model.dto;
+package com.fubon.ecplatformapi.model.dto.resp.fb;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
+import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
 @Builder
-public class GetFubonSSOTokenRespDTO {
+@Data
+public class FbLoginRespDTO {
 
     private Header Header;
     private Any Any;
@@ -18,6 +16,7 @@ public class GetFubonSSOTokenRespDTO {
     public static class Header {
         private String MsgId;
         private String FromSys;
+        private String ToSys;
         private String SysPwd;
         private String FunctionCode;
         private String StatusCode;
@@ -26,9 +25,11 @@ public class GetFubonSSOTokenRespDTO {
 
     @Data
     @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class Any {
-        private String sid;
+        private boolean staffValid ;
+        private String staffValidMsg;
+        private GetUserInfoVo getUserInfoVo;
     }
+
 }
+

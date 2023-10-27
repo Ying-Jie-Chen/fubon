@@ -47,7 +47,6 @@ public class SsoController {
     public ApiRespDTO<GetUserInfoVo> SSOLogin(@RequestBody SsoReqDTO ssoReq) {
         try {
 
-
             ssoService.performSSOLogin(ssoReq);
 
             return ApiRespDTO.<GetUserInfoVo>builder()

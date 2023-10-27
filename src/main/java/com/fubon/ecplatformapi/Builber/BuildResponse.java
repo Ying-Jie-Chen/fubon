@@ -3,16 +3,15 @@ package com.fubon.ecplatformapi.Builber;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fubon.ecplatformapi.model.dto.FubonPolicyDetailRespDTO;
-import com.fubon.ecplatformapi.model.dto.GetFubonSSOTokenRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.FbQueryRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.fb.*;
+import com.fubon.ecplatformapi.model.dto.resp.GetFubonSSOTokenRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -197,13 +196,85 @@ public class BuildResponse {
                         .rskDEcAppWsBeans(Collections.singleton(FubonPolicyDetailRespDTO.RskDEcAppEtpWsBean.builder()
                                 .build()))
                         // 保險項目標題
-                        .pitEcAppWsBean(Collections.singleton(FubonPolicyDetailRespDTO.PitEcAppEtpWsBean.builder()
+                        .pitEcAppEtpWsBeans(Collections.singleton(FubonPolicyDetailRespDTO.PitEcAppEtpWsBean.builder()
                                 .build()))
                         .build())
                 .build();
 
         return response;
     }
+    public FubonPrnDetailResp buildPrnDetailResponse() {
+        FubonPrnDetailResp.PrnResult prnResult1 = FubonPrnDetailResp.PrnResult.builder()
+                .prnDoc("001")
+                .prnDocName("Document 1")
+                .prnFormat("PDF")
+                .prnType("正本")
+                .prnSendType("Email")
+                .prnPrintStatus("已寄送")
+                .prnPrintdate(new Date())
+                .build();
+
+        FubonPrnDetailResp.PrnResult prnResult2 = FubonPrnDetailResp.PrnResult.builder()
+                .prnDoc("002")
+                .prnDocName("Document 2")
+                .prnFormat("PDF")
+                .prnType("副本")
+                .prnSendType("Mail")
+                .prnPrintStatus("已寄送")
+                .prnPrintdate(new Date())
+                .build();
+
+        List<FubonPrnDetailResp.PrnResult> prmList = Arrays.asList(prnResult1, prnResult2);
+
+        return FubonPrnDetailResp.builder()
+                .prmList(prmList)
+                .build();
+    }
+
+    public FubonClmSalesRespDTO buildClmSalesResponse() {
+        FubonClmSalesRespDTO.Content.ClaimInfo claimInfo1 = FubonClmSalesRespDTO.Content.ClaimInfo.builder()
+                .no(1)
+                .queryPlan("險種1")
+                .acdate(new Date())
+                .clamno("CLAIM001")
+                .queryPolyNo("POLY001")
+                .icname("被保險人1")
+                .accper("事故人1")
+                .clamsts("處理中")
+                .prcdeptnm("處理單位1")
+                .prcempnm("處理人員1")
+                .phone("123-456-7890")
+                .build();
+
+        FubonClmSalesRespDTO.Content.ClaimInfo claimInfo2 = FubonClmSalesRespDTO.Content.ClaimInfo.builder()
+                .no(2)
+                .queryPlan("險種2")
+                .acdate(new Date())
+                .clamno("CLAIM002")
+                .queryPolyNo("POLY002")
+                .icname("被保險人2")
+                .accper("事故人2")
+                .clamsts("已結案")
+                .prcdeptnm("處理單位2")
+                .prcempnm("處理人員2")
+                .phone("987-654-3210")
+                .build();
+
+        List<FubonClmSalesRespDTO.Content.ClaimInfo> claimInfoList = Arrays.asList(claimInfo1, claimInfo2);
+
+        FubonClmSalesRespDTO.Content content = FubonClmSalesRespDTO.Content.builder()
+                .claimInfo(claimInfoList)
+                .build();
+
+        return FubonClmSalesRespDTO.builder()
+                .result(200)
+                .message("成功")
+                .total(2)
+                .count(2)
+                .content(content)
+                .build();
+    }
+
 
     private void printJSON(FbQueryRespDTO response) {
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版

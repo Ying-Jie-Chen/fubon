@@ -3,7 +3,7 @@ package com.fubon.ecplatformapi.service.impl;
 //import com.fubon.ecplatformapi.repository.CompanyRepository;
 //import com.fubon.ecplatformapi.repository.LicenseInfoRepository;
 import com.fubon.ecplatformapi.enums.SSOLoginEnum;
-import com.fubon.ecplatformapi.model.dto.GetFubonSSOTokenRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.GetFubonSSOTokenRespDTO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import com.fubon.ecplatformapi.service.SsoService;
 import lombok.extern.slf4j.Slf4j;

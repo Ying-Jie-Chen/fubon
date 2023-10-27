@@ -1,8 +1,7 @@
 package com.fubon.ecplatformapi.service.impl;
 
-import com.fubon.ecplatformapi.model.dto.GetFubonSSOTokenRespDTO;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
-import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.fb.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;

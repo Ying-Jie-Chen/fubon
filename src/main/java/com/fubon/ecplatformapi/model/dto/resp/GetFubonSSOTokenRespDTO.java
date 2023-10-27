@@ -1,12 +1,13 @@
 package com.fubon.ecplatformapi.model.dto.resp;
 
-import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Builder
 @Data
-public class FbLoginRespDTO {
+@Builder
+public class GetFubonSSOTokenRespDTO {
 
     private Header Header;
     private Any Any;
@@ -16,7 +17,6 @@ public class FbLoginRespDTO {
     public static class Header {
         private String MsgId;
         private String FromSys;
-        private String ToSys;
         private String SysPwd;
         private String FunctionCode;
         private String StatusCode;
@@ -25,11 +25,9 @@ public class FbLoginRespDTO {
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Any {
-        private boolean staffValid ;
-        private String staffValidMsg;
-        private GetUserInfoVo getUserInfoVo;
+        private String sid;
     }
-
 }
-

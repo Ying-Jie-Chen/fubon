@@ -2,7 +2,7 @@ package com.fubon.ecplatformapi.service.impl;
 
 import com.fubon.ecplatformapi.enums.SessionAttribute;
 import com.fubon.ecplatformapi.config.SessionConfig;
-import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.fb.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
 import com.fubon.ecplatformapi.service.SessionService;
 import jakarta.servlet.http.HttpSession;

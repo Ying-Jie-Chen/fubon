@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.model.dto.resp;
+package com.fubon.ecplatformapi.model.dto.resp.fb;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

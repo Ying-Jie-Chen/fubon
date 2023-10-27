@@ -1,6 +1,6 @@
 package com.fubon.ecplatformapi.service;
 
-import com.fubon.ecplatformapi.model.dto.resp.FbLoginRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.fb.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;

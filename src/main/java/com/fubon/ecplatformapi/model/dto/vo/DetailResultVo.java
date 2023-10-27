@@ -8,7 +8,6 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -290,6 +289,7 @@ public class DetailResultVo {
     }
 
     @Data
+    @NoArgsConstructor
     @AllArgsConstructor
     public static class PitEb0List{
         private String eb0TsiDesc;
@@ -315,18 +315,6 @@ public class DetailResultVo {
         private String relation;
         @Size(max = 120)
         private String beneficiary;
-        @Size(max = 100)
-        private String petType;
-
-        private String petName;
-        @Size(max = 1)
-        private String petSex;
-        @Size(max = 10)
-        private Integer petSeq;
-
-        private Calendar petBirthDate;
-        @Size(max = 1)
-        private Integer petAge;
     }
 
     @Data
@@ -435,6 +423,13 @@ public class DetailResultVo {
     @Builder
     @AllArgsConstructor
     public static class ConservationRecord{
+        private String proposerName;
+        private String insuredName;
+        private String policyName;
+        private Date createDate;
+        private Date modifyDate;
+        private String wrpStatus;
+        private Date closeDate;
 
     }
 

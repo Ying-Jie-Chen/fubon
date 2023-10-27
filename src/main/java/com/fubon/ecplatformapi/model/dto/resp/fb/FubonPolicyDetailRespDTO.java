@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.model.dto;
+package com.fubon.ecplatformapi.model.dto.resp.fb;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -63,8 +63,9 @@ public class FubonPolicyDetailRespDTO {
         private RmaEcAppWsBean rmaAEcAppWsBean;
         private Collection<RskEcAppEtpWsBean> rskEcAppWsBeans;
         private Collection<RskDEcAppEtpWsBean> rskDEcAppWsBeans;
-        //private 保險項目標題 pitColumnNames;
-        private Collection<PitEcAppEtpWsBean> pitEcAppWsBean;
+        private Collection<String> pitColumnNames;
+        private Collection<PitEcAppEtpWsBean> pitEcAppEtpWsBeans;
+
 
     }
     @Data
@@ -169,9 +170,11 @@ public class FubonPolicyDetailRespDTO {
     @Builder
     public static class PitNecAppWsBeans {
         private String pitBnfCode;
+        private String pitEb0Name;
         private String pitNUid;
         private String pitNIsrName;
         private String pitNBirth;
+        private String pitNTitle;
         private String pitNAppRelation;
         private String pitNBeneficiary;
     }
@@ -248,6 +251,7 @@ public class FubonPolicyDetailRespDTO {
         private Integer seq;
         private Collection<String> values;
     }
+
     @Data
     @Builder
     public static class BenEcAppWsBean {
