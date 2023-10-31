@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 public class VerificationResp {
     private Header Header;
-    private Any Any;
+    private any any;
 
     @Data
     @Builder
@@ -23,7 +23,7 @@ public class VerificationResp {
 
     @Data
     @Builder
-    public static class Any {
+    public static class any {
         private String token;
         private String verificationImageBase64;
     }

@@ -36,7 +36,7 @@ public class BuildResponse {
                         .StatusCode("0000")
                         .StatusDesc("成功")
                         .build())
-                .Any(VerificationResp.Any.builder()
+                .any(VerificationResp.any.builder()
                         .token("2da6cf70570e44658d8fd7e5c334ca03")
                         .verificationImageBase64("base64String")
                         .build())

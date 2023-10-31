@@ -1,5 +1,7 @@
 package com.fubon.ecplatformapi.controller;
 
+import com.fubon.ecplatformapi.Builber.BuildRequest;
+import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
 import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationImageVO;
 import com.fubon.ecplatformapi.service.AuthService;
@@ -25,7 +27,8 @@ public class AuthController {
     AuthService authService;
     @Autowired
     SessionService sessionService;
-
+    @Autowired
+    BuildRequest buildRequest;
 
 
     @PostMapping("/logout")
@@ -77,7 +80,7 @@ public class AuthController {
     public ApiRespDTO<VerificationImageVO> getVerificationImage() {
         try {
 
-            VerificationImageVO responseData = authService.getVerificationImage();
+            VerificationImageVO responseData = authService.getVerificationImage(buildRequest.buildVerificationImageRequest());
 
             return ApiRespDTO.<VerificationImageVO>builder()
                     .data(responseData)

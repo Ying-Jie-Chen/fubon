@@ -18,6 +18,8 @@ public class VerificationReq {
                 private String FromSys;
                 private String SysPwd;
                 private String FunctionCode;
+                private String account;
+                private String user_ip;
         }
         @Getter
         @Builder

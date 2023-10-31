@@ -1,6 +1,7 @@
 package com.fubon.ecplatformapi.service.impl;
 
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
+import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
 import com.fubon.ecplatformapi.model.dto.resp.fb.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
@@ -38,13 +39,15 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public VerificationImageVO getVerificationImage() {
+    public VerificationImageVO getVerificationImage(VerificationReq verificationReq) {
 
         log.info("Fubon API /GetVerificationImage 的回應結果#Start");
 
         Mono<VerificationResp> mono = webClient
-                .get()
+                .post()
                 .uri("/GetVerificationImage")
+                .accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(verificationReq))
                 .retrieve()
                 .bodyToMono(VerificationResp.class);
 

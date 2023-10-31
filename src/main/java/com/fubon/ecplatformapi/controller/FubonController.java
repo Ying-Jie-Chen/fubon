@@ -38,7 +38,7 @@ public class FubonController {
     public FubonPrnDetailResp getPrnDetail(){return buildResponse.buildPrnDetailResponse();}
     @GetMapping("/ClmSalesAppWs/api101")
     public FubonClmSalesRespDTO getClmSales(){return buildResponse.buildClmSalesResponse(); }
-    @GetMapping ("/GetVerificationImage")
+    @GetMapping ("")
     public VerificationResp GetVerificationImage() {
         return buildResponse.buildVerificationImageResponse();
     }

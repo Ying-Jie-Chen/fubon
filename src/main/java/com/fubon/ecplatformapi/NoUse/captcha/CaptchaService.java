@@ -65,7 +65,7 @@ public class CaptchaService {
                             .StatusCode("0000")
                             .StatusDesc("成功")
                             .build())
-                    .Any(VerificationResp.Any.builder()
+                    .any(VerificationResp.any.builder()
                             .token(token)
                             .verificationImageBase64(base64String)
                             .build())
