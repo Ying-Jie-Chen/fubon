@@ -1,19 +1,16 @@
-package com.fubon.ecplatformapi.model.dto.req;
+package com.fubon.ecplatformapi.config;
 
-import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-@Getter
-@Setter
-@Builder
-public class VerificationReq {
-        private Header Header;
+@Data
+@Configuration
+@ConfigurationProperties(prefix = "ecws")
+public class VerificationConfig {
+        private Header header;
         private FBECCOMSTA1032 FBECCOMSTA1032RQ;
-
-        @Getter
-        @Builder
+        @Data
         public static class Header {
                 private String FromSys;
                 private String SysPwd;
@@ -21,8 +18,7 @@ public class VerificationReq {
                 private String account;
                 private String user_ip;
         }
-        @Getter
-        @Builder
+        @Data
         public static class FBECCOMSTA1032 {
                 private String system;
                 private String insureType;

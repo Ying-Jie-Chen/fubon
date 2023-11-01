@@ -1,7 +1,7 @@
 package com.fubon.ecplatformapi.service.impl;
 
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
-import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
+import com.fubon.ecplatformapi.config.VerificationConfig;
 import com.fubon.ecplatformapi.model.dto.resp.fb.FbLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
@@ -31,6 +31,8 @@ public class AuthServiceImpl implements AuthService {
     TokenService tokenService;
     @Autowired
     TokenRepository tokenRepository;
+    @Autowired
+    VerificationConfig verificationConfig;
     private static final String FUBON_API_URL = "http://localhost:8080";
     private final WebClient webClient;
     @Autowired
@@ -39,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public VerificationImageVO getVerificationImage(VerificationReq verificationReq) {
+    public VerificationImageVO getVerificationImage() {
 
         log.info("Fubon API /GetVerificationImage 的回應結果#Start");
 
@@ -47,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
                 .post()
                 .uri("/GetVerificationImage")
                 .accept(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(verificationReq))
+                .body(BodyInserters.fromValue(verificationConfig.toString()))
                 .retrieve()
                 .bodyToMono(VerificationResp.class);
 

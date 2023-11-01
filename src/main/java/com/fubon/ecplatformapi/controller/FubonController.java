@@ -2,6 +2,7 @@ package com.fubon.ecplatformapi.controller;
 
 
 import com.fubon.ecplatformapi.Builber.BuildResponse;
+import com.fubon.ecplatformapi.config.VerificationConfig;
 import com.fubon.ecplatformapi.model.dto.resp.fb.*;
 import com.fubon.ecplatformapi.model.dto.resp.GetFubonSSOTokenRespDTO;
 import com.fubon.ecplatformapi.model.dto.req.LoginReq;
@@ -21,8 +22,6 @@ public class FubonController {
     @Autowired
     private BuildResponse buildResponse;
 
-
-
     @GetMapping("/GetSSOToken")
     public GetFubonSSOTokenRespDTO getSSOToken(){return buildResponse.buildSSOTokenResponse();}
 
@@ -38,8 +37,8 @@ public class FubonController {
     public FubonPrnDetailResp getPrnDetail(){return buildResponse.buildPrnDetailResponse();}
     @GetMapping("/ClmSalesAppWs/api101")
     public FubonClmSalesRespDTO getClmSales(){return buildResponse.buildClmSalesResponse(); }
-    @GetMapping ("")
-    public VerificationResp GetVerificationImage() {
+    @PostMapping ("/GetVerificationImage")
+    public VerificationResp GetVerificationImage(VerificationConfig verificationConfig) {
         return buildResponse.buildVerificationImageResponse();
     }
 

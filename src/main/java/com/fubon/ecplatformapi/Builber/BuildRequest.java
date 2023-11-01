@@ -3,6 +3,7 @@ package com.fubon.ecplatformapi.Builber;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fubon.ecplatformapi.config.VerificationConfig;
 import com.fubon.ecplatformapi.model.dto.req.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,23 +18,11 @@ public class BuildRequest {
     private ObjectMapper objectMapper;
 
 
-    public VerificationReq buildVerificationImageRequest() {
+    public VerificationConfig buildVerificationImageRequest() {
         log.info("建立 FubonAPI 取得圖形驗證的請求 #Start");
 
-        return  VerificationReq.builder()
-                .Header(VerificationReq.Header.builder()
-                        .FromSys("B2A")
-                        .SysPwd("lYKMhPW8SGg=")
-                        .FunctionCode("FBECCOMSTA1032")
-                        .account("123456")
-                        .user_ip("192.168.50.138")
-                        .build())
-                .FBECCOMSTA1032RQ(VerificationReq.FBECCOMSTA1032.builder()
-                        .system("B2A")
-                        .insureType("FBINSAPP")
-                        .verificationTypes("1")
-                        .build())
-                .build();
+//        return
+        return null;
     }
     public FbLoginReq buildFubonLoginRequest(LoginReq loginReq) {
         log.info("建立 FubonAPI 登入的請求 #Start");

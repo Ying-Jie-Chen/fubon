@@ -2,8 +2,6 @@ package com.fubon.ecplatformapi.NoUse.captcha;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fubon.ecplatformapi.service.impl.SessionServiceImpl;
-import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
-import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,37 +39,38 @@ public class CaptchaService {
 
         try {
 
-            VerificationReq req = VerificationReq.builder()
-                    .Header(VerificationReq.Header.builder()
-                            .FromSys("B2A")
-                            .SysPwd("*****PW8SGg=")
-                            .FunctionCode("FBECCOMSTA1032")
-                            .build())
-                    .FBECCOMSTA1032RQ(VerificationReq.FBECCOMSTA1032.builder()
-                            .system(system)
-                            .insureType(insureType)
-                            .verificationTypes(verificationTypes)
-                            .build())
-                    .build();
+//            VerificationReq req = VerificationReq.builder()
+//                    .Header(VerificationReq.Header.builder()
+//                            .FromSys("B2A")
+//                            .SysPwd("*****PW8SGg=")
+//                            .FunctionCode("FBECCOMSTA1032")
+//                            .build())
+//                    .FBECCOMSTA1032RQ(VerificationReq.FBECCOMSTA1032.builder()
+//                            .system(system)
+//                            .insureType(insureType)
+//                            .verificationTypes(verificationTypes)
+//                            .build())
+//                    .build();
 
 
-            VerificationResp resp = VerificationResp.builder()
-                    .Header(VerificationResp.Header.builder()
-                            .MsgId("033ef14f-345e-42a9-9114-fbfdd562909f")
-                            .FromSys("ECWS")
-                            .ToSys(req.getHeader().getFromSys())
-                            .SysPwd(req.getHeader().getSysPwd())
-                            .FunctionCode(req.getHeader().getFunctionCode())
-                            .StatusCode("0000")
-                            .StatusDesc("成功")
-                            .build())
-                    .any(VerificationResp.any.builder()
-                            .token(token)
-                            .verificationImageBase64(base64String)
-                            .build())
-                    .build();
+//            VerificationResp resp = VerificationResp.builder()
+//                    .Header(VerificationResp.Header.builder()
+//                            .MsgId("033ef14f-345e-42a9-9114-fbfdd562909f")
+//                            .FromSys("ECWS")
+//                            .ToSys(req.getHeader().getFromSys())
+//                            .SysPwd(req.getHeader().getSysPwd())
+//                            .FunctionCode(req.getHeader().getFunctionCode())
+//                            .StatusCode("0000")
+//                            .StatusDesc("成功")
+//                            .build())
+//                    .any(VerificationResp.any.builder()
+//                            .token(token)
+//                            .verificationImageBase64(base64String)
+//                            .build())
+//                    .build();
 
-            return objectMapper.writeValueAsString(resp);
+//            return objectMapper.writeValueAsString(resp);
+            return null;
 
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());

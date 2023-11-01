@@ -2,7 +2,7 @@ package com.fubon.ecplatformapi.NoUse;
 
 
 import com.fubon.ecplatformapi.NoUse.captcha.CaptchaUtil;
-import com.fubon.ecplatformapi.model.dto.req.VerificationReq;
+import com.fubon.ecplatformapi.config.VerificationConfig;
 import com.fubon.ecplatformapi.NoUse.captcha.CaptchaService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,12 +29,12 @@ public class VerificationController {
 
 
     //@GetMapping("/GetVerificationImage")
-    public ResponseEntity<String> getCaptchaBase64(@RequestBody VerificationReq verificationReq,
+    public ResponseEntity<String> getCaptchaBase64(@RequestBody VerificationConfig verificationConfig,
                                                    HttpServletRequest request, HttpServletResponse response) {
 
-        String system = verificationReq.getFBECCOMSTA1032RQ().getSystem();
-        String insureType = verificationReq.getFBECCOMSTA1032RQ().getInsureType();
-        String verificationTypes = verificationReq.getFBECCOMSTA1032RQ().getVerificationTypes();
+        String system = verificationConfig.getFBECCOMSTA1032RQ().getSystem();
+        String insureType = verificationConfig.getFBECCOMSTA1032RQ().getInsureType();
+        String verificationTypes = verificationConfig.getFBECCOMSTA1032RQ().getVerificationTypes();
 
         response.setContentType("image/png");
         String base64String = captchaUtil.generateCaptchaBase64();
