@@ -28,5 +28,4 @@ public class Token {
     @Column(name = "expired")
     public Boolean expired;
 
-
 }

@@ -5,28 +5,59 @@ spring:
   application:
     name: b2b-EcPlatform-API
   datasource:
-    driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://localhost:1433;databaseName=TestSchema;encrypt=false;trustServerCertificate=true;
-    username: sa
-    password: Systex0624
-  jpa:
-    database-platform: org.hibernate.dialect.SQLServerDialect
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.SQLServerDialect
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/testschema
+    username: root
+    password: ooxx1998
+#  jpa:
+#    database-platform: org.hibernate.dialect.SQLServerDialect
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.SQLServerDialect
 
-#Fubon Get VerificationImage Setting
+#Fubon Get VerificationImage & Login Request
 ecws:
-  header:
-    from-sys: "B2A"
-    sys-pwd: "lYKMhPW8SGg="
-    function-code: "FBECCOMSTA1032"
-    account: "12546"
-    user-ip: "192.168.50.138"
-  FBECCOMSTA1032-rQ:
-    system: "B2A"
-    insure-type: "FBINSAPP"
-    verification-types: "1"
+  domain: https://tb2b.518fb.com/ecws/json/service
+  get-verification-image:
+    header:
+      from-sys: "B2A"
+      sys-pwd: "lYKMhPW8SGg="
+      function-code: "FBECCOMSTA1032"
+      account: "12546"
+      user-ip: "192.168.50.138"
+    FBECCOMSTA1032-rQ:
+      system: "B2A"
+      insure-type: "FBINSAPP"
+      verification-types: "1"
+  login:
+    Header:
+      From-sys: "B2A"
+      Sys-pwd: "lYKMhPW8SGg="
+      Function-code: "FBECAPPCERT1001"
+      account: "12546"
+      user-ip: "192.168.50.138"
+    FBECAPPCERT1001-rQ:
+      ip-address: "192.168.50.138"
+      device: "iOS"
+      code-name: "ASUS P01T_1"
+      device-id: "589241cf66bb05f7"
+      os-version: "6.0.1"
+      app-version: "1.01.81"
+      agent-id: ""
+      login-id: ""
+      sales-id: ""
+      agent-name: ""
+      union-num: ""
+      admin-id: ""
+      return-pfx: "1"
+      identify: "1"
+      emp-no: "12546"
+      password: "1qaz2wsx"
+      token: ""
+      verification-code: ""
+      client: ""
+      sid: ""
+
 
 
 

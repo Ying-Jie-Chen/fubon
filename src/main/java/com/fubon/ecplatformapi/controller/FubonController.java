@@ -2,12 +2,12 @@ package com.fubon.ecplatformapi.controller;
 
 
 import com.fubon.ecplatformapi.Builber.BuildResponse;
-import com.fubon.ecplatformapi.config.VerificationConfig;
-import com.fubon.ecplatformapi.model.dto.resp.fb.*;
+import com.fubon.ecplatformapi.model.dto.req.FubonVerificationReqDTO;
+import com.fubon.ecplatformapi.model.dto.resp.fubon.*;
 import com.fubon.ecplatformapi.model.dto.resp.GetFubonSSOTokenRespDTO;
-import com.fubon.ecplatformapi.model.dto.req.LoginReq;
+import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
-import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
+import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonVerificationResp;
 import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,18 +38,18 @@ public class FubonController {
     @GetMapping("/ClmSalesAppWs/api101")
     public FubonClmSalesRespDTO getClmSales(){return buildResponse.buildClmSalesResponse(); }
     @PostMapping ("/GetVerificationImage")
-    public VerificationResp GetVerificationImage(VerificationConfig verificationConfig) {
+    public FubonVerificationResp GetVerificationImage(FubonVerificationReqDTO fubonVerificationReqDTO) {
         return buildResponse.buildVerificationImageResponse();
     }
 
     @PostMapping("/Login")
-    public FbLoginRespDTO Login(@RequestBody LoginReq loginReq) {
+    public FubonLoginRespDTO Login(@RequestBody LoginReqDTO loginReqDTO) {
 
         return buildResponse.buildLoginResponse(createUserInfo());
     }
 
     @PostMapping("/Logout")
-    public FbLoginRespDTO Logout() {
+    public FubonLoginRespDTO Logout() {
 
         return buildResponse.buildLoginResponse(createUserInfo());
     }

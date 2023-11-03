@@ -16,9 +16,6 @@ import java.util.Random;
 @Slf4j
 @Service
 public class CaptchaUtil {
-    @Autowired
-    SessionServiceImpl sessionService;
-
     private final int CODE_SIZE = 4;
     private final int WIDTH = 165;
     private final int HEIGHT = 45;
@@ -86,7 +83,7 @@ public class CaptchaUtil {
 
         // 將驗證碼字串儲存在會話中
         //log.info("驗證碼：" + randomStr);
-        sessionService.saveSession(randomStr);
+        //sessionService.saveSession(randomStr);
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {

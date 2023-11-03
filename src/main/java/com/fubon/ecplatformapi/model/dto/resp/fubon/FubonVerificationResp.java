@@ -1,11 +1,11 @@
-package com.fubon.ecplatformapi.model.dto.resp;
+package com.fubon.ecplatformapi.model.dto.resp.fubon;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class VerificationResp {
+public class FubonVerificationResp {
     private Header Header;
     private any any;
 

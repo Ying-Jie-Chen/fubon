@@ -1,9 +1,11 @@
 package com.fubon.ecplatformapi.model.dto.vo;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class VerificationImageVO {
+@Builder
+public class VerificationVo {
     private String verificationImage;
     private String token;
 }

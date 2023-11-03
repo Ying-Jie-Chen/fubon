@@ -1,6 +1,5 @@
 package com.fubon.ecplatformapi.NoUse.captcha;
 
-import com.fubon.ecplatformapi.NoUse.LoginService;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,8 +18,6 @@ import java.util.Map;
 public class CaptchaController {
     @Autowired
     CaptchaUtil captchaUtil;
-    @Autowired
-    LoginService loginService;
 
     /** 取得登入頁面中的圖形驗證碼
      *

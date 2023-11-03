@@ -9,11 +9,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class CaptchaService {
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private SessionServiceImpl sessionService;
-
 
     /** 驗證用戶輸入的驗證碼是否匹配
      *
@@ -21,17 +16,18 @@ public class CaptchaService {
     public boolean verifyCaptcha(String userInput){
         log.info("驗證用戶輸入的驗證碼#Start");
 
-        String storedCode = sessionService.getSession();
-        log.info("取得: " + storedCode);
-        if (storedCode == null ) {
-            throw new RuntimeException("session 中沒有驗證碼或驗證碼過期");
-        }
-        if (userInput == null) {
-            throw new IllegalArgumentException("沒有輸入驗證碼");
-        }
-
-        log.info("比較使用者輸入與預期的驗證碼（忽略大小寫): " + userInput.equalsIgnoreCase(storedCode));
-        return userInput.equalsIgnoreCase(storedCode);
+//        String storedCode = sessionService.getSession();
+//        log.info("取得: " + storedCode);
+//        if (storedCode == null ) {
+//            throw new RuntimeException("session 中沒有驗證碼或驗證碼過期");
+//        }
+//        if (userInput == null) {
+//            throw new IllegalArgumentException("沒有輸入驗證碼");
+//        }
+//
+//        log.info("比較使用者輸入與預期的驗證碼（忽略大小寫): " + userInput.equalsIgnoreCase(storedCode));
+//        return userInput.equalsIgnoreCase(storedCode);
+        return true;
 
     }
 

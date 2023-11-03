@@ -11,7 +11,7 @@ import lombok.Data;
  */
 @Data
 @JsonIgnoreProperties(value = {"password"}, allowSetters = true)
-public class LoginReq {
+public class LoginReqDTO {
 
     @NotNull(message = "identify 不可為空值")
     @JsonProperty("identify")

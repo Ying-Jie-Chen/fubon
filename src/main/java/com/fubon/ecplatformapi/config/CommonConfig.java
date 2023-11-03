@@ -1,5 +1,6 @@
 package com.fubon.ecplatformapi.config;
 
+import com.fubon.ecplatformapi.helper.JsonHelper;
 import com.fubon.ecplatformapi.mapper.PolicyDetailMapper;
 import org.modelmapper.ModelMapper;
 import com.fubon.ecplatformapi.mapper.ResultMapper;
@@ -16,10 +17,14 @@ public class CommonConfig {
     public ResultMapper resultMapper() {
         return new ResultMapper();
     }
-
     @Bean
     public PolicyDetailMapper policyDetailMapper() {
         return new PolicyDetailMapper();
+    }
+
+    @Bean
+    public JsonHelper jsonHelper() {
+        return new JsonHelper();
     }
 
 }

@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.model.dto.resp.fb;
+package com.fubon.ecplatformapi.model.dto.resp.fubon;
 
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
