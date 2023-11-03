@@ -20,6 +20,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.Map;
 
 
@@ -31,14 +34,10 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     TokenService tokenService;
     @Autowired
-    TokenRepository tokenRepository;
-    @Autowired
     EcwsConfig ecwsConfig;
     @Autowired
     JsonHelper jsonHelper;
-
     private final WebClient webClient;
-
     @Autowired
     public AuthServiceImpl(WebClient.Builder webClientBuilder, EcwsConfig ecwsConfig) {
         this.ecwsConfig = ecwsConfig;
@@ -65,7 +64,6 @@ public class AuthServiceImpl implements AuthService {
 
     }
 
-
     /**
      * 取得 Fubon API /Login 的回應結果
      *
@@ -81,14 +79,13 @@ public class AuthServiceImpl implements AuthService {
 
         sessionService.saveSessionInfo(fbLoginRespDTO, session);
 
-        String empNo = loginReq.getAccount();
-        long timestamp = System.currentTimeMillis();
-
-        String authToken = tokenService.generateToken(session.getId(), empNo, timestamp);
-        saveUserToken(authToken);
-
         Map<String, Object> values = SessionHelper.getAllValue(session);
         log.info(values.toString());
+
+        String empNo = loginReq.getAccount();
+        long timestamp = System.currentTimeMillis();
+        String authToken = tokenService.generateToken(session.getId(), empNo, timestamp);
+        tokenService.saveAuthToken(authToken);
 
         FubonLoginRespDTO.UserInfo userInfo= fbLoginRespDTO.getAny().getUserInfo();
 
@@ -96,16 +93,6 @@ public class AuthServiceImpl implements AuthService {
                 .token(authToken)
                 .userInfo(userInfo)
                 .build();
-    }
-
-    @Override
-    public void saveUserToken(String authToken) {
-        Token token = Token.builder()
-                .token(authToken)
-                .expired(false)
-                .revoked(false)
-                .build();
-        tokenRepository.save(token);
     }
 
     private <T> T callFubonService(String jsonRequest, Class<T> responseType) {
@@ -117,6 +104,17 @@ public class AuthServiceImpl implements AuthService {
                 .retrieve()
                 .bodyToMono(responseType)
                 .block();
+    }
+
+    @Override
+    public void saveVerificationImage(String outputPath, String base64String){
+        byte[] imageBytes = Base64.getDecoder().decode(base64String);
+        try (FileOutputStream fos = new FileOutputStream(outputPath)) {
+            fos.write(imageBytes);
+            log.info("驗證碼圖片成功存到: " + outputPath);
+        } catch (IOException e) {
+            log.error("保存驗證碼圖片錯誤: " + e.getMessage());
+        }
     }
 
 }

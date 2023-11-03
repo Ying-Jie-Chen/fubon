@@ -1,6 +1,7 @@
 package com.fubon.ecplatformapi.service.impl;
 
 
+import com.fubon.ecplatformapi.service.SessionService;
 import com.fubon.ecplatformapi.service.TokenService;
 import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.model.entity.Token;
@@ -27,27 +28,31 @@ public class TokenServiceImpl implements TokenService {
     @Autowired
     TokenRepository tokenRepository;
     @Autowired
-    SessionServiceImpl sessionService;
-    private static final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
-    private static final String SIGNATURE_ALGORITHM = "SHA-256";
+    SessionService sessionService;
     private final SecretKey secretKey;
     @Autowired
     public TokenServiceImpl(SecretKey AESKey) {
         this.secretKey = AESKey;
     }
 
+    @Override
+    public void saveAuthToken(String authToken) {
+        Token token = Token.builder()
+                .token(authToken)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
+    }
+
     /**
      *  生成 Token
-     *
      */
     @Override
     public String generateToken(String sessionId, String empNo, long timestamp) throws Exception {
-        log.info("Generate Token #Start");
         String signature = SHA256Hash(sessionId + empNo + timestamp);
         String tokenContent = sessionId + "|" + empNo + "|" + timestamp + "|" + signature;
-        String authToken = encrypt(tokenContent, secretKey);
-        log.info("Generate Token: " + authToken);
-        return authToken;
+        return encrypt(tokenContent, secretKey);
     }
 
     /**
@@ -55,25 +60,21 @@ public class TokenServiceImpl implements TokenService {
      */
     @Override
     public boolean isTokenValid(Token token, HttpSession session){
-        log.info("驗證Token #Start");
-        log.info("token: " + token + "AESKey: " + secretKey);
+
         try{
 
             String[] tokenParts = decrypt(token.getToken(), secretKey).split("\\|");
 
             if (tokenParts.length != 4 || !tokenParts[0].equals(session.getId())) {
-                //log.error("在Session中找不到對應的資訊或是Invalid token format");
                 token.setRevoked(true);
             }
 
             Object value = SessionHelper.getAllValue(session);
             //log.info("value: " + value);
 
-            log.info("驗證簽章#Start");
             if (!validateSignature(tokenParts[0], tokenParts[1], Long.parseLong(tokenParts[2]), tokenParts[3])) {
                 token.setRevoked(true);
                 sessionService.removeSession(session);
-                //log.error("Invalid signature");
             }
 
             long decryptedTimestamp = Long.parseLong(tokenParts[2]);
@@ -81,22 +82,18 @@ public class TokenServiceImpl implements TokenService {
             long tokenAge = currentTimestamp - decryptedTimestamp;
             Duration tokenExpirationTime = tokenProperties.getExpirationMinutes();
 
-            log.info("驗證令牌是否過期#Start");
             if (tokenAge > tokenExpirationTime.toMillis()) {
                 token.setExpired(true);
                 sessionService.removeSession(session);
-                //log.error("Token has expired");
             }
 
             if (token.getRevoked() || token.getExpired()){
                 log.error("Token has expired or revoked");
                 return false;
             }
-
-            //log.info("Token驗證成功 #End");
             return true;
 
-        }catch (Exception e){
+        } catch (Exception e){
             log.error("Token驗證失敗: " + e.getMessage());
             return false;
         }
@@ -121,18 +118,17 @@ public class TokenServiceImpl implements TokenService {
                 .revoked(false)
                 .build();
         tokenRepository.save(newToken);
-        //log.info("New Token: " + newToken);
     }
 
     public static String encrypt(String data, SecretKey secretKey) throws Exception {
-        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
         byte[] encryptedBytes = cipher.doFinal(data.getBytes());
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
     public static String decrypt(String encryptedData, SecretKey secretKey) throws Exception {
-        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
         byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedData));
         return new String(decryptedBytes);
@@ -145,7 +141,7 @@ public class TokenServiceImpl implements TokenService {
 
     private static String SHA256Hash(String data) throws NoSuchAlgorithmException {
         try {
-            MessageDigest digest = MessageDigest.getInstance(SIGNATURE_ALGORITHM);
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));
             StringBuilder hexString = new StringBuilder(2 * hash.length);
 

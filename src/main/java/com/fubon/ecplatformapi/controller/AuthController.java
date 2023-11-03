@@ -13,12 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Base64;
-
 
 @Slf4j
 @RestController
@@ -70,6 +66,9 @@ public class AuthController {
         try {
             VerificationVo responseData = authService.getVerificationImage();
 
+            // 保存解碼圖片到指定路徑
+            authService.saveVerificationImage("/Users/yingjie/Desktop/image.png", responseData.getVerificationImage());
+
             return ApiRespDTO.<VerificationVo>builder()
                     .data(responseData)
                     .build();
@@ -104,24 +103,4 @@ public class AuthController {
                     .build();
         }
     }
-
-
-
-    /**
-     * 圖形驗證碼解碼
-     *
-     */
-    @GetMapping("/getImage")
-    public ResponseEntity<byte[]> getImage() {
-        String base64String = authService.getVerificationImage().getVerificationImage();
-        byte[] imageBytes = Base64.getDecoder().decode(base64String);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG);
-
-        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
-    }
-
-
-
 }

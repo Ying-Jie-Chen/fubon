@@ -12,6 +12,6 @@ public interface AuthService {
 
     LoginRespVo getUserInfo(LoginReqDTO loginReqDTO, HttpSession session) throws Exception;
 
-    void saveUserToken(String authToken);
+    void saveVerificationImage(String outputPath, String base64String);
 
 }
