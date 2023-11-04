@@ -1,6 +1,7 @@
 package com.fubon.ecplatformapi.config;
 
 import com.fubon.ecplatformapi.model.dto.req.FubonLoginReqDTO;
+import com.fubon.ecplatformapi.model.dto.req.FubonSsoTokenDTO;
 import com.fubon.ecplatformapi.model.dto.req.FubonVerificationReqDTO;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -22,4 +23,7 @@ public class EcwsConfig {
     public FubonVerificationReqDTO verificationConfig() {
         return new FubonVerificationReqDTO();
     }
+
+    @Bean
+    public FubonSsoTokenDTO fubonSsoTokenDTO(){ return  new FubonSsoTokenDTO(); }
 }

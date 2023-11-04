@@ -1,10 +1,12 @@
 package com.fubon.ecplatformapi.aop;
 
+import com.fubon.ecplatformapi.SessionManager;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.model.entity.Token;
 import com.fubon.ecplatformapi.repository.TokenRepository;
 import com.fubon.ecplatformapi.service.TokenService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,14 @@ public class HeaderAspect {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         final String authHeader = request.getHeader("Authorization");
         HttpSession session = request.getSession();
+
+
+        String sessionId = getSessionIdFromCookie(request);
+        log.info("SESSION Cookie的值: " + sessionId);
+        if(SessionManager.getSessionById(sessionId) != null) {
+           log.info("執行方法");
+        }
+
         try {
 
             if (StringUtils.isEmpty(authHeader) || !authHeader.startsWith("Bearer")) { return errorResponse(); }
@@ -58,11 +68,24 @@ public class HeaderAspect {
         }
     }
 
+    private String getSessionIdFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("Session-ID".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
     private ApiRespDTO<?> errorResponse() {
         return ApiRespDTO.builder()
                 .code(StatusCodeEnum.ERR00002.getCode())
                 .message(StatusCodeEnum.ERR00002.getMessage())
                 .build();
     }
+
 }
 

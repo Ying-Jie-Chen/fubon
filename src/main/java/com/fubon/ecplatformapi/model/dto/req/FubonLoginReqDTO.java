@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "ecws.login")
 public class FubonLoginReqDTO {
 
-    private Header Header;
+    private Header header;
 
     private FunctionCode FBECAPPCERT1001RQ;
 

@@ -1,5 +1,6 @@
 package com.fubon.ecplatformapi.service.impl;
 
+import com.fubon.ecplatformapi.SessionManager;
 import com.fubon.ecplatformapi.config.EcwsConfig;
 import com.fubon.ecplatformapi.helper.JsonHelper;
 import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
@@ -8,12 +9,7 @@ import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonVerificationResp;
 import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationVo;
 import com.fubon.ecplatformapi.service.AuthService;
-import com.fubon.ecplatformapi.helper.SessionHelper;
-import com.fubon.ecplatformapi.model.entity.Token;
-import com.fubon.ecplatformapi.repository.TokenRepository;
-import com.fubon.ecplatformapi.service.SessionService;
 import com.fubon.ecplatformapi.service.TokenService;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -23,14 +19,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.Map;
 
 
 @Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
-    @Autowired
-    SessionService sessionService;
     @Autowired
     TokenService tokenService;
     @Autowired
@@ -71,20 +64,18 @@ public class AuthServiceImpl implements AuthService {
      * @return UserInfo
      */
     @Override
-    public LoginRespVo getUserInfo(LoginReqDTO loginReq, HttpSession session) throws Exception {
+    public LoginRespVo getUserInfo(String sessionId, LoginReqDTO loginReq) throws Exception {
 
         String jsonRequest = jsonHelper.convertLoginConfigToJson(ecwsConfig.fubonLoginConfig(), loginReq);
 
         FubonLoginRespDTO fbLoginRespDTO = callFubonService(jsonRequest, FubonLoginRespDTO.class);
 
-        sessionService.saveSessionInfo(fbLoginRespDTO, session);
-
-        Map<String, Object> values = SessionHelper.getAllValue(session);
-        log.info(values.toString());
+        SessionManager.setSessionAttributes(sessionId, fbLoginRespDTO.getAny().getUserInfo());
+        //SessionHelper.getAllValue(sessionId);
 
         String empNo = loginReq.getAccount();
         long timestamp = System.currentTimeMillis();
-        String authToken = tokenService.generateToken(session.getId(), empNo, timestamp);
+        String authToken = tokenService.generateToken(sessionId, empNo, timestamp);
         tokenService.saveAuthToken(authToken);
 
         FubonLoginRespDTO.UserInfo userInfo= fbLoginRespDTO.getAny().getUserInfo();

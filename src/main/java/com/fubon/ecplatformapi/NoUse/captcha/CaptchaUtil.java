@@ -1,8 +1,7 @@
 package com.fubon.ecplatformapi.NoUse.captcha;
 
-import com.fubon.ecplatformapi.service.impl.SessionServiceImpl;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;

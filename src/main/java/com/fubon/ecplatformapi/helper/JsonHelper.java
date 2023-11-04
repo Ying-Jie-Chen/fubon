@@ -1,52 +1,58 @@
 package com.fubon.ecplatformapi.helper;
 
+import com.fubon.ecplatformapi.CsvUtil;
+import com.fubon.ecplatformapi.enums.SessionAttribute;
 import com.fubon.ecplatformapi.model.dto.req.FubonLoginReqDTO;
+import com.fubon.ecplatformapi.model.dto.req.FubonSsoTokenDTO;
 import com.fubon.ecplatformapi.model.dto.req.FubonVerificationReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
-
+@Slf4j
 public class JsonHelper {
+    @Autowired
+    CsvUtil csvUtil;
+
     public String convertVerificationConfigToJson(FubonVerificationReqDTO config) {
-        return "{" + "\"Header\":{" +
-                "\"account\":\"" + config.getHeader().getAccount() + "\"," +
-                "\"user_ip\":\"" + config.getHeader().getUser_ip() + "\"," +
-                "\"SysPwd\":\"" + config.getHeader().getSysPwd() + "\"," +
-                "\"FromSys\":\"" + config.getHeader().getFromSys() + "\"," +
-                "\"FunctionCode\":\"" + config.getHeader().getFunctionCode() + "\"" +
-                "}," + "\"FBECCOMSTA1032RQ\":{" +
-                "\"system\":\"" + config.getFBECCOMSTA1032RQ().getSystem() + "\"," +
-                "\"insureType\":\"" + config.getFBECCOMSTA1032RQ().getInsureType() + "\"," +
-                "\"verificationTypes\":\"" + config.getFBECCOMSTA1032RQ().getVerificationTypes() + "\"" +
-                "}" + "}";
+        FubonVerificationReqDTO.Header header = config.getHeader();
+        FubonVerificationReqDTO.FBECCOMSTA1032 functionCode = config.getFBECCOMSTA1032RQ();
+        return "{" + "\"Header\":{" + "\"account\":\"" + header.getAccount() + "\"," + "\"user_ip\":\"" + header.getUser_ip() + "\"," + "\"SysPwd\":\"" + header.getSysPwd() + "\"," + "\"FromSys\":\"" + header.getFromSys() + "\"," + "\"FunctionCode\":\"" + header.getFunctionCode() + "\"" + "}," + "\"FBECCOMSTA1032RQ\":{" + "\"system\":\"" + functionCode.getSystem() + "\"," + "\"insureType\":\"" + functionCode.getInsureType() + "\"," + "\"verificationTypes\":\"" + functionCode.getVerificationTypes() + "\"" + "}" + "}";
     }
 
     public String convertLoginConfigToJson(FubonLoginReqDTO config, LoginReqDTO loginReq) {
-        return "{" + "\"Header\":{" +
-                "\"account\":\"" + config.getHeader().getAccount() + "\"," +
-                "\"user_ip\":\"" + config.getHeader().getUser_ip() + "\"," +
-                "\"SysPwd\":\"" + config.getHeader().getSysPwd() + "\"," +
-                "\"FromSys\":\"" + config.getHeader().getFromSys() + "\"," +
-                "\"FunctionCode\":\"" + config.getHeader().getFunctionCode() + "\"" +
-                "}," + "\"FBECAPPCERT1001RQ\":{" +
-                "\"ipAddress\":\"" + config.getFBECAPPCERT1001RQ().getIpAddress() + "\"," +
-                "\"device\":\"" + config.getFBECAPPCERT1001RQ().getDevice() + "\"," +
-                "\"codeName\":\"" + config.getFBECAPPCERT1001RQ().getCodeName() + "\"," +
-                "\"deviceId\":\"" + config.getFBECAPPCERT1001RQ().getDeviceId() + "\"," +
-                "\"osVersion\":\"" + config.getFBECAPPCERT1001RQ().getOsVersion() + "\"," +
-                "\"appVersion\":\"" + config.getFBECAPPCERT1001RQ().getAppVersion() + "\"," +
-                "\"agentId\":\"" + config.getFBECAPPCERT1001RQ().getAgentId() + "\"," +
-                "\"loginId\":\"" + config.getFBECAPPCERT1001RQ().getLoginId() + "\"," +
-                "\"salesId\":\"" + config.getFBECAPPCERT1001RQ().getSalesId() + "\"," +
-                "\"agentName\":\"" + config.getFBECAPPCERT1001RQ().getAgentName() + "\"," +
-                "\"unionNum\":\"" + config.getFBECAPPCERT1001RQ().getUnionNum() + "\"," +
-                "\"returnPfx\":\"" + config.getFBECAPPCERT1001RQ().getReturnPfx() + "\"," +
-                "\"identity\":\"" + config.getFBECAPPCERT1001RQ().getIdentify() + "\"," +
-                "\"empNo\":\"" + config.getFBECAPPCERT1001RQ().getEmpNo() + "\"," +
-                "\"password\":\"" + config.getFBECAPPCERT1001RQ().getPassword() + "\"," +
-                "\"token\":\"" + loginReq.getToken() + "\"," +
-                "\"verificationCode\":\"" + loginReq.getVerificationCode() + "\"," +
-                "\"client\":\"" + config.getFBECAPPCERT1001RQ().getClient() + "\"," +
-                "\"sid\":\"" + config.getFBECAPPCERT1001RQ().getSid() + "\"" +
-                "}" + "}";
+        FubonLoginReqDTO.Header header = config.getHeader();
+        FubonLoginReqDTO.FunctionCode functionCode = config.getFBECAPPCERT1001RQ();
+        return "{" + "\"Header\":{" + "\"account\":\"" + header.getAccount() + "\"," + "\"user_ip\":\"" + header.getUser_ip() + "\"," + "\"SysPwd\":\"" + header.getSysPwd() + "\"," + "\"FromSys\":\"" + header.getFromSys() + "\"," + "\"FunctionCode\":\"" + header.getFunctionCode() + "\"" + "}," + "\"FBECAPPCERT1001RQ\":{" + "\"ipAddress\":\"" + functionCode.getIpAddress() + "\"," + "\"device\":\"" + functionCode.getDevice() + "\"," + "\"codeName\":\"" + functionCode.getCodeName() + "\"," + "\"deviceId\":\"" + functionCode.getDeviceId() + "\"," + "\"osVersion\":\"" + functionCode.getOsVersion() + "\"," + "\"appVersion\":\"" + functionCode.getAppVersion() + "\"," + "\"agentId\":\"" + functionCode.getAgentId() + "\"," + "\"loginId\":\"" + functionCode.getLoginId() + "\"," + "\"salesId\":\"" + functionCode.getSalesId() + "\"," + "\"agentName\":\"" + functionCode.getAgentName() + "\"," + "\"unionNum\":\"" + functionCode.getUnionNum() + "\"," + "\"returnPfx\":\"" + functionCode.getReturnPfx() + "\"," + "\"identity\":\"" + functionCode.getIdentify() + "\"," + "\"empNo\":\"" + functionCode.getEmpNo() + "\"," + "\"password\":\"" + functionCode.getPassword() + "\"," + "\"token\":\"" + loginReq.getToken() + "\"," + "\"verificationCode\":\"" + loginReq.getVerificationCode() + "\"," + "\"client\":\"" + functionCode.getClient() + "\"," + "\"sid\":\"" + functionCode.getSid() + "\"" + "}" + "}";
+    }
+
+    public String convertSsoTokenToJson(FubonSsoTokenDTO config, String sessionId){
+        FubonSsoTokenDTO.Header header = config.getHeader();
+        FubonSsoTokenDTO.FunctionCode functionCode = config.getFbeccomsta1040RQ();
+        String unionNum = SessionHelper.getValueByAttribute(sessionId, SessionAttribute.UNION_NUM).toString();
+        String account = SessionHelper.getValueByAttribute(sessionId, SessionAttribute.FBID).toString();
+        String parameter = csvUtil.generateCsv(sessionId);
+        //log.info(functionCode.toString());
+        try {
+            return "{" + "\"Header\":{" +
+                    "\"FromSys\":\"" + header.getFromSys() + "\"," +
+                    "\"SysPwd\":\"" + header.getSysPwd() + "\"," +
+                    "\"FunctionCode\":\"" + header.getFunctionCode() + "\"" +
+                    "\"account\":\"" + header.getAccount() + "\"," +
+                    "\"user_ip\":\"" + header.getUserIp() +"\"," +
+                    "}," + "\"FBECCOMSTA1040RQ\":{" +
+                    "\"unionNum\":\"" + unionNum + "\"," +
+                    "\"account\":\"" + account + "\"," +
+                    "\"source\":\"" + functionCode.getSource() + "\"," +
+                    "\"desType\":\"" + functionCode.getDesType() + "\"," +
+                    "\"desFunction\":\"" + functionCode.getDesFunction() + "\"," +
+                    "\"desModule\":\"" + functionCode.getDesModule() + "\"," +
+                    "\"type\":\"" + functionCode.getType() + "\"," +
+                    "\"parameter\":\"" + parameter + "\"," +
+                    "}" + "}";
+        }catch (Exception e){
+            e.printStackTrace();
+            return "{}";
+        }
     }
 }

@@ -25,18 +25,19 @@ ecws:
       function-code: "FBECCOMSTA1032"
       account: "12546"
       user-ip: "192.168.50.138"
-    FBECCOMSTA1032-rQ:
+    fbeccomsta1032-rQ:
       system: "B2A"
       insure-type: "FBINSAPP"
       verification-types: "1"
+
   login:
-    Header:
-      From-sys: "B2A"
-      Sys-pwd: "lYKMhPW8SGg="
-      Function-code: "FBECAPPCERT1001"
+    header:
+      from-sys: "B2A"
+      sys-pwd: "lYKMhPW8SGg="
+      function-code: "FBECAPPCERT1001"
       account: "12546"
       user-ip: "192.168.50.138"
-    FBECAPPCERT1001-rQ:
+    fbecappcert1001-rQ:
       ip-address: "192.168.50.138"
       device: "iOS"
       code-name: "ASUS P01T_1"
@@ -57,6 +58,25 @@ ecws:
       verification-code: ""
       client: ""
       sid: ""
+
+  sso-token:
+      header:
+        from-sys: "B2A"
+        sys-pwd: "lYKMhPW8SGg="
+        function-code: "FBECCOMSTA1040"
+        account: "12546"
+        user-ip: "192.168.50.138"
+      fbeccomsta1040-rQ:
+        union-num: ""
+        account: ""
+        source: "FBInsAgent"
+        des-type: ""
+        des-module: ""
+        des-function: "FBInsAgentAPP"
+        type: ""
+        parameter: ""
+
+
 
 
 

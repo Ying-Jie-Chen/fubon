@@ -1,13 +1,16 @@
 package com.fubon.ecplatformapi.controller;
 
+import com.fubon.ecplatformapi.SessionManager;
 import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationVo;
 import com.fubon.ecplatformapi.service.AuthService;
-import com.fubon.ecplatformapi.service.SessionService;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,19 +25,22 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     @Autowired
     AuthService authService;
-    @Autowired
-    SessionService sessionService;
 
     /**
      * 展業平台登入
      *
      */
     @PostMapping("/login")
-    public ResponseEntity<ApiRespDTO<FubonLoginRespDTO.UserInfo>> login(@RequestBody LoginReqDTO loginReq, HttpSession session){
+    public ResponseEntity<ApiRespDTO<FubonLoginRespDTO.UserInfo>> login(@RequestBody LoginReqDTO loginReq, HttpSession session, HttpServletResponse response){
 
         try {
 
-            LoginRespVo responseData = authService.getUserInfo(loginReq, session);
+            Cookie sessionCookie = new Cookie("SESSION-ID", session.getId());
+            sessionCookie.setMaxAge(-1);
+            response.addCookie(sessionCookie);
+
+            SessionManager.associateSession(session, session.getId());
+            LoginRespVo responseData = authService.getUserInfo(session.getId(),loginReq);
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", "Bearer " + responseData.getToken());
 
@@ -87,9 +93,10 @@ public class AuthController {
      *
      */
     @PostMapping("/logout")
-    public ApiRespDTO<String> logout(HttpSession session){
+    public ApiRespDTO<String> logout(HttpServletRequest request){
         try {
-            sessionService.removeSession(session);
+
+            SessionManager.removeSession(sessionId);
 
             return ApiRespDTO.<String>builder()
                     .code(StatusCodeEnum.SUCCESS.getCode())

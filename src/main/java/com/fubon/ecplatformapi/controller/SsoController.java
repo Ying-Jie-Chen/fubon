@@ -1,12 +1,13 @@
-package com.fubon.ecplatformapi.controller.other;
+package com.fubon.ecplatformapi.controller;
 
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
 import com.fubon.ecplatformapi.repository.TokenRepository;
-import com.fubon.ecplatformapi.service.AuthService;
 import com.fubon.ecplatformapi.service.SsoService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,10 +22,16 @@ public class SsoController {
     TokenRepository tokenRepository;
 
     @GetMapping("/getSSOToken")
-    public ApiRespDTO<String> getSSOToken(){
+    public ApiRespDTO<String> getSSOToken(HttpServletRequest request){
         try {
+//            寫在ＡＯＰ
+//            String sessionId = getSessionIdFromCookie(request);
+//            log.info("SESSION Cookie的值: " + sessionId);
+//            HttpSession session = SessionManager.getSessionById(sessionId);
+//
+//            if(session != null) {
 
-            String ssoToken = ssoService.getSSOToken();
+            String ssoToken = ssoService.getSSOToken(sessionId);
 
             return ApiRespDTO.<String>builder()
                     .code(StatusCodeEnum.SUCCESS.getCode())
@@ -62,6 +69,17 @@ public class SsoController {
                     .message(StatusCodeEnum.ERR00999.getMessage())
                     .build();
         }
+    }
+
+    private String getSessionIdFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("SESSION-ID".equals(cookie.getName())) {return cookie.getValue();}
+            }
+
+        }
+        return null;
     }
 
 }

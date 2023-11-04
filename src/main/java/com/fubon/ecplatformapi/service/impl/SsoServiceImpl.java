@@ -1,8 +1,9 @@
 package com.fubon.ecplatformapi.service.impl;
 
-//import com.fubon.ecplatformapi.repository.CompanyRepository;
-//import com.fubon.ecplatformapi.repository.LicenseInfoRepository;
+
+import com.fubon.ecplatformapi.config.EcwsConfig;
 import com.fubon.ecplatformapi.enums.SSOLoginEnum;
+import com.fubon.ecplatformapi.helper.JsonHelper;
 import com.fubon.ecplatformapi.model.dto.resp.GetFubonSSOTokenRespDTO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import com.fubon.ecplatformapi.service.SsoService;
@@ -18,36 +19,47 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
 @Slf4j
 @Service
 public class SsoServiceImpl implements SsoService {
+    @Autowired
+    JsonHelper jsonHelper;
+    @Autowired
+    EcwsConfig ecwsConfig;
     private static final String DOMAIN_URL = "https://tb2b.518fb.com/ecws/json/service";
     private final WebClient webClient;
     @Autowired
-    public SsoServiceImpl(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl(DOMAIN_URL).build();
+    public SsoServiceImpl(WebClient.Builder webClientBuilder, EcwsConfig ecwsConfig) {
+        this.ecwsConfig = ecwsConfig;
+        this.webClient = webClientBuilder.baseUrl(ecwsConfig.getDomain()).build();
     }
-    //    @Autowired
-//    LicenseInfoRepository licenseInfoRepository;
-//    @Autowired
-//    CompanyRepository companyRepository;
+
     @Override
-    public String getSSOToken(){
+    public String getSSOToken(String sessionId){
+        try {
 
-        Mono<GetFubonSSOTokenRespDTO> mono = webClient
-                .get()
-                .uri("/GetSSOToken")
-                .accept(MediaType.APPLICATION_JSON)
+            String jsonRequest = jsonHelper.convertSsoTokenToJson(ecwsConfig.fubonSsoTokenDTO(), sessionId);
+            GetFubonSSOTokenRespDTO respDTO = callFubonService(jsonRequest, GetFubonSSOTokenRespDTO.class);
+            return respDTO.getAny().getSid();
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private <T> T callFubonService(String jsonRequest, Class<T> responseType) {
+        return webClient
+                .post()
+                .uri("")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(jsonRequest)
                 .retrieve()
-                .bodyToMono(GetFubonSSOTokenRespDTO.class);
-
-        GetFubonSSOTokenRespDTO respDTO = mono.block();
-        assert respDTO != null;
-        return respDTO.getAny().getSid();
+                .bodyToMono(responseType)
+                .block();
     }
 
 

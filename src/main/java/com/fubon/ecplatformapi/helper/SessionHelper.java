@@ -1,5 +1,6 @@
 package com.fubon.ecplatformapi.helper;
 
+import com.fubon.ecplatformapi.SessionManager;
 import com.fubon.ecplatformapi.enums.SessionAttribute;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -12,25 +13,28 @@ import java.util.Map;
 @Component
 public class SessionHelper {
 
-    public static Map<String, Object> getAllValue(HttpSession session) {
-        log.info("取得儲存在Session中的All Value#Start");
+    /**
+     * 取得儲存在Session中的All Value
+     */
+    public static Map<String, Object> getAllValue(String sessionId) {
+        HttpSession session = SessionManager.getSessionById(sessionId);
 
         Map<String, Object> values = new HashMap<>();
-
         for (SessionAttribute attribute : SessionAttribute.values()) {
             Object value = session.getAttribute(attribute.name());
             values.put(attribute.name(), value);
-            //log.info(attribute + ": " + value);
+            log.info(attribute + ": " + value);
         }
         return values;
     }
 
-    public static Object getValueByAttribute(HttpSession session, SessionAttribute attribute) {
-        log.info("取得儲存在Session中的特定Value#Start");
-
-        Object value = session.getAttribute(attribute.getAttributeName());
-        log.info(attribute.getAttributeName() + ": " + value);
+    /**
+     * 取得儲存在Session中的特定Value
+     */
+    public static Object getValueByAttribute(String sessionId, SessionAttribute attribute) {
+        HttpSession session = SessionManager.getSessionById(sessionId);
+        Object value = session.getAttribute(attribute.name());
+        log.info(attribute + ": " + value);
         return value;
     }
-
 }

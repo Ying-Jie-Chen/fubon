@@ -1,7 +1,7 @@
 package com.fubon.ecplatformapi.service.impl;
 
 
-import com.fubon.ecplatformapi.service.SessionService;
+import com.fubon.ecplatformapi.SessionManager;
 import com.fubon.ecplatformapi.service.TokenService;
 import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.model.entity.Token;
@@ -27,8 +27,6 @@ public class TokenServiceImpl implements TokenService {
     TokenProperties tokenProperties;
     @Autowired
     TokenRepository tokenRepository;
-    @Autowired
-    SessionService sessionService;
     private final SecretKey secretKey;
     @Autowired
     public TokenServiceImpl(SecretKey AESKey) {
@@ -69,12 +67,13 @@ public class TokenServiceImpl implements TokenService {
                 token.setRevoked(true);
             }
 
-            Object value = SessionHelper.getAllValue(session);
+            Object value = SessionHelper.getAllValue(session.getId());
             //log.info("value: " + value);
 
             if (!validateSignature(tokenParts[0], tokenParts[1], Long.parseLong(tokenParts[2]), tokenParts[3])) {
                 token.setRevoked(true);
-                sessionService.removeSession(session);
+                SessionManager.removeSession(session.getId());
+                //sessionService.removeSession(session.getId());
             }
 
             long decryptedTimestamp = Long.parseLong(tokenParts[2]);
@@ -84,7 +83,7 @@ public class TokenServiceImpl implements TokenService {
 
             if (tokenAge > tokenExpirationTime.toMillis()) {
                 token.setExpired(true);
-                sessionService.removeSession(session);
+                SessionManager.removeSession(session.getId());
             }
 
             if (token.getRevoked() || token.getExpired()){
