@@ -1,9 +1,8 @@
 package com.fubon.ecplatformapi.controller;
 
-import com.fubon.ecplatformapi.SessionManager;
+import com.fubon.ecplatformapi.config.SessionManager;
 import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationVo;
 import com.fubon.ecplatformapi.service.AuthService;
@@ -31,26 +30,28 @@ public class AuthController {
      *
      */
     @PostMapping("/login")
-    public ResponseEntity<ApiRespDTO<FubonLoginRespDTO.UserInfo>> login(@RequestBody LoginReqDTO loginReq, HttpSession session, HttpServletResponse response){
+    public ResponseEntity<ApiRespDTO<LoginRespVo.ResponseData>> login(@RequestBody LoginReqDTO loginReq, HttpSession session, HttpServletResponse response){
 
         try {
 
             LoginRespVo responseData = authService.getUserInfo(loginReq, session, response);
+            SessionHelper.getAllValue(session.getId());
+
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", "Bearer " + responseData.getToken());
 
             return ResponseEntity.ok().headers(headers)
-                    .body(ApiRespDTO.<FubonLoginRespDTO.UserInfo>builder()
+                    .body(ApiRespDTO.<LoginRespVo.ResponseData>builder()
                             .code(StatusCodeEnum.SUCCESS.getCode())
                             .message(StatusCodeEnum.SUCCESS.getMessage())
                             .authToken(responseData.getToken())
-                            .data(responseData.getUserInfo())
+                            .data(responseData.getData())
                             .build());
 
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiRespDTO.<FubonLoginRespDTO.UserInfo>builder()
+                    .body(ApiRespDTO.<LoginRespVo.ResponseData>builder()
                             .code(StatusCodeEnum.ERR00999.name())
                             .message(StatusCodeEnum.ERR00999.getMessage())
                             .build());
@@ -96,6 +97,7 @@ public class AuthController {
                     .code(StatusCodeEnum.SUCCESS.getCode())
                     .message(StatusCodeEnum.SUCCESS.getMessage())
                     .build();
+
         } catch (Exception e) {
             return ApiRespDTO.<String>builder()
                     .code(StatusCodeEnum.ERR00999.name())

@@ -52,7 +52,7 @@ public class SsoController {
     public ApiRespDTO<GetUserInfoVo> SSOLogin(@RequestBody SsoReqDTO ssoReq) {
         try {
 
-            ssoService.performSSOLogin(ssoReq);
+            ssoService.verifySSOLogin(ssoReq);
 
             return ApiRespDTO.<GetUserInfoVo>builder()
                     .code(StatusCodeEnum.SUCCESS.getCode())

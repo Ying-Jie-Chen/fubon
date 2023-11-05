@@ -29,7 +29,6 @@ public class SsoServiceImpl implements SsoService {
     JsonHelper jsonHelper;
     @Autowired
     EcwsConfig ecwsConfig;
-    private static final String DOMAIN_URL = "https://tb2b.518fb.com/ecws/json/service";
     private final WebClient webClient;
     @Autowired
     public SsoServiceImpl(WebClient.Builder webClientBuilder, EcwsConfig ecwsConfig) {
@@ -39,16 +38,9 @@ public class SsoServiceImpl implements SsoService {
 
     @Override
     public String getSSOToken(String sessionId){
-        try {
-
             String jsonRequest = jsonHelper.convertSsoTokenToJson(ecwsConfig.fubonSsoTokenDTO(), sessionId);
             GetFubonSSOTokenRespDTO respDTO = callFubonService(jsonRequest, GetFubonSSOTokenRespDTO.class);
             return respDTO.getAny().getSid();
-
-        }catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
     }
 
     private <T> T callFubonService(String jsonRequest, Class<T> responseType) {
@@ -64,14 +56,15 @@ public class SsoServiceImpl implements SsoService {
 
 
     @Override
-    public void performSSOLogin(SsoReqDTO sspReq) {
+    public void verifySSOLogin(SsoReqDTO sspReq) {
         String webServiceAcc;
         String webServicePwd;
+        String domain = ecwsConfig.getDomain();
 
         try {
 
             log.info("判斷請求參數 domain決定環境 #Start");
-            if(DOMAIN_URL.contains("/ttran.518fb.com/") || DOMAIN_URL.contains("/tb2b.518fb.com/")) {
+            if(domain.contains("/ttran.518fb.com/") || domain.contains("/tb2b.518fb.com/")) {
                 log.info(":測試環境");
                 webServiceAcc = SSOLoginEnum.TEST.getWebServiceAcc();
                 webServicePwd = SSOLoginEnum.TEST.getWebServicePwd();
@@ -83,6 +76,7 @@ public class SsoServiceImpl implements SsoService {
 
             log.info("組成請求字串 #Start");
             String soapResp = sendAndReceiveSoapRequest(webServiceAcc, webServicePwd, sspReq.getToken());
+            log.info("soap response: " + soapResp);
 
             log.info("發送 SOAP 請求，取得回覆資料 #Start");
             String[] webserviceResp = soapResp.split("\\|");
@@ -90,7 +84,6 @@ public class SsoServiceImpl implements SsoService {
             String userName = webserviceResp[1].split("-")[1].trim();
             String unitCode = webserviceResp[1].split("-")[2].trim();
 
-            log.info("soap response: " + soapResp);
             log.info("web service response: " + webserviceResp);
 
             log.info("檢核是否有考過保險證照 #Start");

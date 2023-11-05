@@ -1,6 +1,6 @@
 package com.fubon.ecplatformapi.service.impl;
 
-import com.fubon.ecplatformapi.SessionManager;
+import com.fubon.ecplatformapi.config.SessionManager;
 import com.fubon.ecplatformapi.config.EcwsConfig;
 import com.fubon.ecplatformapi.helper.JsonHelper;
 import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
@@ -10,6 +10,7 @@ import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationVo;
 import com.fubon.ecplatformapi.service.AuthService;
 import com.fubon.ecplatformapi.service.TokenService;
+import com.fubon.ecplatformapi.service.XrefInfoService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 
-
 @Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -32,6 +32,8 @@ public class AuthServiceImpl implements AuthService {
     EcwsConfig ecwsConfig;
     @Autowired
     JsonHelper jsonHelper;
+    @Autowired
+    XrefInfoService xrefInfoService;
     private final WebClient webClient;
     @Autowired
     public AuthServiceImpl(WebClient.Builder webClientBuilder, EcwsConfig ecwsConfig) {
@@ -76,14 +78,13 @@ public class AuthServiceImpl implements AuthService {
         String authToken = tokenService.generateToken(session.getId(), loginReq.getAccount(), System.currentTimeMillis());
         tokenService.saveAuthToken(authToken);
 
-        FubonLoginRespDTO.UserInfo userInfo= fbLoginRespDTO.getAny().getUserInfo();
+        LoginRespVo.ResponseData data = xrefInfoService.getXrefInfoList(fbLoginRespDTO);
 
         return LoginRespVo.builder()
                 .token(authToken)
-                .userInfo(userInfo)
+                .data(data)
                 .build();
     }
-
 
     private <T> T callFubonService(String jsonRequest, Class<T> responseType) {
         return webClient

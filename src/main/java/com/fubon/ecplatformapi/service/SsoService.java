@@ -6,5 +6,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface SsoService {
     String getSSOToken(String sessionId);
-    void performSSOLogin(SsoReqDTO sspReq);
+    void verifySSOLogin(SsoReqDTO sspReq);
 }

@@ -1,9 +1,6 @@
 package com.fubon.ecplatformapi.mapper;
 
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonClmSalesRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonPolicyDetailRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FbQueryRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonPrnDetailResp;
+import com.fubon.ecplatformapi.model.dto.resp.fubon.*;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
 

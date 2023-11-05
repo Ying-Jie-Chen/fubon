@@ -13,8 +13,6 @@ public class FubonSsoTokenDTO {
         private String fromSys;
         private String sysPwd;
         private String functionCode;
-        private String account;
-        private String userIp;
     }
     @Data
     public static class FunctionCode{

@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi;
+package com.fubon.ecplatformapi.config;
 
 import com.fubon.ecplatformapi.enums.SessionAttribute;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonLoginRespDTO;
@@ -8,8 +8,10 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -32,8 +34,7 @@ public class SessionManager {
 
     public static void saveSession(HttpSession session, HttpServletResponse response, FubonLoginRespDTO fbLoginRespDTO){
         associateSession(session, session.getId());
-        setSessionAttributes(session.getId(), fbLoginRespDTO.getAny().getUserInfo());
-        //SessionHelper.getAllValue(sessionId);
+        setSessionAttributes(session.getId(), fbLoginRespDTO);
         saveSessionID(response, session);
     }
 
@@ -48,9 +49,12 @@ public class SessionManager {
         response.addCookie(sessionCookie);
     }
 
-    public static void setSessionAttributes(String sessionId, FubonLoginRespDTO.UserInfo user) {
+    public static void setSessionAttributes(String sessionId, FubonLoginRespDTO dto) {
         HttpSession session = getSessionById(sessionId);
         session.setMaxInactiveInterval(1200);
+
+        FubonLoginRespDTO.UserInfo user = dto.getAny().getUserInfo();
+        List<FubonLoginRespDTO.XrefInfo> userXrefInfoList = dto.getAny().getXrefInfo();
 
         session.setAttribute(String.valueOf(SessionAttribute.IDENTITY), user.getIdentity());
         session.setAttribute(String.valueOf(SessionAttribute.EMP_NO), user.getAgent_id());
@@ -60,24 +64,28 @@ public class SessionManager {
         session.setAttribute(String.valueOf(SessionAttribute.ADMIN_NUM), user.getAdmin_num());
         session.setAttribute(String.valueOf(SessionAttribute.EMAIL), user.getEmail());
         session.setAttribute(String.valueOf(SessionAttribute.SALES_ID), user.getSales_id());
-        session.setAttribute(String.valueOf(SessionAttribute.XREF_INFOS), user.getXrefInfo());
+        session.setAttribute(String.valueOf(SessionAttribute.XREF_INFOS), user);
 
-//        List<FubonLoginRespDTO.UserInfo.XrefInfo> userXrefInfoList = user.getXrefInfo().stream()
-//                .map(xrefInfo -> FubonLoginRespDTO.UserInfo.XrefInfo.builder()
-//                        .xref(xrefInfo.getXref())
-//                        .channel(xrefInfo.getChannel())
-//                        .regno(xrefInfo.getRegno())
-//                        .empcname(xrefInfo.getEmpcname())
-//                        .adminSeq(xrefInfo.getAdminSeq())
-//                        .ascCrzSale(xrefInfo.getAscCrzSale())
-//                        .admin(xrefInfo.getAdmin())
-//                        .isctype(xrefInfo.getIsctype())
-//                        .licempcname(xrefInfo.getLicempcname())
-//                        .build())
-//                .collect(Collectors.toList());
-//
-//        session.setAttribute(String.valueOf(SessionAttribute.XREF_INFOS), userXrefInfoList);
+        List<FubonLoginRespDTO.XrefInfo> xrefInfoList = setXrefInfo(userXrefInfoList);
+        session.setAttribute(String.valueOf(SessionAttribute.XREF_INFOS), xrefInfoList);
     }
+
+    public static List<FubonLoginRespDTO.XrefInfo> setXrefInfo(List<FubonLoginRespDTO.XrefInfo> xrefInfoList) {
+        return xrefInfoList.stream()
+                .map(xref -> FubonLoginRespDTO.XrefInfo.builder()
+                        .xref(xref.getXref())
+                        .channel(xref.getChannel())
+                        .regno(xref.getRegno())
+                        .empcname(xref.getEmpcname())
+                        .adminSeq(xref.getAdminSeq())
+                        .ascCrzSale(xref.getAscCrzSale())
+                        .admin(xref.getAdmin())
+                        .isctype(xref.getIsctype())
+                        .licempcname(xref.getLicempcname())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 
     public static void removeSessionAttributes(String sessionId) {
         HttpSession session = getSessionById(sessionId);
