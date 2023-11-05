@@ -1,6 +1,7 @@
-package com.fubon.ecplatformapi.controller;
+package com.fubon.ecplatformapi.controller.test;
 
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
+import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 
 @Slf4j
 @RestController
@@ -24,12 +26,8 @@ public class SsoController {
     @GetMapping("/getSSOToken")
     public ApiRespDTO<String> getSSOToken(HttpServletRequest request){
         try {
-//            寫在ＡＯＰ
-//            String sessionId = getSessionIdFromCookie(request);
-//            log.info("SESSION Cookie的值: " + sessionId);
-//            HttpSession session = SessionManager.getSessionById(sessionId);
-//
-//            if(session != null) {
+            String sessionId = SessionHelper.getSessionID(request);
+
 
             String ssoToken = ssoService.getSSOToken(sessionId);
 

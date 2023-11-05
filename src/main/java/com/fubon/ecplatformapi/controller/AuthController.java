@@ -1,6 +1,7 @@
 package com.fubon.ecplatformapi.controller;
 
 import com.fubon.ecplatformapi.SessionManager;
+import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonLoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
@@ -8,7 +9,6 @@ import com.fubon.ecplatformapi.model.dto.vo.VerificationVo;
 import com.fubon.ecplatformapi.service.AuthService;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -35,12 +35,7 @@ public class AuthController {
 
         try {
 
-            Cookie sessionCookie = new Cookie("SESSION-ID", session.getId());
-            sessionCookie.setMaxAge(-1);
-            response.addCookie(sessionCookie);
-
-            SessionManager.associateSession(session, session.getId());
-            LoginRespVo responseData = authService.getUserInfo(session.getId(),loginReq);
+            LoginRespVo responseData = authService.getUserInfo(loginReq, session, response);
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", "Bearer " + responseData.getToken());
 
@@ -95,16 +90,14 @@ public class AuthController {
     @PostMapping("/logout")
     public ApiRespDTO<String> logout(HttpServletRequest request){
         try {
-
-            SessionManager.removeSession(sessionId);
+            SessionManager.removeSession(SessionHelper.getSessionID(request));
 
             return ApiRespDTO.<String>builder()
                     .code(StatusCodeEnum.SUCCESS.getCode())
                     .message(StatusCodeEnum.SUCCESS.getMessage())
                     .build();
-        } catch (Exception e){
-            log.error(e.getMessage());
-            return  ApiRespDTO.<String>builder()
+        } catch (Exception e) {
+            return ApiRespDTO.<String>builder()
                     .code(StatusCodeEnum.ERR00999.name())
                     .message(StatusCodeEnum.ERR00999.getMessage())
                     .build();

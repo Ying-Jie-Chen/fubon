@@ -7,7 +7,7 @@ import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.model.entity.Token;
 import com.fubon.ecplatformapi.properties.TokenProperties;
 import com.fubon.ecplatformapi.repository.TokenRepository;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,22 +57,23 @@ public class TokenServiceImpl implements TokenService {
      * 驗證 Token
      */
     @Override
-    public boolean isTokenValid(Token token, HttpSession session){
+    public boolean isTokenValid(Token token, HttpServletRequest request){
 
         try{
+            String sessionId = SessionHelper.getSessionID(request);
 
             String[] tokenParts = decrypt(token.getToken(), secretKey).split("\\|");
 
-            if (tokenParts.length != 4 || !tokenParts[0].equals(session.getId())) {
+            if (tokenParts.length != 4 || !tokenParts[0].equals(sessionId)) {
                 token.setRevoked(true);
             }
 
-            Object value = SessionHelper.getAllValue(session.getId());
+            Object value = SessionHelper.getAllValue(sessionId);
             //log.info("value: " + value);
 
             if (!validateSignature(tokenParts[0], tokenParts[1], Long.parseLong(tokenParts[2]), tokenParts[3])) {
                 token.setRevoked(true);
-                SessionManager.removeSession(session.getId());
+                SessionManager.removeSession(sessionId);
                 //sessionService.removeSession(session.getId());
             }
 
@@ -83,7 +84,7 @@ public class TokenServiceImpl implements TokenService {
 
             if (tokenAge > tokenExpirationTime.toMillis()) {
                 token.setExpired(true);
-                SessionManager.removeSession(session.getId());
+                SessionManager.removeSession(sessionId);
             }
 
             if (token.getRevoked() || token.getExpired()){

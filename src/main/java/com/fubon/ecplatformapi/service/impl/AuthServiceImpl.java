@@ -10,6 +10,8 @@ import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationVo;
 import com.fubon.ecplatformapi.service.AuthService;
 import com.fubon.ecplatformapi.service.TokenService;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -64,18 +66,14 @@ public class AuthServiceImpl implements AuthService {
      * @return UserInfo
      */
     @Override
-    public LoginRespVo getUserInfo(String sessionId, LoginReqDTO loginReq) throws Exception {
+    public LoginRespVo getUserInfo(LoginReqDTO loginReq, HttpSession session, HttpServletResponse response) throws Exception {
 
         String jsonRequest = jsonHelper.convertLoginConfigToJson(ecwsConfig.fubonLoginConfig(), loginReq);
-
         FubonLoginRespDTO fbLoginRespDTO = callFubonService(jsonRequest, FubonLoginRespDTO.class);
 
-        SessionManager.setSessionAttributes(sessionId, fbLoginRespDTO.getAny().getUserInfo());
-        //SessionHelper.getAllValue(sessionId);
+        SessionManager.saveSession(session, response, fbLoginRespDTO);
 
-        String empNo = loginReq.getAccount();
-        long timestamp = System.currentTimeMillis();
-        String authToken = tokenService.generateToken(sessionId, empNo, timestamp);
+        String authToken = tokenService.generateToken(session.getId(), loginReq.getAccount(), System.currentTimeMillis());
         tokenService.saveAuthToken(authToken);
 
         FubonLoginRespDTO.UserInfo userInfo= fbLoginRespDTO.getAny().getUserInfo();
@@ -85,6 +83,7 @@ public class AuthServiceImpl implements AuthService {
                 .userInfo(userInfo)
                 .build();
     }
+
 
     private <T> T callFubonService(String jsonRequest, Class<T> responseType) {
         return webClient
