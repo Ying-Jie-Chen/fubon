@@ -5,13 +5,26 @@ import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonLoginRespDTO;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Builder
 public class LoginRespVo {
 
     @JsonProperty("token")
     private String token;
-    @JsonProperty("userInfo")
-    private FubonLoginRespDTO.UserInfo userInfo;
 
+    private ResponseData data;
+
+    @Data
+    @Builder
+    public static class ResponseData {
+        @JsonProperty("userInfo")
+        private FubonLoginRespDTO.UserInfo userInfo;
+        @JsonProperty("xrefInfo")
+        private List<FubonLoginRespDTO.XrefInfo> xrefInfo;
+    }
 }
+
+
+

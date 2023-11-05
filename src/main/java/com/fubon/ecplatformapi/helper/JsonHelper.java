@@ -32,27 +32,7 @@ public class JsonHelper {
         String unionNum = SessionHelper.getValueByAttribute(sessionId, SessionAttribute.UNION_NUM).toString();
         String account = SessionHelper.getValueByAttribute(sessionId, SessionAttribute.FBID).toString();
         String parameter = csvUtil.generateCsv(sessionId);
-        //log.info(functionCode.toString());
-        try {
-            return "{" + "\"Header\":{" +
-                    "\"FromSys\":\"" + header.getFromSys() + "\"," +
-                    "\"SysPwd\":\"" + header.getSysPwd() + "\"," +
-                    "\"FunctionCode\":\"" + header.getFunctionCode() + "\"" +
-                    "\"account\":\"" + header.getAccount() + "\"," +
-                    "\"user_ip\":\"" + header.getUserIp() +"\"," +
-                    "}," + "\"FBECCOMSTA1040RQ\":{" +
-                    "\"unionNum\":\"" + unionNum + "\"," +
-                    "\"account\":\"" + account + "\"," +
-                    "\"source\":\"" + functionCode.getSource() + "\"," +
-                    "\"desType\":\"" + functionCode.getDesType() + "\"," +
-                    "\"desFunction\":\"" + functionCode.getDesFunction() + "\"," +
-                    "\"desModule\":\"" + functionCode.getDesModule() + "\"," +
-                    "\"type\":\"" + functionCode.getType() + "\"," +
-                    "\"parameter\":\"" + parameter + "\"," +
-                    "}" + "}";
-        }catch (Exception e){
-            e.printStackTrace();
-            return "{}";
-        }
+
+        return "{" + "\"Header\":{" + "\"FromSys\":\"" + header.getFromSys() + "\"," + "\"SysPwd\":\"" + header.getSysPwd() + "\"," + "\"FunctionCode\":\"" + header.getFunctionCode() + "\"" + "}," + "\"FBECCOMSTA1040RQ\":{" + "\"unionNum\":\"" + unionNum + "\"," + "\"account\":\"" + account + "\"," + "\"source\":\"" + functionCode.getSource() + "\"," + "\"desType\":\"" + functionCode.getDesType() + "\"," + "\"desFunction\":\"" + functionCode.getDesFunction() + "\"," + "\"desModule\":\"" + functionCode.getDesModule() + "\"," + "\"type\":\"" + functionCode.getType() + "\"," + "\"parameter\":\"" + parameter  + "\"" + "}" + "}";
     }
 }

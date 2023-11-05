@@ -1,7 +1,7 @@
 package com.fubon.ecplatformapi.service.impl;
 
 
-import com.fubon.ecplatformapi.SessionManager;
+import com.fubon.ecplatformapi.config.SessionManager;
 import com.fubon.ecplatformapi.service.TokenService;
 import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.model.entity.Token;

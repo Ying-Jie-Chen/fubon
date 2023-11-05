@@ -39,16 +39,9 @@ public class SsoServiceImpl implements SsoService {
 
     @Override
     public String getSSOToken(String sessionId){
-        try {
-
             String jsonRequest = jsonHelper.convertSsoTokenToJson(ecwsConfig.fubonSsoTokenDTO(), sessionId);
             GetFubonSSOTokenRespDTO respDTO = callFubonService(jsonRequest, GetFubonSSOTokenRespDTO.class);
             return respDTO.getAny().getSid();
-
-        }catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
     }
 
     private <T> T callFubonService(String jsonRequest, Class<T> responseType) {
