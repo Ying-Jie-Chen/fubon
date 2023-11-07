@@ -2,6 +2,7 @@ package com.fubon.ecplatformapi.service.impl;
 
 
 import com.fubon.ecplatformapi.config.EcwsConfig;
+import com.fubon.ecplatformapi.controller.SessionController;
 import com.fubon.ecplatformapi.enums.SSOLoginEnum;
 import com.fubon.ecplatformapi.helper.JsonHelper;
 import com.fubon.ecplatformapi.model.dto.resp.SSOTokenRespDTO;
@@ -32,7 +33,7 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Service
-public class SsoServiceImpl implements SsoService {
+public class SsoServiceImpl implements SsoService{
     @Autowired
     JsonHelper jsonHelper;
     @Autowired
@@ -47,8 +48,8 @@ public class SsoServiceImpl implements SsoService {
     }
 
     @Override
-    public String getSSOToken(String sessionId){
-            String jsonRequest = jsonHelper.convertSsoTokenToJson(ecwsConfig.fubonSsoTokenDTO(), sessionId);
+    public String getSSOToken(){
+            String jsonRequest = jsonHelper.convertSsoTokenToJson(ecwsConfig.fubonSsoTokenDTO());
             SSOTokenRespDTO respDTO = callFubonService(jsonRequest, SSOTokenRespDTO.class);
             return respDTO.getAny().getSid();
     }

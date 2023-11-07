@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/auth")
-public class SsoController extends SessionController{
+public class SsoController {
     @Autowired
     SsoService ssoService;
     @Autowired
@@ -27,7 +27,7 @@ public class SsoController extends SessionController{
     public ApiRespDTO<String> getSSOToken(){
         try {
 
-            String ssoToken = ssoService.getSSOToken(sessionID());
+            String ssoToken = ssoService.getSSOToken();
 
             return ApiRespDTO.<String>builder()
                     .code(StatusCodeEnum.SUCCESS.getCode())

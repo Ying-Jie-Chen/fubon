@@ -1,5 +1,6 @@
 package com.fubon.ecplatformapi.config;
 
+import com.fubon.ecplatformapi.controller.SessionController;
 import com.fubon.ecplatformapi.enums.SessionAttribute;
 import com.fubon.ecplatformapi.model.dto.resp.LoginRespDTO;
 import jakarta.servlet.http.Cookie;
