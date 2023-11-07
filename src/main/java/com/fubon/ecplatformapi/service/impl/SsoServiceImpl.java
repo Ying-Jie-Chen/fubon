@@ -2,7 +2,6 @@ package com.fubon.ecplatformapi.service.impl;
 
 
 import com.fubon.ecplatformapi.config.EcwsConfig;
-import com.fubon.ecplatformapi.controller.SessionController;
 import com.fubon.ecplatformapi.enums.SSOLoginEnum;
 import com.fubon.ecplatformapi.helper.JsonHelper;
 import com.fubon.ecplatformapi.model.dto.resp.SSOTokenRespDTO;
