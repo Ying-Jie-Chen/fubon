@@ -1,7 +1,7 @@
 package com.fubon.ecplatformapi.config;
 
 import com.fubon.ecplatformapi.enums.SessionAttribute;
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonLoginRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.LoginRespDTO;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -32,7 +32,7 @@ public class SessionManager {
     }
 
 
-    public static void saveSession(HttpSession session, HttpServletResponse response, FubonLoginRespDTO fbLoginRespDTO){
+    public static void saveSession(HttpSession session, HttpServletResponse response, LoginRespDTO fbLoginRespDTO){
         associateSession(session, session.getId());
         setSessionAttributes(session.getId(), fbLoginRespDTO);
         saveSessionID(response, session);
@@ -49,12 +49,12 @@ public class SessionManager {
         response.addCookie(sessionCookie);
     }
 
-    public static void setSessionAttributes(String sessionId, FubonLoginRespDTO dto) {
+    public static void setSessionAttributes(String sessionId, LoginRespDTO dto) {
         HttpSession session = getSessionById(sessionId);
         session.setMaxInactiveInterval(1200);
 
-        FubonLoginRespDTO.UserInfo user = dto.getAny().getUserInfo();
-        List<FubonLoginRespDTO.XrefInfo> userXrefInfoList = dto.getAny().getXrefInfo();
+        LoginRespDTO.UserInfo user = dto.getAny().getUserInfo();
+        List<LoginRespDTO.XrefInfo> userXrefInfoList = dto.getAny().getXrefInfo();
 
         session.setAttribute(String.valueOf(SessionAttribute.IDENTITY), user.getIdentity());
         session.setAttribute(String.valueOf(SessionAttribute.EMP_NO), user.getAgent_id());
@@ -66,13 +66,13 @@ public class SessionManager {
         session.setAttribute(String.valueOf(SessionAttribute.SALES_ID), user.getSales_id());
         session.setAttribute(String.valueOf(SessionAttribute.XREF_INFOS), user);
 
-        List<FubonLoginRespDTO.XrefInfo> xrefInfoList = setXrefInfo(userXrefInfoList);
+        List<LoginRespDTO.XrefInfo> xrefInfoList = setXrefInfo(userXrefInfoList);
         session.setAttribute(String.valueOf(SessionAttribute.XREF_INFOS), xrefInfoList);
     }
 
-    public static List<FubonLoginRespDTO.XrefInfo> setXrefInfo(List<FubonLoginRespDTO.XrefInfo> xrefInfoList) {
+    public static List<LoginRespDTO.XrefInfo> setXrefInfo(List<LoginRespDTO.XrefInfo> xrefInfoList) {
         return xrefInfoList.stream()
-                .map(xref -> FubonLoginRespDTO.XrefInfo.builder()
+                .map(xref -> LoginRespDTO.XrefInfo.builder()
                         .xref(xref.getXref())
                         .channel(xref.getChannel())
                         .regno(xref.getRegno())

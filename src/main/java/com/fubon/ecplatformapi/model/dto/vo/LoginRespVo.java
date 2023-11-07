@@ -1,7 +1,7 @@
 package com.fubon.ecplatformapi.model.dto.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonLoginRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.LoginRespDTO;
 import lombok.Builder;
 import lombok.Data;
 
@@ -20,9 +20,9 @@ public class LoginRespVo {
     @Builder
     public static class ResponseData {
         @JsonProperty("userInfo")
-        private FubonLoginRespDTO.UserInfo userInfo;
+        private LoginRespDTO.UserInfo userInfo;
         @JsonProperty("xrefInfo")
-        private List<FubonLoginRespDTO.XrefInfo> xrefInfo;
+        private List<LoginRespDTO.XrefInfo> xrefInfo;
     }
 }
 

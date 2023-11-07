@@ -1,22 +1,20 @@
 package com.fubon.ecplatformapi.model.dto.resp;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-public class GetFubonSSOTokenRespDTO {
-
+public class VerificationResp {
     private Header Header;
-    private Any Any;
+    private any any;
 
     @Data
     @Builder
     public static class Header {
         private String MsgId;
         private String FromSys;
+        private String ToSys;
         private String SysPwd;
         private String FunctionCode;
         private String StatusCode;
@@ -25,9 +23,8 @@ public class GetFubonSSOTokenRespDTO {
 
     @Data
     @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Any {
-        private String sid;
+    public static class any {
+        private String token;
+        private String verificationImageBase64;
     }
 }

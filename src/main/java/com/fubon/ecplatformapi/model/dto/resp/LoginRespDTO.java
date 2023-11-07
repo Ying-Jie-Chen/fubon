@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.model.dto.resp.fubon;
+package com.fubon.ecplatformapi.model.dto.resp;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,7 +8,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class FubonLoginRespDTO {
+public class LoginRespDTO {
     @JsonProperty("Header")
     private Header Header;
     @JsonProperty("any")

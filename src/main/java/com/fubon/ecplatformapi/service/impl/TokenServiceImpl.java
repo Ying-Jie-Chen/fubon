@@ -87,11 +87,7 @@ public class TokenServiceImpl implements TokenService {
                 SessionManager.removeSession(sessionId);
             }
 
-            if (token.getRevoked() || token.getExpired()){
-                log.error("Token has expired or revoked");
-                return false;
-            }
-            return true;
+            return !token.getRevoked() && !token.getExpired();
 
         } catch (Exception e){
             log.error("Token驗證失敗: " + e.getMessage());

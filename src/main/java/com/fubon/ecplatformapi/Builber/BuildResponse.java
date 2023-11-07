@@ -3,9 +3,10 @@ package com.fubon.ecplatformapi.Builber;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fubon.ecplatformapi.model.dto.resp.LoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.*;
-import com.fubon.ecplatformapi.model.dto.resp.GetFubonSSOTokenRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonVerificationResp;
+import com.fubon.ecplatformapi.model.dto.resp.SSOTokenRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +24,11 @@ public class BuildResponse {
     @Autowired
     ObjectMapper objectMapper;
 
-    public FubonVerificationResp buildVerificationImageResponse() {
+    public VerificationResp buildVerificationImageResponse() {
         log.info("建立 FubonAPI 取得圖形驗證的回應 #Start");
 
-        FubonVerificationResp response = FubonVerificationResp.builder()
-                .Header(FubonVerificationResp.Header.builder()
+        VerificationResp response = VerificationResp.builder()
+                .Header(VerificationResp.Header.builder()
                         .MsgId("033ef14f-345e-42a9-9114-fbfdd562909")
                         .FromSys("ECWS")
                         .ToSys("B2A")
@@ -36,7 +37,7 @@ public class BuildResponse {
                         .StatusCode("0000")
                         .StatusDesc("成功")
                         .build())
-                .any(FubonVerificationResp.any.builder()
+                .any(VerificationResp.any.builder()
                         .token("2da6cf70570e44658d8fd7e5c334ca03")
                         .verificationImageBase64("base64String")
                         .build())
@@ -46,7 +47,7 @@ public class BuildResponse {
         return response;
     }
 
-    public FubonLoginRespDTO buildLoginResponse(GetUserInfoVo getUserInfoVo) {
+    public LoginRespDTO buildLoginResponse(GetUserInfoVo getUserInfoVo) {
         log.info("建立 FubonAPI 登入的回應 #Start");
 
 //        FubonLoginRespDTO response = FubonLoginRespDTO.builder()
@@ -104,10 +105,10 @@ public class BuildResponse {
         return response;
     }
 
-    public GetFubonSSOTokenRespDTO buildSSOTokenResponse() {
+    public SSOTokenRespDTO buildSSOTokenResponse() {
 
-        GetFubonSSOTokenRespDTO response = GetFubonSSOTokenRespDTO.builder()
-                .Header(GetFubonSSOTokenRespDTO.Header.builder()
+        SSOTokenRespDTO response = SSOTokenRespDTO.builder()
+                .Header(SSOTokenRespDTO.Header.builder()
                         .MsgId("afb1d47a-e60a-453b-ad86-f6f84de2ac5f")
                         .FromSys("ECWS")
                         .SysPwd("lYKMhPW8SGg=")
@@ -115,7 +116,7 @@ public class BuildResponse {
                         .StatusCode("0000")
                         .StatusDesc("成功")
                         .build())
-                .Any(GetFubonSSOTokenRespDTO.Any.builder()
+                .Any(SSOTokenRespDTO.Any.builder()
                         .sid("e795025984b84443b5b04ad343472cec")
                         .build())
                 .build();
@@ -288,7 +289,7 @@ public class BuildResponse {
         System.out.println(jsonRequest);
     }
 
-    public void printJSON(FubonLoginRespDTO response){
+    public void printJSON(LoginRespDTO response){
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
         String jsonRequest;
         try {
@@ -299,7 +300,7 @@ public class BuildResponse {
         System.out.println(jsonRequest);
     }
 
-    private void printJSON(FubonVerificationResp response) {
+    private void printJSON(VerificationResp response) {
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
         String jsonRequest;
         try {

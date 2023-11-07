@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.controller.test;
+package com.fubon.ecplatformapi.controller;
 
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.helper.SessionHelper;
@@ -17,19 +17,17 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/auth")
-public class SsoController {
+public class SsoController extends SessionController{
     @Autowired
     SsoService ssoService;
     @Autowired
     TokenRepository tokenRepository;
 
     @GetMapping("/getSSOToken")
-    public ApiRespDTO<String> getSSOToken(HttpServletRequest request){
+    public ApiRespDTO<String> getSSOToken(){
         try {
-            String sessionId = SessionHelper.getSessionID(request);
 
-
-            String ssoToken = ssoService.getSSOToken(sessionId);
+            String ssoToken = ssoService.getSSOToken(sessionID());
 
             return ApiRespDTO.<String>builder()
                     .code(StatusCodeEnum.SUCCESS.getCode())
@@ -68,16 +66,4 @@ public class SsoController {
                     .build();
         }
     }
-
-    private String getSessionIdFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("SESSION-ID".equals(cookie.getName())) {return cookie.getValue();}
-            }
-
-        }
-        return null;
-    }
-
 }

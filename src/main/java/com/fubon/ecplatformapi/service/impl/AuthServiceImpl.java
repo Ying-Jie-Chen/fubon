@@ -4,8 +4,8 @@ import com.fubon.ecplatformapi.config.SessionManager;
 import com.fubon.ecplatformapi.config.EcwsConfig;
 import com.fubon.ecplatformapi.helper.JsonHelper;
 import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonLoginRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonVerificationResp;
+import com.fubon.ecplatformapi.model.dto.resp.LoginRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationVo;
 import com.fubon.ecplatformapi.service.AuthService;
@@ -50,9 +50,9 @@ public class AuthServiceImpl implements AuthService {
     public VerificationVo getVerificationImage() {
         String jsonRequest = jsonHelper.convertVerificationConfigToJson(ecwsConfig.verificationConfig());
 
-        FubonVerificationResp fubonVerificationResp = callFubonService(jsonRequest, FubonVerificationResp.class);
-        String imageBase64 = fubonVerificationResp.getAny().getVerificationImageBase64();
-        String token = fubonVerificationResp.getAny().getToken();
+        VerificationResp verificationResp = callFubonService(jsonRequest, VerificationResp.class);
+        String imageBase64 = verificationResp.getAny().getVerificationImageBase64();
+        String token = verificationResp.getAny().getToken();
 
         return VerificationVo.builder()
                 .verificationImage(imageBase64)
@@ -71,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
     public LoginRespVo getUserInfo(LoginReqDTO loginReq, HttpSession session, HttpServletResponse response) throws Exception {
 
         String jsonRequest = jsonHelper.convertLoginConfigToJson(ecwsConfig.fubonLoginConfig(), loginReq);
-        FubonLoginRespDTO fbLoginRespDTO = callFubonService(jsonRequest, FubonLoginRespDTO.class);
+        LoginRespDTO fbLoginRespDTO = callFubonService(jsonRequest, LoginRespDTO.class);
 
         SessionManager.saveSession(session, response, fbLoginRespDTO);
 
