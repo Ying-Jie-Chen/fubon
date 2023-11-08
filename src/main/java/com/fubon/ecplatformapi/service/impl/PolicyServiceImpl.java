@@ -1,6 +1,9 @@
 package com.fubon.ecplatformapi.service.impl;
 
+import com.fubon.ecplatformapi.config.PolicyDetailConfig;
+import com.fubon.ecplatformapi.helper.WebClientHelper;
 import com.fubon.ecplatformapi.mapper.ResultMapper;
+import com.fubon.ecplatformapi.model.dto.req.GetPolicyDetailReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.*;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
@@ -22,6 +25,8 @@ import java.util.List;
 @Slf4j
 @Service
 public class PolicyServiceImpl implements PolicyService {
+    @Autowired
+    PolicyDetailConfig policyDetailConfig;
 
     private static final String FUBON_API_URL = "http://localhost:8080";
 
@@ -63,6 +68,8 @@ public class PolicyServiceImpl implements PolicyService {
         Mono<FubonClmSalesRespDTO> clmSalesMono = callClmSales().cache();
         Mono<FubonChkEnrDataRespDTO> chkEnrDataMono = callChkEnrData().cache();
 
+
+
         return Mono.zip(policyDetailMono, prnDetailMono, clmSalesMono, chkEnrDataMono)
                 .map(tuple -> {
                     FubonPolicyDetailRespDTO policyDetailResp = tuple.getT1();
@@ -73,15 +80,6 @@ public class PolicyServiceImpl implements PolicyService {
                 })
                 .block();
     }
-
-//        //富邦API - 保全紀錄查詢
-//        //適用險種：全險種
-//         //API名稱：chkEnrData
-//        List<PolicyDetailReqDTO> detailResp = policyDetailRepository.findByTypeAndNum(insType, policyNum);
-//        return detailResp.stream()
-//                .map(ModelMapper::mapToDetailResult)
-//                .collect(Collectors.toList());
-//
 
     /**
      * 富邦API - 取得保單資訊
@@ -135,5 +133,10 @@ public class PolicyServiceImpl implements PolicyService {
                     .bodyToMono(FubonChkEnrDataRespDTO.class)
                     .log();
     }
+
+
+
+
+
 
 }

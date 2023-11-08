@@ -74,9 +74,27 @@ ecws:
         type: ""
         parameter: ""
 
-  sso-login:
 
+policy-detail:
+  domain:
 
+  get-policy-detail:
+    query-type: "1"
+    policy-num: ""
+    cls: ""
+
+  get-prn-detail:
+    query-type: "%"
+    format-id: ""
+    cls: ""
+
+  get-cls-sales:
+    query-sales-id: ""
+    query-plan: ""
+    query-poly-no: ""
+
+  get-chk-enr-data:
+    format-id: ""
 
 
 

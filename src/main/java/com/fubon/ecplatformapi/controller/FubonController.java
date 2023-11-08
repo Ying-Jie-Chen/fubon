@@ -2,12 +2,10 @@ package com.fubon.ecplatformapi.controller;
 
 
 import com.fubon.ecplatformapi.Builber.BuildResponse;
-import com.fubon.ecplatformapi.model.dto.req.FubonVerificationReqDTO;
+import com.fubon.ecplatformapi.model.dto.req.*;
 import com.fubon.ecplatformapi.model.dto.resp.LoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.*;
 import com.fubon.ecplatformapi.model.dto.resp.SSOTokenRespDTO;
-import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
-import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
 import com.fubon.ecplatformapi.model.dto.vo.GetUserInfoVo;
 import lombok.extern.slf4j.Slf4j;
@@ -32,14 +30,13 @@ public class FubonController {
     }
 
     @GetMapping("/policyDetail")
-    public FubonPolicyDetailRespDTO getPolicyDetail(){ return  buildResponse.buildPolicyDetailResponse(); }
-
+    public FubonPolicyDetailRespDTO getPolicyDetail(GetPolicyDetailReqDTO reqDTO){ return  buildResponse.buildPolicyDetailResponse(); }
     @GetMapping("/getPrnDetail")
-    public FubonPrnDetailResp getPrnDetail(){return buildResponse.buildPrnDetailResponse();}
+    public FubonPrnDetailResp getPrnDetail(GetPrnDetailReqDTO reqDTO){return buildResponse.buildPrnDetailResponse();}
     @GetMapping("/ClmSalesAppWs/api101")
-    public FubonClmSalesRespDTO getClmSales(){return buildResponse.buildClmSalesResponse(); }
+    public FubonClmSalesRespDTO getClmSales(GetClmSalesReqDTO reqDTO){return buildResponse.buildClmSalesResponse(); }
     @GetMapping("/chkEnrData")
-    public FubonChkEnrDataRespDTO getEnrData(){return buildResponse.buildChkEnrData();}
+    public FubonChkEnrDataRespDTO getEnrData(GetChkEnrDataReqDTO reqDTO){return buildResponse.buildChkEnrData();}
     @PostMapping ("/GetVerificationImage")
     public VerificationResp GetVerificationImage(FubonVerificationReqDTO fubonVerificationReqDTO) {
         return buildResponse.buildVerificationImageResponse();
