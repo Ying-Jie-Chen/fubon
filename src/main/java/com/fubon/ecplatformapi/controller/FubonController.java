@@ -38,6 +38,8 @@ public class FubonController {
     public FubonPrnDetailResp getPrnDetail(){return buildResponse.buildPrnDetailResponse();}
     @GetMapping("/ClmSalesAppWs/api101")
     public FubonClmSalesRespDTO getClmSales(){return buildResponse.buildClmSalesResponse(); }
+    @GetMapping("/chkEnrData")
+    public FubonChkEnrDataRespDTO getEnrData(){return buildResponse.buildChkEnrData();}
     @PostMapping ("/GetVerificationImage")
     public VerificationResp GetVerificationImage(FubonVerificationReqDTO fubonVerificationReqDTO) {
         return buildResponse.buildVerificationImageResponse();

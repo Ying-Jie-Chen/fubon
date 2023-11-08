@@ -1,5 +1,6 @@
 package com.fubon.ecplatformapi.model.dto.resp.fubon;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.Date;
@@ -12,10 +13,17 @@ public class FubonClmSalesRespDTO {
     private String message;
     private Integer total;
     private Integer count;
+
+    @JsonProperty("content")
     private Content content;
+
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Content {
+
+        @JsonProperty("claimInfo")
         private List<ClaimInfo> claimInfo;
         @Data
         @Builder

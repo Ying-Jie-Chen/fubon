@@ -69,6 +69,8 @@ public class DetailResultVo {
         private Double totalPremium100;
         private Double ourshr;
         private String ptcptNo;
+        private String relationPeople;
+        private String relationPeople2;
 
     }
 
@@ -233,7 +235,7 @@ public class DetailResultVo {
         @Digits(integer = 10, fraction = 0)
         private Double buildHeight;
         @Digits(integer = 10, fraction = 3)
-        private Double buildSpace;
+        private String buildSpace;
         @Size(max = 100)
         private List<String> mortgagee;
         @Size(max = 1)
@@ -337,6 +339,8 @@ public class DetailResultVo {
     @Builder
     @AllArgsConstructor
     public static class PolicyDeliveryRecord{
+        @Size(max = 30)
+        private String prnDoc;
         @Size(max = 100)
         private String prmDocName;
         @Size(max = 1)

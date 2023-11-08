@@ -1,12 +1,9 @@
 package com.fubon.ecplatformapi.service.impl;
 
 import com.fubon.ecplatformapi.mapper.ResultMapper;
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonClmSalesRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonPolicyDetailRespDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
+import com.fubon.ecplatformapi.model.dto.resp.fubon.*;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FbQueryRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonPrnDetailResp;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import com.fubon.ecplatformapi.service.PolicyService;
@@ -29,6 +26,7 @@ public class PolicyServiceImpl implements PolicyService {
     private static final String FUBON_API_URL = "http://localhost:8080";
 
     private final WebClient webClient;
+
     @Autowired
     public PolicyServiceImpl(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl(FUBON_API_URL).build();
@@ -47,7 +45,8 @@ public class PolicyServiceImpl implements PolicyService {
                 .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(req))
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<FbQueryRespDTO>() {})
+                .bodyToMono(new ParameterizedTypeReference<FbQueryRespDTO>() {
+                })
                 .log();
         return mono
                 .flatMapMany(fbQueryRespDTO -> Flux.fromIterable(fbQueryRespDTO.getPolicyResults()))
@@ -59,57 +58,82 @@ public class PolicyServiceImpl implements PolicyService {
     @Override
     public DetailResultVo getPolicyDetail(PolicyDetailReqDTO request) {
 
-        return Mono.zip(callPolicyDetail(), callPrnDetail(), callClmSales())
+        Mono<FubonPolicyDetailRespDTO> policyDetailMono = callPolicyDetail().cache();
+        Mono<FubonPrnDetailResp> prnDetailMono = callPrnDetail().cache();
+        Mono<FubonClmSalesRespDTO> clmSalesMono = callClmSales().cache();
+        Mono<FubonChkEnrDataRespDTO> chkEnrDataMono = callChkEnrData().cache();
+
+        return Mono.zip(policyDetailMono, prnDetailMono, clmSalesMono, chkEnrDataMono)
                 .map(tuple -> {
                     FubonPolicyDetailRespDTO policyDetailResp = tuple.getT1();
                     FubonPrnDetailResp prnDetailResp = tuple.getT2();
                     FubonClmSalesRespDTO clmSalesResp = tuple.getT3();
-                    return ResultMapper.mapToDetailResult(policyDetailResp, prnDetailResp, clmSalesResp);
+                    FubonChkEnrDataRespDTO chkEnrDataResp = tuple.getT4();
+                    return ResultMapper.mapToDetailResult(policyDetailResp, prnDetailResp, clmSalesResp, chkEnrDataResp);
                 })
                 .block();
+    }
 
-//         富邦API - 保全紀錄查詢
-//         適用險種：全險種
-//         API名稱：chkEnrData
+//        //富邦API - 保全紀錄查詢
+//        //適用險種：全險種
+//         //API名稱：chkEnrData
 //        List<PolicyDetailReqDTO> detailResp = policyDetailRepository.findByTypeAndNum(insType, policyNum);
 //        return detailResp.stream()
 //                .map(ModelMapper::mapToDetailResult)
 //                .collect(Collectors.toList());
+//
+
+    /**
+     * 富邦API - 取得保單資訊
+     */
+    public Mono<FubonPolicyDetailRespDTO> callPolicyDetail() {
+             return webClient
+                    .get()
+                    .uri("/policyDetail")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(FubonPolicyDetailRespDTO.class)
+                    .log();
     }
 
-    private Mono<FubonPolicyDetailRespDTO> callPolicyDetail() {
-        // 富邦API - 取得保單資訊
-        return webClient
-                .get()
-                .uri("/policyDetail")
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(FubonPolicyDetailRespDTO.class)
-                .log();
+    /**
+     * 富邦API - 保單寄送紀錄查詢
+     */
+    public Mono<FubonPrnDetailResp> callPrnDetail() {
+             return webClient
+                    .get()
+                    .uri("/getPrnDetail")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(FubonPrnDetailResp.class)
+                    .log();
     }
 
-    private Mono<FubonPrnDetailResp> callPrnDetail() {
-        // 富邦API - 保單寄送紀錄查詢
-        return webClient
-                .get()
-                .uri("/getPrnDetail")
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(FubonPrnDetailResp.class)
-                .log();
+    /**
+     * 富邦API - 理賠紀錄查詢
+     */
+    public Mono<FubonClmSalesRespDTO> callClmSales() {
+
+            return webClient
+                    .get()
+                    .uri("/ClmSalesAppWs/api101")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(FubonClmSalesRespDTO.class)
+                    .log();
     }
 
-    private Mono<FubonClmSalesRespDTO> callClmSales() {
-        // 富邦API - 理賠紀錄查詢
-        return webClient
-                .get()
-                .uri("/ClmSalesAppWs/api101")
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(FubonClmSalesRespDTO.class)
-                .log();
+    /**
+     * 富邦API - 保全紀錄查詢
+     */
+    public Mono<FubonChkEnrDataRespDTO> callChkEnrData() {
+            return webClient
+                    .get()
+                    .uri("/chkEnrData")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(FubonChkEnrDataRespDTO.class)
+                    .log();
     }
-
-
 
 }

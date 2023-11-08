@@ -1,5 +1,6 @@
 package com.fubon.ecplatformapi.mapper;
 
+import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonChkEnrDataRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonClmSalesRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonPolicyDetailRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonPrnDetailResp;
@@ -8,18 +9,28 @@ import com.fubon.ecplatformapi.model.entity.NFNV02Entity;
 import com.fubon.ecplatformapi.model.entity.NFNV03Entity;
 import com.fubon.ecplatformapi.repository.NFNV02Repository;
 import com.fubon.ecplatformapi.repository.NFNV03Repository;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
-
+@Slf4j
+@Component
 public class PolicyDetailMapper {
     private static NFNV02Repository nfnv02Repository;
     private static NFNV03Repository nfnv03Repository;
+
+    @Autowired
+    public PolicyDetailMapper(NFNV02Repository nfnv02Repository, NFNV03Repository nfnv03Repository) {
+        PolicyDetailMapper.nfnv02Repository = nfnv02Repository;
+        PolicyDetailMapper.nfnv03Repository = nfnv03Repository;
+    }
+
+
     public static DetailResultVo.InsuranceInfo mapToInsuranceInfo(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure, FubonPolicyDetailRespDTO.EcAppInsureEtp ecAppInsureEtp) {
         FubonPolicyDetailRespDTO.SecEcAppWsBean sec = ecAppInsure.getSecEcAppWsBean();
         FubonPolicyDetailRespDTO.RmaEcAppWsBean rmal = ecAppInsure.getRmalEcAppWsBean();
@@ -46,6 +57,8 @@ public class PolicyDetailMapper {
                         .totalPremium100(ecAppInsureEtp.getTotalPremium100())
                         .ourshr(ecAppInsureEtp.getOurshr())
                         .ptcptNo(ecAppInsure.getEcoEcAppWsBean().getEcoPtcptno())
+                        .relationPeople(ecAppInsure.getSecEcAppWsBean().getSecMtg())
+                        .relationPeople2(ecAppInsure.getSecEcAppWsBean().getSecMtg2())
                         .build())
                 // 被保險人資訊
                 .insuredInfo(DetailResultVo.InsuredInfo.builder()
@@ -79,7 +92,7 @@ public class PolicyDetailMapper {
                                 .insuredCompany(eco.getEcoCompnm())
                                 .insuredContent(eco.getEcoContent())
                                 .insuredCrcGrop(eco.getEcoCrcGrp())
-                                .insuredPlanCode("待確認")
+                                .insuredPlanCode("還沒弄")
                                 .insuredQualification(rmal.getRmaQualification())
                                 .insuredRepresentative(rmal.getRmaRepresentative())
                                 .insuredRepresentativeId(rmal.getRmaRepresentativeId())
@@ -98,7 +111,7 @@ public class PolicyDetailMapper {
                         .proposerEmail(rmaA.getRmaEmail())
                         .totalNum(null)
                         .relation(rmaA.getRmaRela())
-                        .payer(sec.getSetMtg())
+                        .payer(sec.getSecMtg())
                         .payMode(sec.getSecPayMode())
                         .payMethod(sec.getSecPaymthd())
                         .cardNo(crd.getCrdCardno())
@@ -124,6 +137,9 @@ public class PolicyDetailMapper {
         FubonPolicyDetailRespDTO.BudEcAppWsBean bud = ecAppInsure.getBudEcAppWsBean();
         FubonPolicyDetailRespDTO.SecEcAppWsBean sec = ecAppInsure.getSecEcAppWsBean();
         FubonPolicyDetailRespDTO.EecEcAppWsBean eec = ecAppInsure.getEecEcAppWsBean();
+        bud.setBudSpace(1.1);
+        bud.setBudSpaceUnit("BudSpaceUnit");
+        String result = bud.getBudSpace() + bud.getBudSpaceUnit();
 
         return  DetailResultVo.InsuranceSubject.builder()
                 .plateNo(moh.getMohPlatno())
@@ -142,7 +158,7 @@ public class PolicyDetailMapper {
                 .buildConstr(bud.getBudConstr())
                 .buildSection(rsk.getRskSection())
                 .buildHeight(bud.getBudHeight())
-                .buildSpace(Double.valueOf(bud.getBudSpace() + bud.getBudSpaceUnit()))
+                .buildSpace(result)
                 .mortgagee(ecAppInsure.getRmaMEcAPpWsBeans().stream()
                         .map(FubonPolicyDetailRespDTO.RmaMEcAppWsBean::getRmaCliname)
                         .collect(toList()))
@@ -161,24 +177,25 @@ public class PolicyDetailMapper {
         Collection<FubonPolicyDetailRespDTO.RskEcAppEtpWsBean> rskEc = ecAppInsureEtp.getRskEcAppWsBeans();
 
         return DetailResultVo.EtpInsuranceSubject.builder()
-                .content(rskEc.stream()
+                .content(String.valueOf(rskEc.stream()
                         .map(FubonPolicyDetailRespDTO.RskEcAppEtpWsBean::getContent)
-                        .toList().toString())
-                .desc(rskEc.stream()
+                        .collect(Collectors.toList())))
+                .desc(String.valueOf(rskEc.stream()
                         .map(FubonPolicyDetailRespDTO.RskEcAppEtpWsBean::getDesc)
-                        .toList().toString())
+                        .collect(Collectors.toList())))
                 .build();
     }
     public static DetailResultVo.EtpInsuranceSubjectDetail mapToEtpInsuranceSubjectDetail(FubonPolicyDetailRespDTO.EcAppInsureEtp ecAppInsureEtp) {
         Collection<FubonPolicyDetailRespDTO.RskDEcAppEtpWsBean> rskDE = ecAppInsureEtp.getRskDEcAppWsBeans();
 
         return DetailResultVo.EtpInsuranceSubjectDetail.builder()
-                .seq(Integer.valueOf(rskDE.stream()
+                .seq(Integer.parseInt(rskDE.stream()
                         .map(FubonPolicyDetailRespDTO.RskDEcAppEtpWsBean::getSeq)
-                        .toList().toString()))
-                .values(Collections.singletonList(rskDE.stream()
+                        .toList().toString().replaceAll("[\\[\\]]", "")))
+                .values(rskDE.stream()
                         .map(FubonPolicyDetailRespDTO.RskDEcAppEtpWsBean::getValues)
-                        .toList().toString()))
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList()))
                 .build();
     }
     public static DetailResultVo.InsuranceItem mapToInsuranceItem(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure, FubonPolicyDetailRespDTO.EcAppInsureEtp ecAppInsureEtp) {
@@ -202,7 +219,9 @@ public class PolicyDetailMapper {
                 .pex(pit.stream()
                         .map(FubonPolicyDetailRespDTO.PitEcAppWsBean::getPitPex)
                         .reduce(0.0, Double::sum))
-                .seq(Integer.valueOf("對應標的明細(seq)用"))
+                .seq(Integer.parseInt(ecAppInsureEtp.getRskDEcAppWsBeans().stream()
+                        .map(FubonPolicyDetailRespDTO.RskDEcAppEtpWsBean::getSeq)
+                        .toList().toString().replaceAll("[\\[\\]]", "")))
                 .title(ecAppInsureEtp.getPitColumnNames().toString())
                 .values(listValues)
                 .build();
@@ -252,41 +271,47 @@ public class PolicyDetailMapper {
 
     }
     public static DetailResultVo.InsuranceOtherList mapToInsuranceOtherList(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure) {
-        List<FubonPolicyDetailRespDTO.MidEcAPpWsBean> mid = ecAppInsure.getMidEcAppWsBeans();
+        List<FubonPolicyDetailRespDTO.MidEcAppWsBean> mid = ecAppInsure.getMidEcAppWsBeans();
 
         return DetailResultVo.InsuranceOtherList.builder()
                 .petType(mid.stream()
-                        .map(FubonPolicyDetailRespDTO.MidEcAPpWsBean::getMidContent)
+                        .map(FubonPolicyDetailRespDTO.MidEcAppWsBean::getMidContent)
                         .findFirst().orElse(null))
                 .petName(mid.stream()
-                        .map(FubonPolicyDetailRespDTO.MidEcAPpWsBean::getMidName)
+                        .map(FubonPolicyDetailRespDTO.MidEcAppWsBean::getMidName)
                         .findFirst().orElse(null))
                 .petSex(mid.stream()
-                        .map(FubonPolicyDetailRespDTO.MidEcAPpWsBean::getMidSex)
+                        .map(FubonPolicyDetailRespDTO.MidEcAppWsBean::getMidSex)
                         .findFirst().orElse(null))
                 .petSeq(mid.stream()
-                        .map(FubonPolicyDetailRespDTO.MidEcAPpWsBean::getMidSeq)
+                        .map(FubonPolicyDetailRespDTO.MidEcAppWsBean::getMidSeq)
                         .findFirst().orElse(null))
                 .petBirthDate(mid.stream()
-                        .map(FubonPolicyDetailRespDTO.MidEcAPpWsBean::getMidBirdate)
+                        .map(FubonPolicyDetailRespDTO.MidEcAppWsBean::getMidBirdate)
                         .findFirst().orElse(null))
                 .petAge(mid.stream()
-                        .map(FubonPolicyDetailRespDTO.MidEcAPpWsBean::getMidAge)
+                        .map(FubonPolicyDetailRespDTO.MidEcAppWsBean::getMidAge)
                         .findFirst().orElse(null))
                 .build();
     }
-    public static DetailResultVo.PolicyDeliveryRecord mapToPolicyDeliveryRecord(FubonPrnDetailResp prnDetailResp) {
+    public static List<DetailResultVo.PolicyDeliveryRecord> mapToPolicyDeliveryRecord(FubonPrnDetailResp prnDetailResp) {
         List<FubonPrnDetailResp.PrnResult> prmList = prnDetailResp.getPrmList();
         FubonPrnDetailResp.PrnResult prnResult = prmList.stream().findFirst().orElse(null);
-        assert prnResult != null;
-        return  DetailResultVo.PolicyDeliveryRecord.builder()
-                .prmDocName(prnResult.getPrnDocName())
-                .prmFormat(prnResult.getPrnFormat())
-                .prmType(prnResult.getPrnType())
-                .prmSendType(prnResult.getPrnSendType())
-                .prmPrintStatus(prnResult.getPrnPrintStatus())
-                .prmPrintDate(prnResult.getPrnPrintdate())
-                .build();
+
+        if (prnResult != null) {
+            return Collections.singletonList(DetailResultVo.PolicyDeliveryRecord.builder()
+                    .prnDoc(prnResult.getPrnDoc())
+                    .prmDocName(prnResult.getPrnDocName())
+                    .prmFormat(prnResult.getPrnFormat())
+                    .prmType(prnResult.getPrnType())
+                    .prmSendType(prnResult.getPrnSendType())
+                    .prmPrintStatus(prnResult.getPrnPrintStatus())
+                    .prmPrintDate(prnResult.getPrnPrintdate())
+                    .build());
+        } else {
+            log.warn("富邦保單寄送紀錄回應 is null");
+            return null;
+        }
     }
     public static DetailResultVo.UnpaidRecord mapToUnpaidRecord(String polyNo) {
         NFNV02Entity unpaidRecord = nfnv02Repository.findUnpaidByPolyno(polyNo);
@@ -322,36 +347,41 @@ public class PolicyDetailMapper {
                 .payKind(paymentRecord.getFundkind())
                 .build();
     }
+
     public static List<DetailResultVo.ClaimRecord> mapToClaimRecord(FubonClmSalesRespDTO clmSalesResp) {
-        List<DetailResultVo.ClaimRecord> claimRecords = new ArrayList<>();
-
-        for (FubonClmSalesRespDTO.Content.ClaimInfo claimInfo : clmSalesResp.getContent().getClaimInfo()) {
-
-            claimRecords.add(DetailResultVo.ClaimRecord.builder()
-                    .insType(claimInfo.getQueryPlan())
-                    .acdate(claimInfo.getAcdtda())
-                    .clamNo(claimInfo.getClamno())
-                    .polyNo(claimInfo.getQueryPolyNo())
-                    .insuredName(claimInfo.getIcname())
-                    .accper(claimInfo.getAccper())
-                    .clamStatus(claimInfo.getClamsts())
-                    .prcdeptNm(claimInfo.getPrcdeptnm())
-                    .prcempNm(claimInfo.getPrcempnm())
-                    .phone(claimInfo.getPhone())
-                    .build());
-        }
-        return claimRecords;
+        List<FubonClmSalesRespDTO.Content.ClaimInfo> claimInfoList = clmSalesResp.getContent().getClaimInfo();
+        return claimInfoList.stream()
+                .map(claimInfo -> DetailResultVo.ClaimRecord.builder()
+                        .insType(claimInfo.getQueryPlan())
+                        .acdate(claimInfo.getAcdate())
+                        .clamNo(claimInfo.getClamno())
+                        .polyNo(claimInfo.getQueryPolyNo())
+                        .insuredName(claimInfo.getIcname())
+                        .accper(claimInfo.getAccper())
+                        .clamStatus(claimInfo.getClamsts())
+                        .prcdeptNm(claimInfo.getPrcdeptnm())
+                        .prcempNm(claimInfo.getPrcempnm())
+                        .phone("資料庫查詢")
+                        .build())
+                .collect(Collectors.toList());
     }
 
-//    public static DetailResultVo.ConservationRecord getConservationRecord() {
-//        return DetailResultVo.ConservationRecord.builder()
-//                .proposerName()
-//                .insuredName()
-//                .policyName()
-//                .createDate()
-//                .modifyDate()
-//                .wrpStatus()
-//                .closeDate()
-//                .build();
-//    }
+    public static DetailResultVo.ConservationRecord getConservationRecord(FubonChkEnrDataRespDTO chkEnrData) {
+        Collection<FubonChkEnrDataRespDTO.RecEcAppWsBean> recEcAppWsBeans = chkEnrData.getRecEcAppWsBeans();
+        if (recEcAppWsBeans != null && !recEcAppWsBeans.isEmpty()) {
+            FubonChkEnrDataRespDTO.RecEcAppWsBean recEcAppWsBean = recEcAppWsBeans.iterator().next();
+            return DetailResultVo.ConservationRecord.builder()
+                    .proposerName(recEcAppWsBean.getRmaACliname())
+                    .insuredName(recEcAppWsBean.getRmalCliname())
+                    .policyName(recEcAppWsBean.getFormatid())
+                    .createDate(recEcAppWsBean.getSecCdate())
+                    .modifyDate(recEcAppWsBean.getSecAdate())
+                    .wrpStatus(recEcAppWsBean.getSecWrpsts())
+                    .closeDate(recEcAppWsBean.getCloseDate())
+                    .build();
+        } else {
+            log.warn("富邦保全紀錄回應 is null");
+            return null;
+        }
+    }
 }

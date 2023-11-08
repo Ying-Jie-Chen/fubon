@@ -17,10 +17,10 @@ public class CommonConfig {
     public ResultMapper resultMapper() {
         return new ResultMapper();
     }
-    @Bean
-    public PolicyDetailMapper policyDetailMapper() {
-        return new PolicyDetailMapper();
-    }
+//    @Bean
+//    public PolicyDetailMapper policyDetailMapper() {
+//        return new PolicyDetailMapper();
+//    }
 
     @Bean
     public JsonHelper jsonHelper() {

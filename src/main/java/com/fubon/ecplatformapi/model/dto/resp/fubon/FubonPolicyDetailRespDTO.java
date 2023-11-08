@@ -43,7 +43,7 @@ public class FubonPolicyDetailRespDTO {
         private RskEcAppWsBean rskEcAppWsBean;
         private BudEcAppWsBean budEcAppWsBean;
         private List<RmaMEcAppWsBean> rmaMEcAPpWsBeans;
-        private List<MidEcAPpWsBean> midEcAppWsBeans;
+        private List<MidEcAppWsBean> midEcAppWsBeans;
         private List<FliEcAppWsBeans> fliEcAppWsBeans;
         private List<BenEcAppWsBean> benEcAppWsBeans;
 
@@ -80,13 +80,14 @@ public class FubonPolicyDetailRespDTO {
         private String secFubonlifeAgree;
         private String secPayMode;
         private String secPaymthd;
-        private String setMtg;
-        private String setMtg2;
+        private String secMtg;
+        private String secMtg2;
         private Long secTotalnum;
         private String secCty1;
         private String secCty2;
         private String secCty3;
         private String secCty4;
+
     }
     @Data
     @Builder
@@ -161,6 +162,7 @@ public class FubonPolicyDetailRespDTO {
         private List<PitEb0List> pitEb0Lists;
     }
     @Data
+    @Builder
     public static class PitEb0List {
         private String eb0TsiDesc;
         private String eb0TsiValue;
@@ -214,7 +216,7 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
-    public static class MidEcAPpWsBean {
+    public static class MidEcAppWsBean {
         private String midContent;
         private String midName;
         private String midSex;

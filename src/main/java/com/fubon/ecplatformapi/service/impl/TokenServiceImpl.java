@@ -75,7 +75,6 @@ public class TokenServiceImpl extends SessionController implements TokenService 
             if (!validateSignature(tokenParts[0], tokenParts[1], Long.parseLong(tokenParts[2]), tokenParts[3])) {
                 token.setRevoked(true);
                 SessionManager.removeSession(sessionID());
-                //sessionService.removeSession(session.getId());
             }
 
             long decryptedTimestamp = Long.parseLong(tokenParts[2]);

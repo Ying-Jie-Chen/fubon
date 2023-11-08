@@ -12,10 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -127,8 +124,6 @@ public class BuildResponse {
         FubonPolicyDetailRespDTO response = FubonPolicyDetailRespDTO.builder()
                 // 車個險
                 .ecAppInsure(FubonPolicyDetailRespDTO.EcAppInsure.builder()
-                        .voltPolicyNum("").compPolicyNum("").voltPremium(1.1)
-                        .compPremium(1.1).totalPremium(1.1).polSt("")
                         // 保單資料
                         .secEcAppWsBean(FubonPolicyDetailRespDTO.SecEcAppWsBean.builder()
                                 .build())
@@ -149,6 +144,22 @@ public class BuildResponse {
                                 .build())
                         // 險種資料
                         .pitEcAppWsBeans(Collections.singleton(FubonPolicyDetailRespDTO.PitEcAppWsBean.builder()
+                                .pitBnfCode("SampleCode")
+                                .pitEb0Name("SampleName")
+                                .pitType("SampleType")
+                                .pitFinalprm(1000.0)
+                                .pitPex(500.0)
+                                .pitPexUnit("SampleUnit")
+                                .pitEb0Lists(Arrays.asList(FubonPolicyDetailRespDTO.PitEb0List.builder()
+                                                .eb0TsiDesc("Desc1")
+                                                .eb0TsiUnit("Unit1")
+                                                .eb0TsiValue("Value1")
+                                                .build(),
+                                        FubonPolicyDetailRespDTO.PitEb0List.builder()
+                                                .eb0TsiDesc("Desc2")
+                                                .eb0TsiUnit("Unit2")
+                                                .eb0TsiValue("Value2")
+                                                .build()))
                                 .build()))
                         // 險種名冊資料
                         .pitNEcAppWsBeans(Collections.singleton(FubonPolicyDetailRespDTO.PitNecAppWsBeans.builder()
@@ -169,7 +180,13 @@ public class BuildResponse {
                         .rmaMEcAPpWsBeans(Collections.singletonList(FubonPolicyDetailRespDTO.RmaMEcAppWsBean.builder()
                                 .build()))
                         // 其他標的名稱資料
-                        .midEcAppWsBeans(Collections.singletonList(FubonPolicyDetailRespDTO.MidEcAPpWsBean.builder()
+                        .midEcAppWsBeans(Collections.singletonList(FubonPolicyDetailRespDTO.MidEcAppWsBean.builder()
+                                .midContent("Sample Content")
+                                .midName("John Doe")
+                                .midSex("Male")
+                                .midSeq(1)
+                                .midBirdate(Calendar.getInstance())
+                                .midAge(30)
                                 .build()))
                         // 航班資料
                         .fliEcAppWsBeans(Collections.singletonList(FubonPolicyDetailRespDTO.FliEcAppWsBeans.builder()
@@ -180,8 +197,6 @@ public class BuildResponse {
                         .build())
                 // 企業險
                 .ecAppInsureEtp(FubonPolicyDetailRespDTO.EcAppInsureEtp.builder()
-                        .policyNum("").clsCode("").cgrCode("").plnCode("")
-                        .totalPremium(1.1).totalPremium100(1.1).ourshr(1.1)
                         // 保單資料
                         .secEcAppWsBean(FubonPolicyDetailRespDTO.SecEcAppWsBean.builder()
                                 .build())
@@ -196,9 +211,16 @@ public class BuildResponse {
                                 .build()))
                         // 標的明細
                         .rskDEcAppWsBeans(Collections.singleton(FubonPolicyDetailRespDTO.RskDEcAppEtpWsBean.builder()
+                                .seq(1)
+                                .values(Arrays.asList("Value1", "Value2", "Value3"))
                                 .build()))
                         // 保險項目標題
+                        .pitColumnNames(Arrays.asList("險種代碼", "保險種類"))
+                        // 保險項目
                         .pitEcAppEtpWsBeans(Collections.singleton(FubonPolicyDetailRespDTO.PitEcAppEtpWsBean.builder()
+                                .pitRskSeq(1)
+                                .pitRskType("pitRskType")
+                                .values(Arrays.asList("Value1", "Value2", "Value3"))
                                 .build()))
                         .build())
                 .build();
@@ -207,23 +229,9 @@ public class BuildResponse {
     }
     public FubonPrnDetailResp buildPrnDetailResponse() {
         FubonPrnDetailResp.PrnResult prnResult1 = FubonPrnDetailResp.PrnResult.builder()
-                .prnDoc("001")
-                .prnDocName("Document 1")
-                .prnFormat("PDF")
-                .prnType("正本")
-                .prnSendType("Email")
-                .prnPrintStatus("已寄送")
-                .prnPrintdate(new Date())
                 .build();
 
         FubonPrnDetailResp.PrnResult prnResult2 = FubonPrnDetailResp.PrnResult.builder()
-                .prnDoc("002")
-                .prnDocName("Document 2")
-                .prnFormat("PDF")
-                .prnType("副本")
-                .prnSendType("Mail")
-                .prnPrintStatus("已寄送")
-                .prnPrintdate(new Date())
                 .build();
 
         List<FubonPrnDetailResp.PrnResult> prmList = Arrays.asList(prnResult1, prnResult2);
@@ -275,6 +283,30 @@ public class BuildResponse {
                 .count(2)
                 .content(content)
                 .build();
+    }
+
+    public FubonChkEnrDataRespDTO buildChkEnrData() {
+        FubonChkEnrDataRespDTO chkEnrData = FubonChkEnrDataRespDTO.builder()
+                .responseCode("200")
+                .responseErrorCode("0")
+                .responseMsg("Success")
+                .recEcAppWsBeans(new ArrayList<>())
+                .build();
+
+        FubonChkEnrDataRespDTO.RecEcAppWsBean bean1 = FubonChkEnrDataRespDTO.RecEcAppWsBean.builder()
+                .formatid("1")
+                .endst("Active")
+                .rmaACliname("Client A")
+                .rmalCliname("Client B")
+                .secCdate(new Date())
+                .secAdate(new Date())
+                .secWrpsts("Approved")
+                .closeDate(new Date())
+                .build();
+
+        chkEnrData.getRecEcAppWsBeans().add(bean1);
+
+        return chkEnrData;
     }
 
 

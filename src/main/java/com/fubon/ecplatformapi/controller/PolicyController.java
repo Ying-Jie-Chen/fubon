@@ -1,9 +1,13 @@
-package com.fubon.ecplatformapi.controller.other;
+package com.fubon.ecplatformapi.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
+import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonPolicyDetailRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import com.fubon.ecplatformapi.model.dto.vo.CreateDetailResultVO;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
@@ -49,12 +53,24 @@ public class PolicyController {
                         .build();
         }
     }
+    @Autowired
+    ObjectMapper objectMapper;
 
     @GetMapping("/queryPolicyDetail")
     public ApiRespDTO<CreateDetailResultVO> queryDetail(@Valid @RequestBody PolicyDetailReqDTO request)
     {
         try {
             DetailResultVo detailResult = policyService.getPolicyDetail(request);
+
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+            String jsonRequest;
+            try {
+                jsonRequest = objectMapper.writeValueAsString(detailResult);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println(jsonRequest);
+
             CreateDetailResultVO resultVO = new CreateDetailResultVO();
             resultVO.setDetailResult(detailResult);
 

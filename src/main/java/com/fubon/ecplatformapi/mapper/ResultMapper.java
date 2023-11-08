@@ -22,12 +22,13 @@ public class ResultMapper {
         );
     }
 
-    public static DetailResultVo mapToDetailResult(FubonPolicyDetailRespDTO policyDetail, FubonPrnDetailResp prnDetail, FubonClmSalesRespDTO clmSales) {
+    public static DetailResultVo mapToDetailResult(FubonPolicyDetailRespDTO policyDetail, FubonPrnDetailResp prnDetail, FubonClmSalesRespDTO clmSales, FubonChkEnrDataRespDTO chkEnrData) {
 
         FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure = policyDetail.getEcAppInsure();
         FubonPolicyDetailRespDTO.EcAppInsureEtp ecAppInsureEtp = policyDetail.getEcAppInsureEtp();
 
-        String polyNo = null;
+        String polyNo2 = "Polyno1";
+        String polyNo3 = "PolynoA";
 
         return DetailResultVo.builder()
                 //保單基本資料
@@ -45,15 +46,16 @@ public class ResultMapper {
                 // 其他險種名冊
                 .insuranceOtherList(Collections.singletonList(mapToInsuranceOtherList(ecAppInsure)))
                 // 保單寄送記錄
-                .policyDeliveryRecord(Collections.singletonList(mapToPolicyDeliveryRecord(prnDetail)))
+                .policyDeliveryRecord(mapToPolicyDeliveryRecord(prnDetail))
                 // 未繳保費
-                .unpaidRecord(Collections.singletonList(mapToUnpaidRecord(polyNo)))
+                .unpaidRecord(Collections.singletonList(mapToUnpaidRecord(polyNo2)))
                 // 繳費紀錄
-                .paidRecord(Collections.singletonList(mapToPaidRecord(polyNo)))
+                .paidRecord(Collections.singletonList(mapToPaidRecord(polyNo3)))
                 // 理賠紀錄
                 .claimRecord(mapToClaimRecord(clmSales))
                 // 保全紀錄
-                //.conservationRecord(Collections.singletonList(getConservationRecord()))
+                .conservationRecord(Collections.singletonList(getConservationRecord(chkEnrData)))
                 .build();
     }
+
 }
