@@ -1,6 +1,7 @@
 package com.fubon.ecplatformapi.helper;
 
 import com.fubon.ecplatformapi.config.SessionManager;
+import com.fubon.ecplatformapi.controller.SessionController;
 import com.fubon.ecplatformapi.enums.SessionAttribute;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class SessionHelper {
+public class SessionHelper extends SessionController {
 
     /**
      * 取得 Session ID
@@ -41,7 +42,7 @@ public class SessionHelper {
         for (SessionAttribute attribute : SessionAttribute.values()) {
             Object value = session.getAttribute(attribute.name());
             values.put(attribute.name(), value);
-            //log.info(attribute + ": " + value);
+            log.info(attribute + ": " + value);
         }
         return values;
     }
@@ -49,10 +50,10 @@ public class SessionHelper {
     /**
      * 取得儲存在Session中的特定Value
      */
-    public static Object getValueByAttribute(String sessionId, SessionAttribute attribute) {
+    public static String getValueByAttribute(String sessionId, SessionAttribute attribute) {
         HttpSession session = SessionManager.getSessionById(sessionId);
-        Object value = session.getAttribute(attribute.name());
-        //log.info(attribute + ": " + value);
+        String value = session.getAttribute(attribute.name()).toString();
+        log.info(attribute + ": " + value);
         return value;
     }
 

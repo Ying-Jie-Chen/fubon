@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.controller;
+package com.fubon.ecplatformapi.controller.other;
 
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;

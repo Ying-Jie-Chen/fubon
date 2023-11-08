@@ -23,7 +23,7 @@ public class CsvUtil {
         Map<SessionAttribute, String> sessionData = new HashMap<>();
 
         for (SessionAttribute attribute : attributes) {
-            Object value = SessionHelper.getValueByAttribute(sessionId,attribute);
+            Object value = SessionHelper.getValueByAttribute(sessionId, attribute);
             sessionData.put(attribute, value.toString());
         }
 

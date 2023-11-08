@@ -2,6 +2,7 @@ package com.fubon.ecplatformapi.service.impl;
 
 
 import com.fubon.ecplatformapi.config.SessionManager;
+import com.fubon.ecplatformapi.controller.SessionController;
 import com.fubon.ecplatformapi.service.TokenService;
 import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.model.entity.Token;
@@ -22,7 +23,7 @@ import java.util.Base64;
 
 @Slf4j
 @Service
-public class TokenServiceImpl implements TokenService {
+public class TokenServiceImpl extends SessionController implements TokenService {
     @Autowired
     TokenProperties tokenProperties;
     @Autowired
@@ -60,20 +61,20 @@ public class TokenServiceImpl implements TokenService {
     public boolean isTokenValid(Token token, HttpServletRequest request){
 
         try{
-            String sessionId = SessionHelper.getSessionID(request);
+            //String sessionId = SessionHelper.getSessionID(request);
 
             String[] tokenParts = decrypt(token.getToken(), secretKey).split("\\|");
 
-            if (tokenParts.length != 4 || !tokenParts[0].equals(sessionId)) {
+            if (tokenParts.length != 4 || !tokenParts[0].equals(sessionID())) {
                 token.setRevoked(true);
             }
 
-            Object value = SessionHelper.getAllValue(sessionId);
+            Object value = SessionHelper.getAllValue(sessionID());
             //log.info("value: " + value);
 
             if (!validateSignature(tokenParts[0], tokenParts[1], Long.parseLong(tokenParts[2]), tokenParts[3])) {
                 token.setRevoked(true);
-                SessionManager.removeSession(sessionId);
+                SessionManager.removeSession(sessionID());
                 //sessionService.removeSession(session.getId());
             }
 
@@ -84,7 +85,7 @@ public class TokenServiceImpl implements TokenService {
 
             if (tokenAge > tokenExpirationTime.toMillis()) {
                 token.setExpired(true);
-                SessionManager.removeSession(sessionId);
+                SessionManager.removeSession(sessionID());
             }
 
             return !token.getRevoked() && !token.getExpired();

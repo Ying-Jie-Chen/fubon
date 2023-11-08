@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+public class AuthController extends SessionController{
     @Autowired
     AuthService authService;
 
@@ -89,9 +89,9 @@ public class AuthController {
      *
      */
     @PostMapping("/logout")
-    public ApiRespDTO<String> logout(HttpServletRequest request){
+    public ApiRespDTO<String> logout(){
         try {
-            SessionManager.removeSession(SessionHelper.getSessionID(request));
+            SessionManager.removeSession(sessionID());
 
             return ApiRespDTO.<String>builder()
                     .code(StatusCodeEnum.SUCCESS.getCode())

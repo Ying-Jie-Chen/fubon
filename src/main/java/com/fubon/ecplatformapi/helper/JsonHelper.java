@@ -31,8 +31,8 @@ public class JsonHelper extends SessionController {
     public String convertSsoTokenToJson(FubonSsoTokenDTO config){
         FubonSsoTokenDTO.Header header = config.getHeader();
         FubonSsoTokenDTO.FunctionCode functionCode = config.getFbeccomsta1040RQ();
-        String unionNum = SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.UNION_NUM).toString();
-        String account = SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.FBID).toString();
+        String unionNum = SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.UNION_NUM);
+        String account = SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.FBID);
         String parameter = csvUtil.generateCsv(sessionID());
 
         return "{" + "\"Header\":{" + "\"FromSys\":\"" + header.getFromSys() + "\"," + "\"SysPwd\":\"" + header.getSysPwd() + "\"," + "\"FunctionCode\":\"" + header.getFunctionCode() + "\"" + "}," + "\"FBECCOMSTA1040RQ\":{" + "\"unionNum\":\"" + unionNum + "\"," + "\"account\":\"" + account + "\"," + "\"source\":\"" + functionCode.getSource() + "\"," + "\"desType\":\"" + functionCode.getDesType() + "\"," + "\"desFunction\":\"" + functionCode.getDesFunction() + "\"," + "\"desModule\":\"" + functionCode.getDesModule() + "\"," + "\"type\":\"" + functionCode.getType() + "\"," + "\"parameter\":\"" + parameter  + "\"" + "}" + "}";
