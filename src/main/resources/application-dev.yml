@@ -74,27 +74,16 @@ ecws:
         type: ""
         parameter: ""
 
+sso-login:
+    test:
+      webServiceAcc: zAq1xSw2
+      webServicePwd: cDe3vFr4
+    production:
+      webServiceAcc: zaq12wsxcde34rfV
+      webServicePwd: vfr43edcxsw21qaZ
 
 policy-detail:
-  domain:
-
-  get-policy-detail:
-    query-type: "1"
-    policy-num: ""
-    cls: ""
-
-  get-prn-detail:
-    query-type: "%"
-    format-id: ""
-    cls: ""
-
-  get-cls-sales:
-    query-sales-id: ""
-    query-plan: ""
-    query-poly-no: ""
-
-  get-chk-enr-data:
-    format-id: ""
+  domain: "http://localhost:8080"
 
 
 

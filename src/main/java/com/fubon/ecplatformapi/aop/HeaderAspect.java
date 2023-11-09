@@ -28,7 +28,8 @@ public class HeaderAspect {
     @Autowired
     TokenRepository tokenRepository;
 
-    @Pointcut("execution(* com.fubon.ecplatformapi.controller.other.*.*(..))")
+
+    @Pointcut("execution(* com.fubon.ecplatformapi.controller.other.*.*(..)) || execution(* com.fubon.ecplatformapi.controller.auth.AuthController.getSSOToken(..)) || execution(* com.fubon.ecplatformapi.controller.auth.AuthController.SSOLogin(..))")
     private void headerValidation() { }
 
     @Around("headerValidation()")

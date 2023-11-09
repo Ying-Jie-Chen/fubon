@@ -1,14 +1,17 @@
-package com.fubon.ecplatformapi.controller;
+package com.fubon.ecplatformapi.controller.auth;
 
 import com.fubon.ecplatformapi.config.SessionManager;
+import com.fubon.ecplatformapi.controller.other.SessionController;
 import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
+import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationVo;
+import com.fubon.ecplatformapi.repository.TokenRepository;
 import com.fubon.ecplatformapi.service.AuthService;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
-import jakarta.servlet.http.HttpServletRequest;
+import com.fubon.ecplatformapi.service.SsoService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +24,13 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/auth")
-public class AuthController extends SessionController{
+public class AuthController extends SessionController {
     @Autowired
     AuthService authService;
+    @Autowired
+    SsoService ssoService;
+    @Autowired
+    TokenRepository tokenRepository;
 
     /**
      * 展業平台登入
@@ -100,6 +107,55 @@ public class AuthController extends SessionController{
 
         } catch (Exception e) {
             return ApiRespDTO.<String>builder()
+                    .code(StatusCodeEnum.ERR00999.name())
+                    .message(StatusCodeEnum.ERR00999.getMessage())
+                    .build();
+        }
+    }
+
+    /**
+     * 取得 SSO Token
+     *
+     */
+    @GetMapping("/getSSOToken")
+    public ApiRespDTO<String> getSSOToken(){
+        try {
+
+            String ssoToken = ssoService.getSSOToken();
+
+            return ApiRespDTO.<String>builder()
+                    .code(StatusCodeEnum.SUCCESS.getCode())
+                    .message(StatusCodeEnum.SUCCESS.getMessage())
+                    .authToken(tokenRepository.findLatestToken().getToken())
+                    .data(ssoToken)
+                    .build();
+
+        }catch (Exception e){
+            return  ApiRespDTO.<String>builder()
+                    .code(StatusCodeEnum.ERR00999.name())
+                    .message(StatusCodeEnum.ERR00999.getMessage())
+                    .build();
+        }
+    }
+
+    /**
+     * 登入SSO驗證
+     *
+     */
+    @PostMapping("/loginSSO")
+    public ApiRespDTO<LoginRespVo.ResponseData> SSOLogin(@RequestBody SsoReqDTO ssoReq) {
+        try {
+
+            ssoService.verifySSOLogin(ssoReq);
+
+            return ApiRespDTO.<LoginRespVo.ResponseData>builder()
+                    .code(StatusCodeEnum.SUCCESS.getCode())
+                    .message(StatusCodeEnum.SUCCESS.getMessage())
+                    //.data(responseData)
+                    .build();
+
+        } catch (Exception e) {
+            return  ApiRespDTO.<LoginRespVo.ResponseData>builder()
                     .code(StatusCodeEnum.ERR00999.name())
                     .message(StatusCodeEnum.ERR00999.getMessage())
                     .build();

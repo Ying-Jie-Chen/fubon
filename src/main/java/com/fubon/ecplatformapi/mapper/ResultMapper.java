@@ -1,5 +1,6 @@
 package com.fubon.ecplatformapi.mapper;
 
+import com.fubon.ecplatformapi.enums.InsuranceType;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.*;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
@@ -29,33 +30,39 @@ public class ResultMapper {
 
         String polyNo2 = "Polyno1";
         String polyNo3 = "PolynoA";
+        try {
 
-        return DetailResultVo.builder()
-                //保單基本資料
-                .insuranceInfo(mapToInsuranceInfo(ecAppInsure, ecAppInsureEtp))
-                // 保險標的
-                .insuranceSubject(mapToInsuranceSubject(ecAppInsure))
-                // 企業險保險標的
-                .etpInsuranceSubject(Collections.singletonList(mapToEtpInsuranceSubject(ecAppInsureEtp)))
-                // 企業險保險標的明細
-                .etpInsuranceSubjectDetail(Collections.singletonList(mapToEtpInsuranceSubjectDetail(ecAppInsureEtp)))
-                // 保險項目
-                .insuranceItem(Collections.singletonList(mapToInsuranceItem(ecAppInsure, ecAppInsureEtp)))
-                // 險種名冊
-                .insuranceList(Collections.singletonList(mapToInsuranceList(ecAppInsure)))
-                // 其他險種名冊
-                .insuranceOtherList(Collections.singletonList(mapToInsuranceOtherList(ecAppInsure)))
-                // 保單寄送記錄
-                .policyDeliveryRecord(mapToPolicyDeliveryRecord(prnDetail))
-                // 未繳保費
-                .unpaidRecord(Collections.singletonList(mapToUnpaidRecord(polyNo2)))
-                // 繳費紀錄
-                .paidRecord(Collections.singletonList(mapToPaidRecord(polyNo3)))
-                // 理賠紀錄
-                .claimRecord(mapToClaimRecord(clmSales))
-                // 保全紀錄
-                .conservationRecord(Collections.singletonList(getConservationRecord(chkEnrData)))
-                .build();
+            return DetailResultVo.builder()
+                    //保單基本資料
+                    .insuranceInfo(mapToInsuranceInfo(ecAppInsure, ecAppInsureEtp))
+                    // 保險標的
+                    .insuranceSubject(mapToInsuranceSubject(ecAppInsure))
+                    // 企業險保險標的 - 企業險才有
+                    .etpInsuranceSubject(mapToEtpInsuranceSubject(ecAppInsureEtp))
+                    // 企業險保險標的明細 - 企業險才有
+                    .etpInsuranceSubjectDetail(mapToEtpInsuranceSubjectDetail(ecAppInsureEtp))
+                    // 保險項目
+                    .insuranceItem(Collections.singletonList(mapToInsuranceItem(ecAppInsure, ecAppInsureEtp)))
+                    // 險種名冊 - 車險才有
+                    .insuranceList(mapToInsuranceList(ecAppInsure))
+                    // 其他險種名冊
+                    .insuranceOtherList(Collections.singletonList(mapToInsuranceOtherList(ecAppInsure)))
+                    // 保單寄送記錄
+                    .policyDeliveryRecord(mapToPolicyDeliveryRecord(prnDetail))
+                    // 未繳保費
+                    .unpaidRecord(Collections.singletonList(mapToUnpaidRecord(polyNo2)))
+                    // 繳費紀錄
+                    .paidRecord(Collections.singletonList(mapToPaidRecord(polyNo3)))
+                    // 理賠紀錄
+                    .claimRecord(mapToClaimRecord(clmSales))
+                    // 保全紀錄
+                    .conservationRecord(Collections.singletonList(getConservationRecord(chkEnrData)))
+                    .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

@@ -1,7 +1,7 @@
 package com.fubon.ecplatformapi.helper;
 
 import com.fubon.ecplatformapi.config.SessionManager;
-import com.fubon.ecplatformapi.controller.SessionController;
+import com.fubon.ecplatformapi.controller.other.SessionController;
 import com.fubon.ecplatformapi.enums.SessionAttribute;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

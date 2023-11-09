@@ -1,6 +1,5 @@
 package com.fubon.ecplatformapi.service;
 
-import com.fubon.ecplatformapi.controller.SessionController;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import org.springframework.stereotype.Service;
 

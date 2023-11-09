@@ -1,5 +1,6 @@
 package com.fubon.ecplatformapi.model.dto.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -42,6 +43,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    //@JsonInclude(JsonInclude.Include.NON_NULL)
     public static class BasicInfo {
         @Size(max = 14)
         private String policyNum;
@@ -110,6 +112,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class InsuredList {
         @Size(max = 200)
         private String insuredName;

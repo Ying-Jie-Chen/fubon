@@ -2,7 +2,7 @@ package com.fubon.ecplatformapi.service.impl;
 
 
 import com.fubon.ecplatformapi.config.EcwsConfig;
-import com.fubon.ecplatformapi.enums.SSOLoginEnum;
+import com.fubon.ecplatformapi.config.SsoLoginConfig;
 import com.fubon.ecplatformapi.helper.JsonHelper;
 import com.fubon.ecplatformapi.model.dto.resp.SSOTokenRespDTO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
@@ -18,7 +18,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -37,6 +36,8 @@ public class SsoServiceImpl implements SsoService{
     JsonHelper jsonHelper;
     @Autowired
     EcwsConfig ecwsConfig;
+    @Autowired
+    SsoLoginConfig ssoLoginConfig;
 
     private final WebClient webClient;
 
@@ -94,12 +95,13 @@ public class SsoServiceImpl implements SsoService{
 
         if (domain.contains("/ttran.518fb.com/") || domain.contains("/tb2b.518fb.com/")) {
             log.info(":測試環境");
-            webServiceAcc = SSOLoginEnum.TEST.getWebServiceAcc();
-            webServicePwd = SSOLoginEnum.TEST.getWebServicePwd();
+            webServiceAcc = ssoLoginConfig.getTest().getWebServiceAcc();
+            webServicePwd = ssoLoginConfig.getTest().getWebServicePwd();
+
         } else {
             log.info(":正式環境");
-            webServiceAcc = SSOLoginEnum.PRODUCTION.getWebServiceAcc();
-            webServicePwd = SSOLoginEnum.PRODUCTION.getWebServicePwd();
+            webServiceAcc = ssoLoginConfig.getProduction().getWebServiceAcc();
+            webServicePwd = ssoLoginConfig.getProduction().getWebServicePwd();
         }
 
         log.info("組成請求字串 #Start");

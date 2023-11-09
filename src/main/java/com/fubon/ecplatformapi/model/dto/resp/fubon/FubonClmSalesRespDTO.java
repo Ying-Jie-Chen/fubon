@@ -8,6 +8,8 @@ import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class FubonClmSalesRespDTO {
     private Integer result;
     private String message;

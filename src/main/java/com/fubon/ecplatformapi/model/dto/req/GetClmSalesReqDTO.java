@@ -1,10 +1,11 @@
 package com.fubon.ecplatformapi.model.dto.req;
 
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Data
-@ConfigurationProperties(prefix = "policy-detail.get-cls-sales")
+@Builder
 public class GetClmSalesReqDTO {
     private String query_SalesId;
     private String query_Plan;

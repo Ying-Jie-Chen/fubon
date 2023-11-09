@@ -62,14 +62,14 @@ public class PolicyController {
         try {
             DetailResultVo detailResult = policyService.getPolicyDetail(request);
 
-            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-            String jsonRequest;
-            try {
-                jsonRequest = objectMapper.writeValueAsString(detailResult);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-            System.out.println(jsonRequest);
+//            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+//            String jsonRequest;
+//            try {
+//                jsonRequest = objectMapper.writeValueAsString(detailResult);
+//            } catch (JsonProcessingException e) {
+//                throw new RuntimeException(e);
+//            }
+//            System.out.println(jsonRequest);
 
             CreateDetailResultVO resultVO = new CreateDetailResultVO();
             resultVO.setDetailResult(detailResult);

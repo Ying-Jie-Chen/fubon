@@ -29,13 +29,13 @@ public class FubonController {
         return buildResponse.buildListResponse();
     }
 
-    @GetMapping("/policyDetail")
+    @PostMapping("/policyDetail")
     public FubonPolicyDetailRespDTO getPolicyDetail(GetPolicyDetailReqDTO reqDTO){ return  buildResponse.buildPolicyDetailResponse(); }
-    @GetMapping("/getPrnDetail")
+    @PostMapping("/getPrnDetail")
     public FubonPrnDetailResp getPrnDetail(GetPrnDetailReqDTO reqDTO){return buildResponse.buildPrnDetailResponse();}
-    @GetMapping("/ClmSalesAppWs/api101")
+    @PostMapping("/ClmSalesAppWs/api101")
     public FubonClmSalesRespDTO getClmSales(GetClmSalesReqDTO reqDTO){return buildResponse.buildClmSalesResponse(); }
-    @GetMapping("/chkEnrData")
+    @PostMapping("/chkEnrData")
     public FubonChkEnrDataRespDTO getEnrData(GetChkEnrDataReqDTO reqDTO){return buildResponse.buildChkEnrData();}
     @PostMapping ("/GetVerificationImage")
     public VerificationResp GetVerificationImage(FubonVerificationReqDTO fubonVerificationReqDTO) {
