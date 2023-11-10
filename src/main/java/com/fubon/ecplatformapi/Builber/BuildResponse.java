@@ -148,6 +148,7 @@ public class BuildResponse {
                                 .ecoPtcptno("1")
                                 .ecoReltn("Self")
                                 .ecoAge(30)
+                                .ecoPlnCode("1")
                                 .build()))
                         // 要保人資料
                         .rmaAEcAppWsBean(FubonPolicyDetailRespDTO.RmaEcAppWsBean.builder()
@@ -182,6 +183,7 @@ public class BuildResponse {
                                 .build())
                         // 車輛資料
                         .mohEcAppWsBean(FubonPolicyDetailRespDTO.MohEcAppWsBean.builder()
+                                .mohPrmCode("002")
                                 .build())
                         // 標的物地址
                         .rskEcAppWsBean(FubonPolicyDetailRespDTO.RskEcAppWsBean.builder()
@@ -206,6 +208,16 @@ public class BuildResponse {
                                 .build()))
                         // 受益人資料
                         .benEcAppWsBeans(Collections.singletonList(FubonPolicyDetailRespDTO.BenEcAppWsBean.builder()
+                                .build()))
+                        // 附加條款
+                        .sbcEcAppWsBeans(Collections.singletonList(FubonPolicyDetailRespDTO.SbcEcAppWsBean.builder()
+                                .sbcCode("附加條款代碼")
+                                .sbcApply("Y")
+                                .sbcMohParam1("5")
+                                .sbcMohParam2(10.5)
+                                .sbcMohParam3(20.3)
+                                .sbcMohParam4(15.2)
+                                .sbcMohParam5(8.0)
                                 .build()))
                         .build())
                 // 企業險

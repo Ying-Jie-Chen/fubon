@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.controller.other;
+package com.fubon.ecplatformapi.controller.auth;
 
 import com.fubon.ecplatformapi.helper.SessionHelper;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,7 +1,6 @@
 package com.fubon.ecplatformapi.controller.auth;
 
 import com.fubon.ecplatformapi.config.SessionManager;
-import com.fubon.ecplatformapi.controller.other.SessionController;
 import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;

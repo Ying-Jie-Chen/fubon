@@ -22,6 +22,7 @@ public class DetailResultVo {
     private List<EtpInsuranceSubject> etpInsuranceSubject; // 企業險保險標的：富邦API - 取得保單資訊
     private List<EtpInsuranceSubjectDetail> etpInsuranceSubjectDetail; // 企業險保險標的明細：富邦API - 取得保單資訊
     private List<InsuranceItem> insuranceItem; // 保險項目：富邦API - 取得保單資訊
+    private List<AdditionalTerm> additionalTerms; // 附加條款- 車險才有
     private List<InsuranceList> insuranceList; // 險種名冊：富邦API - 取得保單資訊
     private List<InsuranceOtherList> insuranceOtherList; // 其他險種名冊 個人傷害險的寵物險
     private List<PolicyDeliveryRecord> policyDeliveryRecord; // 保單寄送記錄：富邦API - 保單寄送紀錄查詢
@@ -292,6 +293,13 @@ public class DetailResultVo {
         private String title;
         private List<List<String>> values;
     }
+    @Data
+    @Builder
+    @AllArgsConstructor
+    public static class AdditionalTerm {
+        private String term;
+        private String value;
+    }
 
     @Data
     @NoArgsConstructor
@@ -439,5 +447,6 @@ public class DetailResultVo {
         private Date closeDate;
 
     }
+
 
 }

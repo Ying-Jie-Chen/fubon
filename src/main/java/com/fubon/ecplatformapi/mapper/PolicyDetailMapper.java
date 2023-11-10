@@ -1,16 +1,23 @@
 package com.fubon.ecplatformapi.mapper;
 
+import com.fubon.ecplatformapi.model.dto.CarInsuranceTermDTO;
+import com.fubon.ecplatformapi.model.dto.UnpaidRecordDTO;
+import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonChkEnrDataRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonClmSalesRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonPolicyDetailRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonPrnDetailResp;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
+import com.fubon.ecplatformapi.model.entity.CarInsuranceTerm;
 import com.fubon.ecplatformapi.model.entity.NFNV02Entity;
 import com.fubon.ecplatformapi.model.entity.NFNV03Entity;
+import com.fubon.ecplatformapi.repository.CarInsuranceTermRepository;
 import com.fubon.ecplatformapi.repository.NFNV02Repository;
 import com.fubon.ecplatformapi.repository.NFNV03Repository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -21,17 +28,20 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 @Component
 public class PolicyDetailMapper {
-    private static NFNV02Repository nfnv02Repository;
+    
     private static NFNV03Repository nfnv03Repository;
+    private static CarInsuranceTermRepository carInsuranceTermRepository;
+    private static JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public PolicyDetailMapper(NFNV02Repository nfnv02Repository, NFNV03Repository nfnv03Repository) {
-        PolicyDetailMapper.nfnv02Repository = nfnv02Repository;
+    public PolicyDetailMapper(JdbcTemplate jdbcTemplate, NFNV03Repository nfnv03Repository, CarInsuranceTermRepository carInsuranceTermRepository) {
+        PolicyDetailMapper.jdbcTemplate = jdbcTemplate;
         PolicyDetailMapper.nfnv03Repository = nfnv03Repository;
+        PolicyDetailMapper.carInsuranceTermRepository = carInsuranceTermRepository;
     }
 
 
-    public static DetailResultVo.InsuranceInfo mapToInsuranceInfo(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure, FubonPolicyDetailRespDTO.EcAppInsureEtp ecAppInsureEtp) {
+    public static DetailResultVo.InsuranceInfo mapToInsuranceInfo(PolicyDetailReqDTO request, FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure, FubonPolicyDetailRespDTO.EcAppInsureEtp ecAppInsureEtp) {
         FubonPolicyDetailRespDTO.SecEcAppWsBean sec = ecAppInsure.getSecEcAppWsBean();
         FubonPolicyDetailRespDTO.RmaEcAppWsBean rmal = ecAppInsure.getRmalEcAppWsBean();
         List<FubonPolicyDetailRespDTO.EcoEcAppWsBeans> eco = ecAppInsure.getEcoEcAppWsBean();
@@ -57,8 +67,8 @@ public class PolicyDetailMapper {
                         .totalPremium100(ecAppInsureEtp.getTotalPremium100())
                         .ourshr(ecAppInsureEtp.getOurshr())
                         .ptcptNo(String.valueOf(ecAppInsure.getEcoEcAppWsBean().stream()
-                                .map(FubonPolicyDetailRespDTO.EcoEcAppWsBeans::getEcoPtcptno)
-                                .collect(toList())))
+                                .map(FubonPolicyDetailRespDTO.EcoEcAppWsBeans::getEcoSeq)
+                                .min(Integer::compareTo).orElse(null))) // 取ecoSeq名冊序號最小的
                         .relationPeople(ecAppInsure.getSecEcAppWsBean().getSecMtg())
                         .relationPeople2(ecAppInsure.getSecEcAppWsBean().getSecMtg2())
                         .build())
@@ -93,7 +103,7 @@ public class PolicyDetailMapper {
                                 .insuredCompany(String.valueOf(ecoEcAppWsBeans.getEcoCompnm()))
                                 .insuredContent(String.valueOf(ecoEcAppWsBeans.getEcoContent()))
                                 .insuredCrcGrop(String.valueOf(ecoEcAppWsBeans.getEcoCrcGrp()))
-                                .insuredPlanCode("還沒弄")
+                                .insuredPlanCode(getPlanCNames(ecoEcAppWsBeans.getEcoPlnCode(), request.getInsType()))
                                 .insuredQualification(rmal.getRmaQualification())
                                 .insuredRepresentative(rmal.getRmaRepresentative())
                                 .insuredRepresentativeId(rmal.getRmaRepresentativeId())
@@ -133,6 +143,12 @@ public class PolicyDetailMapper {
                         .collect(toList()))
                 .build();
     }
+
+    public static String getPlanCNames(String ecoPlnCode, String insType) {
+        String sql = "SELECT PLN_CNAME FROM VW_EC_APP_PLNLIST WHERE PLN_CODE = ? AND PLN_CLS = ?";
+        return jdbcTemplate.queryForObject(sql, String.class, ecoPlnCode, insType);
+    }
+    
     public static DetailResultVo.InsuranceSubject mapToInsuranceSubject(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure) {
         FubonPolicyDetailRespDTO.MohEcAppWsBean moh = ecAppInsure.getMohEcAppWsBean();
         FubonPolicyDetailRespDTO.RskEcAppWsBean rsk = ecAppInsure.getRskEcAppWsBean();
@@ -192,37 +208,69 @@ public class PolicyDetailMapper {
                 .build())
                 .collect(Collectors.toList());
     }
-    public static DetailResultVo.InsuranceItem mapToInsuranceItem(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure, FubonPolicyDetailRespDTO.EcAppInsureEtp ecAppInsureEtp) {
+    public static List<DetailResultVo.InsuranceItem> mapToInsuranceItem(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure, FubonPolicyDetailRespDTO.EcAppInsureEtp ecAppInsureEtp) {
         Collection<FubonPolicyDetailRespDTO.PitEcAppWsBean> pit = ecAppInsure.getPitEcAppWsBeans();
 
-        List<List<String>> listValues = new ArrayList<>();
-        for (FubonPolicyDetailRespDTO.PitEcAppEtpWsBean pitEcAppEtpWsBean : ecAppInsureEtp.getPitEcAppEtpWsBeans()) {
-            Collection<String> values = pitEcAppEtpWsBean.getValues();
-            List<String> stringValues = new ArrayList<>(values);
-            listValues.add(stringValues);
-        }
+        List<List<String>> listValues = ecAppInsureEtp.getPitEcAppEtpWsBeans().stream()
+                .map(pitEcAppEtpWsBean -> new ArrayList<>(pitEcAppEtpWsBean.getValues()))
+                .collect(Collectors.toList());
 
-        return DetailResultVo.InsuranceItem.builder()
-                .bnfCode(pit.stream()
-                        .map(FubonPolicyDetailRespDTO.PitEcAppWsBean::getPitBnfCode)
-                        .collect(Collectors.joining()))
+        return pit.stream().map(pitEcAppWsBean -> DetailResultVo.InsuranceItem.builder()
+                .bnfCode(pitEcAppWsBean.getPitBnfCode())
                 .eb0Lists(mapToEb0Lists(ecAppInsure))
-                .finalPrm(pit.stream()
-                        .map(FubonPolicyDetailRespDTO.PitEcAppWsBean::getPitFinalprm)
-                        .reduce(0.0, Double::sum))
-                .pex(pit.stream()
-                        .map(FubonPolicyDetailRespDTO.PitEcAppWsBean::getPitPex)
-                        .reduce(0.0, Double::sum))
-                .seq(Integer.parseInt(ecAppInsureEtp.getRskDEcAppWsBeans().stream()
-                        .map(FubonPolicyDetailRespDTO.RskDEcAppEtpWsBean::getSeq)
-                        .toList().toString().replaceAll("[\\[\\]]", "")))
-                .title(ecAppInsureEtp.getPitColumnNames().toString())
+                .finalPrm(pitEcAppWsBean.getPitFinalprm())
+                .pex(pitEcAppWsBean.getPitPex())
+                .seq(Integer.parseInt(String.valueOf(ecAppInsureEtp.getRskDEcAppWsBeans().iterator().next().getSeq())))
+                .title(ecAppInsureEtp.getPitColumnNames().stream().findFirst().orElse(null))
                 .values(listValues)
-                .build();
+                .build())
+                .collect(toList());
     }
+
+    public static List<DetailResultVo.AdditionalTerm> mapToAdditionalTerm(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure) {
+        String mohPrmCode = ecAppInsure.getMohEcAppWsBean().getMohPrmCode();
+        List<String> sbcMohParam1 = ecAppInsure.getSbcEcAppWsBeans().stream()
+                .map(FubonPolicyDetailRespDTO.SbcEcAppWsBean::getSbcMohParam1)
+                .toList();
+        List<CarInsuranceTermDTO> insuranceTerms = getInsuranceTerms(mohPrmCode, sbcMohParam1);
+
+        return insuranceTerms.stream()
+                .map(term -> {
+                    String[] contentArray = term.getTermInsContent1().split(";");
+                    String value = "";
+
+                    for (String content : contentArray) {
+                        String[] keyValue = content.split(",");
+                        if (keyValue.length == 2) {
+                            String key = keyValue[0].trim();
+                            String contentValue = keyValue[1].trim();
+
+                            if (key.equals(term.getTermInsApiParam1())) {
+                                value = "型式 " + contentValue;
+                                break;
+                            }
+                        }
+                    }
+                    return DetailResultVo.AdditionalTerm.builder()
+                            .term(term.getTermInsName())
+                            .value(value)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    // 保險項目-附加條款(車險)
+    public static List<CarInsuranceTermDTO> getInsuranceTerms(String mohPrmCode, List<String> sbcMohParam1) {
+        List<CarInsuranceTerm> insuranceTerms = carInsuranceTermRepository
+                .findByTermInsCodeAndTermInsApiParam1In(mohPrmCode, sbcMohParam1);
+
+        return insuranceTerms.stream()
+                .map(CarInsuranceMapper::mapToCarInsuranceTermDTO)
+                .collect(Collectors.toList());
+    }
+
     private static List<DetailResultVo.PitEb0List> mapToEb0Lists(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure){
         Collection<FubonPolicyDetailRespDTO.PitEcAppWsBean> pit = ecAppInsure.getPitEcAppWsBeans();
-
         return pit.stream()
                 .flatMap(pitEcAppWsBean -> pitEcAppWsBean.getPitEb0Lists().stream())
                 .map(fubonItem -> {
@@ -236,7 +284,8 @@ public class PolicyDetailMapper {
     public static List<DetailResultVo.InsuranceList> mapToInsuranceList(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure) {
         Collection<FubonPolicyDetailRespDTO.PitNecAppWsBeans> pitNec = ecAppInsure.getPitNEcAppWsBeans();
         return pitNec.stream().map(pitNecAppWsBean -> DetailResultVo.InsuranceList.builder()
-                .bnfCode(pitNecAppWsBean.getPitBnfCode() + mapToEb0Lists(ecAppInsure))
+                .bnfCode(pitNecAppWsBean.getPitBnfCode() + mapToEb0Lists(ecAppInsure) .stream().findFirst()
+                        .map(eb0List -> String.join("", eb0List.getEb0TsiDesc(), eb0List.getEb0TsiValue(), eb0List.getEb0TsiUnit())).orElse(null))
                 .name(pitNecAppWsBean.getPitNIsrName())
                 .uid(pitNecAppWsBean.getPitNUid())
                 .birthDate(pitNecAppWsBean.getPitNBirth())
@@ -248,29 +297,17 @@ public class PolicyDetailMapper {
                 .build())
                 .collect(Collectors.toList());
     }
-    public static DetailResultVo.InsuranceOtherList mapToInsuranceOtherList(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure) {
+    public static List<DetailResultVo.InsuranceOtherList> mapToInsuranceOtherList(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure) {
         List<FubonPolicyDetailRespDTO.MidEcAppWsBean> mid = ecAppInsure.getMidEcAppWsBeans();
-
-        return DetailResultVo.InsuranceOtherList.builder()
-                .petType(mid.stream()
-                        .map(FubonPolicyDetailRespDTO.MidEcAppWsBean::getMidContent)
-                        .findFirst().orElse(null))
-                .petName(mid.stream()
-                        .map(FubonPolicyDetailRespDTO.MidEcAppWsBean::getMidName)
-                        .findFirst().orElse(null))
-                .petSex(mid.stream()
-                        .map(FubonPolicyDetailRespDTO.MidEcAppWsBean::getMidSex)
-                        .findFirst().orElse(null))
-                .petSeq(mid.stream()
-                        .map(FubonPolicyDetailRespDTO.MidEcAppWsBean::getMidSeq)
-                        .findFirst().orElse(null))
-                .petBirthDate(mid.stream()
-                        .map(FubonPolicyDetailRespDTO.MidEcAppWsBean::getMidBirdate)
-                        .findFirst().orElse(null))
-                .petAge(mid.stream()
-                        .map(FubonPolicyDetailRespDTO.MidEcAppWsBean::getMidAge)
-                        .findFirst().orElse(null))
-                .build();
+        return mid.stream().map(midEcAppWsBean ->  DetailResultVo.InsuranceOtherList.builder()
+                .petType(midEcAppWsBean.getMidContent())
+                .petName(midEcAppWsBean.getMidName())
+                .petSex(midEcAppWsBean.getMidSex())
+                .petSeq(midEcAppWsBean.getMidSeq())
+                .petBirthDate(midEcAppWsBean.getMidBirdate())
+                .petAge(midEcAppWsBean.getMidAge())
+                .build())
+                .collect(toList());
     }
     public static List<DetailResultVo.PolicyDeliveryRecord> mapToPolicyDeliveryRecord(FubonPrnDetailResp prnDetailResp) {
         List<FubonPrnDetailResp.PrnResult> prmList = prnDetailResp.getPrmList();
@@ -291,28 +328,27 @@ public class PolicyDetailMapper {
             return null;
         }
     }
-    public static DetailResultVo.UnpaidRecord mapToUnpaidRecord(String polyNo) {
-        NFNV02Entity unpaidRecord = nfnv02Repository.findUnpaidByPolyno(polyNo);
+    public static List<DetailResultVo.UnpaidRecord> mapToUnpaidRecord(UnpaidRecordDTO unpaidRecord) {
 
-        String effDate = unpaidRecord.getEffda().toInstant().toString() + " - " + unpaidRecord.getExpda().toInstant().toString();
+        String effDate = unpaidRecord.getEffDa() + " - " + unpaidRecord.getExpDa();
 
-        return DetailResultVo.UnpaidRecord.builder()
-                .insType(unpaidRecord.getInslin())
-                .policyNum(unpaidRecord.getPolynoQ())
-                .quoteNum(unpaidRecord.getPolyno())
-                .proposer(unpaidRecord.getIsrnm())
-                .insured(unpaidRecord.getInsnm())
-                .platno(unpaidRecord.getPlatno())
+        return Collections.singletonList(DetailResultVo.UnpaidRecord.builder()
+                .insType(unpaidRecord.getInsLin())
+                .policyNum(unpaidRecord.getPolyNoQ())
+                .quoteNum(unpaidRecord.getPolyNo())
+                .proposer(unpaidRecord.getIsrNm())
+                .insured(unpaidRecord.getInsNm())
+                .platno(unpaidRecord.getPlatNo())
                 .effdate(effDate)
-                .premium(unpaidRecord.getPremiu())
-                .build();
+                .premium(unpaidRecord.getPreMiu())
+                .build());
 
     }
-    public static DetailResultVo.PaidRecord mapToPaidRecord(String polyNo) {
+    public static List<DetailResultVo.PaidRecord> mapToPaidRecord(String polyNo) {
         NFNV03Entity paymentRecord = nfnv03Repository.findPaymentByPolyno(polyNo);
         String effDate = paymentRecord.getEffda().toInstant().toString() + " - " + paymentRecord.getExpda().toInstant().toString();
 
-        return  DetailResultVo.PaidRecord.builder()
+        return Collections.singletonList(DetailResultVo.PaidRecord.builder()
                 .insType(paymentRecord.getInslin())
                 .policyNum(paymentRecord.getPolynoQ())
                 .quoteNum(paymentRecord.getPolyno())
@@ -323,7 +359,7 @@ public class PolicyDetailMapper {
                 .payamt(paymentRecord.getPayamt())
                 .pcllDate(paymentRecord.getPcllda())
                 .payKind(paymentRecord.getFundkind())
-                .build();
+                .build());
     }
 
     public static List<DetailResultVo.ClaimRecord> mapToClaimRecord(FubonClmSalesRespDTO clmSalesResp) {
@@ -344,11 +380,11 @@ public class PolicyDetailMapper {
                 .collect(Collectors.toList());
     }
 
-    public static DetailResultVo.ConservationRecord getConservationRecord(FubonChkEnrDataRespDTO chkEnrData) {
+    public static List<DetailResultVo.ConservationRecord> getConservationRecord(FubonChkEnrDataRespDTO chkEnrData) {
         Collection<FubonChkEnrDataRespDTO.RecEcAppWsBean> recEcAppWsBeans = chkEnrData.getRecEcAppWsBeans();
         if (recEcAppWsBeans != null && !recEcAppWsBeans.isEmpty()) {
             FubonChkEnrDataRespDTO.RecEcAppWsBean recEcAppWsBean = recEcAppWsBeans.iterator().next();
-            return DetailResultVo.ConservationRecord.builder()
+            return Collections.singletonList(DetailResultVo.ConservationRecord.builder()
                     .proposerName(recEcAppWsBean.getRmaACliname())
                     .insuredName(recEcAppWsBean.getRmalCliname())
                     .policyName(recEcAppWsBean.getFormatid())
@@ -356,7 +392,7 @@ public class PolicyDetailMapper {
                     .modifyDate(recEcAppWsBean.getSecAdate())
                     .wrpStatus(recEcAppWsBean.getSecWrpsts())
                     .closeDate(recEcAppWsBean.getCloseDate())
-                    .build();
+                    .build());
         } else {
             log.warn("富邦保全紀錄回應 is null");
             return null;

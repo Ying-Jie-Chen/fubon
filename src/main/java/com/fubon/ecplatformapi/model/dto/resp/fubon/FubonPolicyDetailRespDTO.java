@@ -190,6 +190,8 @@ public class FubonPolicyDetailRespDTO {
         private String ecoReltn;
         @Size(max = 5)
         private Integer ecoAge;
+        @Size(max = 11)
+        private String ecoPlnCode;
     }
     @Data
     @Builder
@@ -211,7 +213,7 @@ public class FubonPolicyDetailRespDTO {
         @Size(max = 8)
         private String mohVehTramak;
         @Size(max = 10)
-        private String mohPrnCode;
+        private String mohPrmCode;
         @Size(max = 11)
         private String mohPlnCode;
     }
@@ -410,7 +412,7 @@ public class FubonPolicyDetailRespDTO {
 
     @Data
     @Builder
-    private static class EcoEcAppWsBean {
+    private static class  EcoEcAppWsBean {
         private String ecoSeq;
         private String ecoGprId;
         private String ecoCreGrp;

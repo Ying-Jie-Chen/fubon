@@ -1,7 +1,7 @@
 package com.fubon.ecplatformapi.helper;
 
 import com.fubon.ecplatformapi.config.SessionManager;
-import com.fubon.ecplatformapi.controller.other.SessionController;
+import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.enums.SessionAttribute;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +22,6 @@ public class SessionHelper extends SessionController {
     public static String getSessionID(HttpServletRequest request){
         Cookie[] cookies = request.getCookies();
         String sessionId = findSessionFromCookies(cookies);
-
         if (sessionId != null) {
             if (SessionManager.getSessionById(sessionId) != null) {
                 //log.info(sessionId);
@@ -60,7 +59,10 @@ public class SessionHelper extends SessionController {
     private static String findSessionFromCookies(Cookie[] cookies) {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("SESSION-ID".equals(cookie.getName())) { return cookie.getValue(); }
+                if ("SESSION-ID".equals(cookie.getName())) {
+                    log.info("SESSION-ID="+cookie.getValue());
+                    return cookie.getValue();
+                }
             }
         }
         return null;

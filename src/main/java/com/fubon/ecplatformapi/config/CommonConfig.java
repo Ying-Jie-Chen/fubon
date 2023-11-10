@@ -13,10 +13,10 @@ public class CommonConfig {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
-    @Bean
-    public ResultMapper resultMapper() {
-        return new ResultMapper();
-    }
+//    @Bean
+//    public ResultMapper resultMapper() {
+//        return new ResultMapper();
+//    }
 //    @Bean
 //    public PolicyDetailMapper policyDetailMapper() {
 //        return new PolicyDetailMapper();
