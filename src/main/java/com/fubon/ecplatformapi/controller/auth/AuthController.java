@@ -6,7 +6,6 @@ import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationVo;
-import com.fubon.ecplatformapi.repository.TokenRepository;
 import com.fubon.ecplatformapi.service.AuthService;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
@@ -28,8 +27,6 @@ public class AuthController extends SessionController {
     AuthService authService;
     @Autowired
     SsoService ssoService;
-    @Autowired
-    TokenRepository tokenRepository;
 
     /**
      * 展業平台登入
@@ -125,7 +122,7 @@ public class AuthController extends SessionController {
             return ApiRespDTO.<String>builder()
                     .code(StatusCodeEnum.SUCCESS.getCode())
                     .message(StatusCodeEnum.SUCCESS.getMessage())
-                    .authToken(tokenRepository.findLatestToken().getToken())
+                    .authToken(getAuthToken())
                     .data(ssoToken)
                     .build();
 

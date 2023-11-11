@@ -41,7 +41,7 @@ public class SessionHelper extends SessionController {
         for (SessionAttribute attribute : SessionAttribute.values()) {
             Object value = session.getAttribute(attribute.name());
             values.put(attribute.name(), value);
-            log.info(attribute + ": " + value);
+            //log.info(attribute + ": " + value);
         }
         return values;
     }
@@ -52,7 +52,7 @@ public class SessionHelper extends SessionController {
     public static String getValueByAttribute(String sessionId, SessionAttribute attribute) {
         HttpSession session = SessionManager.getSessionById(sessionId);
         String value = session.getAttribute(attribute.name()).toString();
-        log.info(attribute + ": " + value);
+        //log.info(attribute + ": " + value);
         return value;
     }
 
@@ -60,7 +60,7 @@ public class SessionHelper extends SessionController {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("SESSION-ID".equals(cookie.getName())) {
-                    log.info("SESSION-ID="+cookie.getValue());
+                    //log.info("SESSION-ID="+cookie.getValue());
                     return cookie.getValue();
                 }
             }

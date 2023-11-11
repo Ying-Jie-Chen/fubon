@@ -44,7 +44,6 @@ public class AuthServiceImpl implements AuthService {
     /**
      * 取得 Fubon API /GetVerificationImage 的回應結果
      *
-     * @return VerificationVO
      */
     @Override
     public VerificationVo getVerificationImage() {
@@ -64,26 +63,30 @@ public class AuthServiceImpl implements AuthService {
     /**
      * 取得 Fubon API /Login 的回應結果
      *
-     * @param loginReq LoginReq
-     * @return UserInfo
      */
     @Override
     public LoginRespVo getUserInfo(LoginReqDTO loginReq, HttpSession session, HttpServletResponse response) throws Exception {
+        try {
+            String jsonRequest = jsonHelper.convertLoginConfigToJson(ecwsConfig.fubonLoginConfig(), loginReq);
+            LoginRespDTO fbLoginRespDTO = callFubonService(jsonRequest, LoginRespDTO.class);
 
-        String jsonRequest = jsonHelper.convertLoginConfigToJson(ecwsConfig.fubonLoginConfig(), loginReq);
-        LoginRespDTO fbLoginRespDTO = callFubonService(jsonRequest, LoginRespDTO.class);
+            SessionManager.saveSession(session, response, fbLoginRespDTO);
 
-        SessionManager.saveSession(session, response, fbLoginRespDTO);
+            String authToken = tokenService.generateToken(session.getId(), loginReq.getAccount(), System.currentTimeMillis());
+            tokenService.saveAuthToken(session, authToken);
 
-        String authToken = tokenService.generateToken(session.getId(), loginReq.getAccount(), System.currentTimeMillis());
-        tokenService.saveAuthToken(authToken);
+            LoginRespVo.ResponseData data = xrefInfoService.getXrefInfoList(fbLoginRespDTO);
 
-        LoginRespVo.ResponseData data = xrefInfoService.getXrefInfoList(fbLoginRespDTO);
+            return LoginRespVo.builder()
+                    .token(authToken)
+                    .data(data)
+                    .build();
 
-        return LoginRespVo.builder()
-                .token(authToken)
-                .data(data)
-                .build();
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
     private <T> T callFubonService(String jsonRequest, Class<T> responseType) {

@@ -1,18 +1,14 @@
-package com.fubon.ecplatformapi.controller;
+package com.fubon.ecplatformapi.controller.other;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
-import com.fubon.ecplatformapi.model.dto.resp.fubon.FubonPolicyDetailRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import com.fubon.ecplatformapi.model.dto.vo.CreateDetailResultVO;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
-import com.fubon.ecplatformapi.model.entity.Token;
-import com.fubon.ecplatformapi.repository.TokenRepository;
 import com.fubon.ecplatformapi.service.impl.PolicyServiceImpl;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +20,10 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/policy")
-public class PolicyController {
+public class PolicyController extends SessionController {
 
     @Autowired
     PolicyServiceImpl policyService;
-    @Autowired
-    TokenRepository tokenRepository;
 
 
     @GetMapping("/queryPolicyList")
@@ -42,7 +36,7 @@ public class PolicyController {
             return ApiRespDTO.<List<PolicyListResultVO>>builder()
                     .code(StatusCodeEnum.SUCCESS.getCode())
                     .message(StatusCodeEnum.SUCCESS.getMessage())
-                    .authToken(tokenRepository.findLatestToken().getToken())
+                    .authToken(getAuthToken())
                     .data(queryResult)
                     .build();
 
@@ -77,7 +71,7 @@ public class PolicyController {
             return ApiRespDTO.<CreateDetailResultVO>builder()
                     .code(StatusCodeEnum.SUCCESS.getCode())
                     .message(StatusCodeEnum.SUCCESS.getMessage())
-                    .authToken(tokenRepository.findLatestToken().getToken())
+                    .authToken(getAuthToken())
                     .data(resultVO)
                     .build();
 

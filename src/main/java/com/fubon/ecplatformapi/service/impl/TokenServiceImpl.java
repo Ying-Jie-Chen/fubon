@@ -5,10 +5,8 @@ import com.fubon.ecplatformapi.config.SessionManager;
 import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.service.TokenService;
 import com.fubon.ecplatformapi.helper.SessionHelper;
-import com.fubon.ecplatformapi.model.entity.Token;
 import com.fubon.ecplatformapi.properties.TokenProperties;
-import com.fubon.ecplatformapi.repository.TokenRepository;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,28 +18,29 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
 public class TokenServiceImpl extends SessionController implements TokenService {
+
+    private final Map<String, HttpSession> authTokenMap = new ConcurrentHashMap<String, HttpSession>();
     @Autowired
     TokenProperties tokenProperties;
-    @Autowired
-    TokenRepository tokenRepository;
     private final SecretKey secretKey;
     @Autowired
     public TokenServiceImpl(SecretKey AESKey) {
         this.secretKey = AESKey;
     }
 
+    /**
+     *  儲存 Token
+     */
     @Override
-    public void saveAuthToken(String authToken) {
-        Token token = Token.builder()
-                .token(authToken)
-                .expired(false)
-                .revoked(false)
-                .build();
-        tokenRepository.save(token);
+    public void saveAuthToken(HttpSession session, String authToken) {
+        authTokenMap.put(authToken, session);
+        session.setAttribute("AUTH_TOKEN", authToken);
     }
 
     /**
@@ -58,23 +57,22 @@ public class TokenServiceImpl extends SessionController implements TokenService 
      * 驗證 Token
      */
     @Override
-    public boolean isTokenValid(Token token, HttpServletRequest request){
+    public boolean isTokenValid(String token){
 
         try{
-            //String sessionId = SessionHelper.getSessionID(request);
 
-            String[] tokenParts = decrypt(token.getToken(), secretKey).split("\\|");
+            String[] tokenParts = decrypt(token, secretKey).split("\\|");
 
             if (tokenParts.length != 4 || !tokenParts[0].equals(sessionID())) {
-                token.setRevoked(true);
+                return false;
             }
 
             Object value = SessionHelper.getAllValue(sessionID());
             //log.info("value: " + value);
 
             if (!validateSignature(tokenParts[0], tokenParts[1], Long.parseLong(tokenParts[2]), tokenParts[3])) {
-                token.setRevoked(true);
                 SessionManager.removeSession(sessionID());
+                return false;
             }
 
             long decryptedTimestamp = Long.parseLong(tokenParts[2]);
@@ -83,11 +81,11 @@ public class TokenServiceImpl extends SessionController implements TokenService 
             Duration tokenExpirationTime = tokenProperties.getExpirationMinutes();
 
             if (tokenAge > tokenExpirationTime.toMillis()) {
-                token.setExpired(true);
                 SessionManager.removeSession(sessionID());
+                return false;
             }
 
-            return !token.getRevoked() && !token.getExpired();
+            return true;
 
         } catch (Exception e){
             log.error("Token驗證失敗: " + e.getMessage());
@@ -100,20 +98,13 @@ public class TokenServiceImpl extends SessionController implements TokenService 
      * 更新 Token
      */
     @Override
-    public void updateToken(Token oldToken) throws Exception {
-        oldToken.setRevoked(true);
-        oldToken.setExpired(true);
-        tokenRepository.save(oldToken);
+    public void updateToken(HttpSession session, String oldToken) throws Exception {
 
-        String[] tokenParts = decrypt(oldToken.getToken(), secretKey).split("\\|");
+        String[] tokenParts = decrypt(oldToken, secretKey).split("\\|");
         long currentTimestamp = System.currentTimeMillis();
 
-        Token newToken = Token.builder()
-                .token(generateToken(tokenParts[0], tokenParts[1],currentTimestamp))
-                .expired(false)
-                .revoked(false)
-                .build();
-        tokenRepository.save(newToken);
+        String newToken = generateToken(tokenParts[0], tokenParts[1],currentTimestamp);
+        session.setAttribute("AUTH_TOKEN", newToken);
     }
 
     public static String encrypt(String data, SecretKey secretKey) throws Exception {

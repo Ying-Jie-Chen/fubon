@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.controller;
+package com.fubon.ecplatformapi.controller.auth;
 
 
 import com.fubon.ecplatformapi.Builber.BuildResponse;

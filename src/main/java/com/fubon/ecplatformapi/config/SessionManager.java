@@ -38,6 +38,7 @@ public class SessionManager {
         saveSessionID(response, session);
     }
 
+
     /**
      * 儲存登入者資訊
      *
