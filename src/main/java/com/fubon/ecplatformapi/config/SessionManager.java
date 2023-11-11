@@ -31,7 +31,6 @@ public class SessionManager {
         sessionMap.remove(sessionId);
     }
 
-
     public static void saveSession(HttpSession session, HttpServletResponse response, LoginRespDTO fbLoginRespDTO){
         associateSession(session, session.getId());
         setSessionAttributes(session.getId(), fbLoginRespDTO);

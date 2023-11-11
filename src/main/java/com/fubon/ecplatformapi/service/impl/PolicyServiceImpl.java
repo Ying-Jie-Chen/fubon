@@ -1,17 +1,10 @@
 package com.fubon.ecplatformapi.service.impl;
 
-import com.fubon.ecplatformapi.config.PolicyDetailConfig;
-import com.fubon.ecplatformapi.enums.InsuranceType;
-import com.fubon.ecplatformapi.helper.WebClientHelper;
-import com.fubon.ecplatformapi.mapper.CarInsuranceMapper;
-import com.fubon.ecplatformapi.mapper.ResultMapper;
-import com.fubon.ecplatformapi.model.dto.CarInsuranceTermDTO;
+import com.fubon.ecplatformapi.mapper.PolicyDetailMapper;
 import com.fubon.ecplatformapi.model.dto.req.*;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.*;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
-import com.fubon.ecplatformapi.model.entity.CarInsuranceTerm;
-import com.fubon.ecplatformapi.repository.CarInsuranceTermRepository;
 import com.fubon.ecplatformapi.service.PolicyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,23 +15,13 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple4;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class PolicyServiceImpl implements PolicyService {
-    @Autowired
-    PolicyDetailConfig policyDetailConfig;
-    @Autowired
-    private CarInsuranceTermRepository carInsuranceTermRepository;
-
-
-
     private static final String FUBON_API_URL = "http://localhost:8080";
-
     private final WebClient webClient;
 
     @Autowired
@@ -60,7 +43,7 @@ public class PolicyServiceImpl implements PolicyService {
                 .log();
         return mono
                 .flatMapMany(fbQueryRespDTO -> Flux.fromIterable(fbQueryRespDTO.getPolicyResults()))
-                .map(ResultMapper::mapToResultVO)
+                .map(PolicyDetailMapper::mapToResultVO)
                 .collectList()
                 .block();
     }
@@ -78,7 +61,7 @@ public class PolicyServiceImpl implements PolicyService {
             Mono<FubonChkEnrDataRespDTO> chkEnrDataMono = callWebClient("/chkEnrData", getChkEnrDataRequest(request), FubonChkEnrDataRespDTO.class);
 
             return Mono.zip(policyDetailMono, prnDetailMono, clmSalesMono, chkEnrDataMono)
-                    .map(tuple -> ResultMapper.mapToDetailResultVo(request, tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4())).block();
+                    .map(tuple -> PolicyDetailMapper.mapToDetailResultVo(request, tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4())).block();
 
         }catch (Exception e) {
             e.printStackTrace();

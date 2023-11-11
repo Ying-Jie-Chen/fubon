@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.controller.other;
+package com.fubon.ecplatformapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fubon.ecplatformapi.controller.auth.SessionController;
