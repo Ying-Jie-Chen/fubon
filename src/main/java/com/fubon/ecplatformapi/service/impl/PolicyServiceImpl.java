@@ -1,8 +1,10 @@
 package com.fubon.ecplatformapi.service.impl;
 
 import com.fubon.ecplatformapi.mapper.PolicyDetailMapper;
+import com.fubon.ecplatformapi.mapper.PolicyListMapper;
 import com.fubon.ecplatformapi.model.dto.req.*;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.*;
+import com.fubon.ecplatformapi.model.dto.vo.MyPolicyListVO;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import com.fubon.ecplatformapi.service.PolicyService;
@@ -30,6 +32,9 @@ public class PolicyServiceImpl implements PolicyService {
         this.webClient = webClientBuilder.baseUrl(FUBON_API_URL).build();
     }
 
+    /**
+     *  保單一般查詢
+     */
     @Override
     public List<PolicyListResultVO> queryPolicyResults(PolicyListReqDTO req) {
 
@@ -44,11 +49,30 @@ public class PolicyServiceImpl implements PolicyService {
                 .log();
         return mono
                 .flatMapMany(fbQueryRespDTO -> Flux.fromIterable(fbQueryRespDTO.getPolicyResults()))
-                .map(PolicyDetailMapper::mapToResultVO)
+                .map(PolicyListMapper::mapToResultVO)
                 .collectList()
                 .block();
     }
 
+    /**
+     * 我的有效保單
+     */
+    @Override
+    public List<MyPolicyListVO> getMyPolicyList(){
+        return webClient
+                .get()
+                .uri("/policy/queryMyPolicyList")
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(QueryPolicyListRespDTO.class)
+                .log()
+                .map(PolicyListMapper::mapToMyPolicyList)
+                .block();
+    }
+
+    /**
+     * 取得保單資訊
+     */
     @Override
     public DetailResultVo getPolicyDetail(PolicyDetailReqDTO request) {
         try {

@@ -1,6 +1,5 @@
 package com.fubon.ecplatformapi.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
@@ -8,6 +7,7 @@ import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import com.fubon.ecplatformapi.model.dto.vo.CreateDetailResultVO;
+import com.fubon.ecplatformapi.model.dto.vo.MyPolicyListVO;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
 import com.fubon.ecplatformapi.service.impl.PolicyServiceImpl;
 import jakarta.validation.Valid;
@@ -25,12 +25,10 @@ public class PolicyController extends SessionController {
     @Autowired
     PolicyServiceImpl policyService;
 
-
     @GetMapping("/queryPolicyList")
     public ApiRespDTO<List<PolicyListResultVO>> queryList(@Valid @RequestBody PolicyListReqDTO req) {
 
         try {
-            log.info("Fubon API /QueryList 的回應結果#Start");
             List<PolicyListResultVO> queryResult = policyService.queryPolicyResults(req);
 
             return ApiRespDTO.<List<PolicyListResultVO>>builder()
@@ -47,23 +45,13 @@ public class PolicyController extends SessionController {
                         .build();
         }
     }
-    @Autowired
-    ObjectMapper objectMapper;
+
 
     @GetMapping("/queryPolicyDetail")
-    public ApiRespDTO<CreateDetailResultVO> queryDetail(@Valid @RequestBody PolicyDetailReqDTO request)
-    {
+    public ApiRespDTO<CreateDetailResultVO> queryDetail(@Valid @RequestBody PolicyDetailReqDTO request) {
         try {
-            DetailResultVo detailResult = policyService.getPolicyDetail(request);
 
-//            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-//            String jsonRequest;
-//            try {
-//                jsonRequest = objectMapper.writeValueAsString(detailResult);
-//            } catch (JsonProcessingException e) {
-//                throw new RuntimeException(e);
-//            }
-//            System.out.println(jsonRequest);
+            DetailResultVo detailResult = policyService.getPolicyDetail(request);
 
             CreateDetailResultVO resultVO = new CreateDetailResultVO();
             resultVO.setDetailResult(detailResult);
@@ -83,5 +71,24 @@ public class PolicyController extends SessionController {
         }
     }
 
+    @GetMapping("/queryMyPolicyList")
+    public  ApiRespDTO<List<MyPolicyListVO>> queryMyPolicyList(){
+        try {
 
+            List<MyPolicyListVO> myPolicyList = policyService.getMyPolicyList();
+
+            return ApiRespDTO.<List<MyPolicyListVO>>builder()
+                    .code(StatusCodeEnum.SUCCESS.getCode())
+                    .message(StatusCodeEnum.SUCCESS.getMessage())
+                    .authToken(getAuthToken())
+                    .data(myPolicyList)
+                    .build();
+
+        } catch (Exception e) {
+            return ApiRespDTO.<List<MyPolicyListVO>>builder()
+                    .code(StatusCodeEnum.ERR00999.name())
+                    .message(StatusCodeEnum.ERR00999.getMessage())
+                    .build();
+        }
+    }
 }

@@ -17,17 +17,7 @@ import static com.fubon.ecplatformapi.mapper.PolicyDetailSpecificMapper.*;
 public class PolicyDetailMapper {
     private static NFNV02Repository nfnv02Repository;
     private static NFNV03Repository nfnv03Repository;
-    public static PolicyListResultVO mapToResultVO(FbQueryRespDTO.PolicyResult policyResult) {
-        return new PolicyListResultVO(
-                policyResult.getClsGrp(),
-                policyResult.getPolFormatid(),
-                policyResult.getUnPaidPrm(),
-                policyResult.getRmaClinameI(),
-                policyResult.getMohPlatno(),
-                policyResult.getSecEffdate(),
-                policyResult.getSecExpdate()
-        );
-    }
+
     @Autowired
     public PolicyDetailMapper(NFNV02Repository nfnv02Repository, NFNV03Repository nfnv03Repository) {
         PolicyDetailMapper.nfnv02Repository = nfnv02Repository;
@@ -104,6 +94,4 @@ public class PolicyDetailMapper {
                 .conservationRecord(getConservationRecord(chkEnrData))
                 .build();
         }
-
-
     }
