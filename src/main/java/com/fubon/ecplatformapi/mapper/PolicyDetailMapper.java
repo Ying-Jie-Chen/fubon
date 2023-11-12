@@ -76,7 +76,7 @@ public class PolicyDetailMapper {
                 // 附加條款
                 .additionalTerms(mapToAdditionalTerm(ecAppInsure))
                 // 險種名冊
-                .insuranceList(mapToInsuranceList(ecAppInsure))
+                .insuranceList(mapToInsuranceList(insType, ecAppInsure))
                 // 其他險種名冊
                 .insuranceOtherList(mapToInsuranceOtherList(ecAppInsure))
                 // 保單寄送記錄

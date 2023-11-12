@@ -11,28 +11,42 @@ import org.modelmapper.PropertyMap;
 
 
 public class InsuranceEntityMapper {
-    private static final ModelMapper modelMapper = new ModelMapper();
+    private static final ModelMapper modelMapper = createModelMapper();
 
-    public static CarInsuranceTermDTO mapToCarInsuranceTermDTO(CarInsuranceTerm entity) {
-        return modelMapper.map(entity, CarInsuranceTermDTO.class);
+    private static ModelMapper createModelMapper() {
+        ModelMapper mapper = new ModelMapper();
+        configureUnpaidRecordDTO(mapper);
+        configurePaymentRecordDTO(mapper);
+        return mapper;
     }
-    public static UnpaidRecordDTO mapToUnpaidRecordDTO(NFNV02Entity entity) {
-        modelMapper.addMappings(new PropertyMap<NFNV02Entity, UnpaidRecordDTO>() {
+
+    private static void configureUnpaidRecordDTO(ModelMapper mapper) {
+        mapper.addMappings(new PropertyMap<NFNV02Entity, UnpaidRecordDTO>() {
             @Override
             protected void configure() {
                 map().setPolyNo(source.getPolyno());
             }
         });
+    }
+
+    private static void configurePaymentRecordDTO(ModelMapper mapper) {
+        mapper.addMappings(new PropertyMap<NFNV03Entity, PaymentRecordDTO>() {
+            @Override
+            protected void configure() {
+                map().setPolyNo(source.getPolyno());
+            }
+        });
+    }
+
+    public static CarInsuranceTermDTO mapToCarInsuranceTermDTO(CarInsuranceTerm entity) {
+        return modelMapper.map(entity, CarInsuranceTermDTO.class);
+    }
+
+    public static UnpaidRecordDTO mapToUnpaidRecordDTO(NFNV02Entity entity) {
         return modelMapper.map(entity, UnpaidRecordDTO.class);
     }
 
     public static PaymentRecordDTO mapToPaymentRecordDTO(NFNV03Entity entity) {
-            modelMapper.addMappings(new PropertyMap<NFNV03Entity, PaymentRecordDTO>() {
-                @Override
-                protected void configure() {
-                    map().setPolyNo(source.getPolyno());
-                }
-            });
-            return modelMapper.map(entity, PaymentRecordDTO.class);
+        return modelMapper.map(entity, PaymentRecordDTO.class);
     }
 }

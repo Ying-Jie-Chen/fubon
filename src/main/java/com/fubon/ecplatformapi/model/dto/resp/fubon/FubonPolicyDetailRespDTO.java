@@ -234,6 +234,7 @@ public class FubonPolicyDetailRespDTO {
     @Data
     @Builder
     public static class PitEcAppWsBean {
+        private Integer pitSeq;
         @Size(max = 10)
         private String pitBnfCode;
         @Size(max = 500)

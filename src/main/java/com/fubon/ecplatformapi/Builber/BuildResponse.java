@@ -135,7 +135,7 @@ public class BuildResponse {
                                 .build())
                         // 被保險人名冊
                         .ecoEcAppWsBean(Collections.singletonList(FubonPolicyDetailRespDTO.EcoEcAppWsBeans.builder()
-                                .ecoSeq(1)
+                                .ecoSeq(100)
                                 .ecoUid("UID12345")
                                 .ecoNat("TW")
                                 .ecoCname("John Doe")
@@ -158,6 +158,7 @@ public class BuildResponse {
                                 .build())
                         // 險種資料
                         .pitEcAppWsBeans(Collections.singleton(FubonPolicyDetailRespDTO.PitEcAppWsBean.builder()
+                                .pitSeq(100)
                                 .pitBnfCode("SampleCode")
                                 .pitEb0Name("SampleName")
                                 .pitType("SampleType")
@@ -208,6 +209,9 @@ public class BuildResponse {
                                 .build()))
                         // 受益人資料
                         .benEcAppWsBeans(Collections.singletonList(FubonPolicyDetailRespDTO.BenEcAppWsBean.builder()
+                                .benPitseq(100)
+                                .benRskSeq(100)
+                                .benType("E")
                                 .build()))
                         // 附加條款
                         .sbcEcAppWsBeans(Collections.singletonList(FubonPolicyDetailRespDTO.SbcEcAppWsBean.builder()
@@ -243,6 +247,7 @@ public class BuildResponse {
                         .pitColumnNames(Arrays.asList("險種代碼", "保險種類"))
                         // 保險項目
                         .pitEcAppEtpWsBeans(Collections.singleton(FubonPolicyDetailRespDTO.PitEcAppEtpWsBean.builder()
+
                                 .pitRskSeq(1)
                                 .pitRskType("pitRskType")
                                 .values(Arrays.asList("Value1", "Value2", "Value3"))

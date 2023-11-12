@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -42,6 +43,19 @@ public class PolicyDetailSpecificMapper {
         List<FubonPolicyDetailRespDTO.EcoEcAppWsBeans> eco = ecAppInsure.getEcoEcAppWsBean();
         FubonPolicyDetailRespDTO.RmaEcAppWsBean rmaA = ecAppInsure.getRmaAEcAppWsBean();
         FubonPolicyDetailRespDTO.CrdEcAppWsBean crd = ecAppInsure.getCrdEcAppWsBean();
+
+        // 以名冊序號(ecoEcAppWsBean.ecoSeq)對應個人險受益人資料 (benEcAppWsBeans)：
+        List<Integer> ecoSeqList = ecAppInsure.getEcoEcAppWsBean().stream()
+                .map(FubonPolicyDetailRespDTO.EcoEcAppWsBeans::getEcoSeq)
+                .toList();
+        //對應條件：ecoEcAppWsBean.ecoSeq = benEcAppWsBeans.benRskSeq & benType = E
+        List<FubonPolicyDetailRespDTO.BenEcAppWsBean> beneficiaries = ecAppInsure.getBenEcAppWsBeans().stream()
+                .filter(benEcAppWsBean -> "E".equals(benEcAppWsBean.getBenType()) && ecoSeqList.contains(benEcAppWsBean.getBenRskSeq()))
+                .toList();
+        // 將搜集的結果設置 'beneficiary' 屬性
+        String beneficiary = beneficiaries.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(", "));
 
         return DetailResultVo.InsuranceInfo.builder()
                 .basicInfo(DetailResultVo.BasicInfo.builder()
@@ -80,7 +94,7 @@ public class PolicyDetailSpecificMapper {
                         .insuredRepresentative(rmal.getRmaRepresentative())
                         .insuredRepresentativeId(rmal.getRmaRepresentativeId())
                         .build())
-                // 被保險人名冊 - 個人險才有
+                // 被保險人名冊
                 .insuredList(eco.stream().map(ecoEcAppWsBeans -> DetailResultVo.InsuredList.builder()
                                 .insuredName(String.valueOf(ecoEcAppWsBeans.getEcoCname()))
                                 .insuredId(String.valueOf(ecoEcAppWsBeans.getEcoUid()))
@@ -98,7 +112,7 @@ public class PolicyDetailSpecificMapper {
                                 .insuredRepresentative(rmal.getRmaRepresentative())
                                 .insuredRepresentativeId(rmal.getRmaRepresentativeId())
                                 .title(String.valueOf(ecoEcAppWsBeans.getEcoReltn()))
-                                .beneficiary("太麻煩先放著")
+                                .beneficiary(beneficiary)
                                 .age(ecoEcAppWsBeans.getEcoAge())
                                 .build())
                         .collect(Collectors.toList()))
@@ -357,22 +371,43 @@ public class PolicyDetailSpecificMapper {
     /**
      * 險種名冊 (車、個險)
      */
-    public static List<DetailResultVo.InsuranceList> mapToInsuranceList(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure) {
+    public static List<DetailResultVo.InsuranceList> mapToInsuranceList(InsuranceType insType, FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure) {
         Collection<FubonPolicyDetailRespDTO.PitNecAppWsBeans> pitNec = ecAppInsure.getPitNEcAppWsBeans();
-        return pitNec.stream().map(pitNecAppWsBean -> DetailResultVo.InsuranceList.builder()
-                .bnfCode(pitNecAppWsBean.getPitBnfCode() + mapToEb0Lists(ecAppInsure) .stream().findFirst()
-                        .map(eb0List -> String.join("", eb0List.getEb0TsiDesc(), eb0List.getEb0TsiValue(), eb0List.getEb0TsiUnit())).orElse(null))
-                .name(pitNecAppWsBean.getPitNIsrName())
-                .uid(pitNecAppWsBean.getPitNUid())
-                .birthDate(pitNecAppWsBean.getPitNBirth())
-                .title(pitNecAppWsBean.getPitNTitle())
-                .relation(pitNecAppWsBean.getPitNAppRelation())
-                /* 個人險：先取得險種資料的險種序號(pitEcAppWsBean.pitSeq)後，再取得個人險受益人資料 (benEcAppWsBeans),
-                   條件：pitEcAppWsBean.pitSeq = benEcAppWsBeans.benPitseq & benType = P */
-                .beneficiary("還沒弄")
-                .build())
-                .collect(Collectors.toList());
+
+        return pitNec.stream().map(pitNecAppWsBean -> {
+            DetailResultVo.InsuranceList.InsuranceListBuilder builder = DetailResultVo.InsuranceList.builder()
+                    .bnfCode(pitNecAppWsBean.getPitBnfCode() + mapToEb0Lists(ecAppInsure).stream().findFirst()
+                            .map(eb0List -> String.join("", eb0List.getEb0TsiDesc(), eb0List.getEb0TsiValue(), eb0List.getEb0TsiUnit())).orElse(null))
+                    .name(pitNecAppWsBean.getPitNIsrName())
+                    .uid(pitNecAppWsBean.getPitNUid())
+                    .birthDate(pitNecAppWsBean.getPitNBirth())
+                    .title(pitNecAppWsBean.getPitNTitle())
+                    .relation(pitNecAppWsBean.getPitNAppRelation());
+
+            if (InsuranceType.Personal_Insurance.contains(insType)) {
+                // 取得險種資料的險種序號
+                List<Integer> pitSeqList = ecAppInsure.getPitEcAppWsBeans().stream()
+                        .map(FubonPolicyDetailRespDTO.PitEcAppWsBean::getPitSeq)
+                        .toList();
+                // 取得個人險受益人資料，條件：pitEcAppWsBean.pitSeq = benEcAppWsBeans.benPitseq & benType = P
+                List<FubonPolicyDetailRespDTO.BenEcAppWsBean> personalBeneficiaries = ecAppInsure.getBenEcAppWsBeans().stream()
+                        .filter(benEcAppWsBean -> "P".equals(benEcAppWsBean.getBenType()) && pitSeqList.contains(benEcAppWsBean.getBenSeq().toString()))
+                        .toList();
+                // 將搜集的結果設置 'beneficiary' 屬性
+                String beneficiary = personalBeneficiaries.stream()
+                        .findFirst().map(Object::toString).orElse(null);
+
+                builder.beneficiary(beneficiary);
+
+            } else {
+                builder.beneficiary(pitNecAppWsBean.getPitNBeneficiary());
+            }
+            return builder.build();
+
+        }).collect(Collectors.toList());
+
     }
+
 
     /**
      * 險種名冊-其他 (個險)
