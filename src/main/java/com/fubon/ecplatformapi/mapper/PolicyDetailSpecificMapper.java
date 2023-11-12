@@ -17,19 +17,23 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
+import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Component
 public class PolicyDetailSpecificMapper {
+    private static DataSource dataSource;
     private static CarInsuranceTermRepository carInsuranceTermRepository;
     private static JdbcTemplate jdbcTemplate;
     @Autowired
-    public PolicyDetailSpecificMapper(JdbcTemplate jdbcTemplate, CarInsuranceTermRepository carInsuranceTermRepository) {
+    public PolicyDetailSpecificMapper(DataSource dataSource, JdbcTemplate jdbcTemplate, CarInsuranceTermRepository carInsuranceTermRepository) {
+        PolicyDetailSpecificMapper.dataSource = dataSource;
         PolicyDetailSpecificMapper.jdbcTemplate = jdbcTemplate;
         PolicyDetailSpecificMapper.carInsuranceTermRepository = carInsuranceTermRepository;
     }
@@ -43,19 +47,6 @@ public class PolicyDetailSpecificMapper {
         List<FubonPolicyDetailRespDTO.EcoEcAppWsBeans> eco = ecAppInsure.getEcoEcAppWsBean();
         FubonPolicyDetailRespDTO.RmaEcAppWsBean rmaA = ecAppInsure.getRmaAEcAppWsBean();
         FubonPolicyDetailRespDTO.CrdEcAppWsBean crd = ecAppInsure.getCrdEcAppWsBean();
-
-        // 以名冊序號(ecoEcAppWsBean.ecoSeq)對應個人險受益人資料 (benEcAppWsBeans)：
-        List<Integer> ecoSeqList = ecAppInsure.getEcoEcAppWsBean().stream()
-                .map(FubonPolicyDetailRespDTO.EcoEcAppWsBeans::getEcoSeq)
-                .toList();
-        //對應條件：ecoEcAppWsBean.ecoSeq = benEcAppWsBeans.benRskSeq & benType = E
-        List<FubonPolicyDetailRespDTO.BenEcAppWsBean> beneficiaries = ecAppInsure.getBenEcAppWsBeans().stream()
-                .filter(benEcAppWsBean -> "E".equals(benEcAppWsBean.getBenType()) && ecoSeqList.contains(benEcAppWsBean.getBenRskSeq()))
-                .toList();
-        // 將搜集的結果設置 'beneficiary' 屬性
-        String beneficiary = beneficiaries.stream()
-                .map(Object::toString)
-                .collect(Collectors.joining(", "));
 
         return DetailResultVo.InsuranceInfo.builder()
                 .basicInfo(DetailResultVo.BasicInfo.builder()
@@ -112,7 +103,7 @@ public class PolicyDetailSpecificMapper {
                                 .insuredRepresentative(rmal.getRmaRepresentative())
                                 .insuredRepresentativeId(rmal.getRmaRepresentativeId())
                                 .title(String.valueOf(ecoEcAppWsBeans.getEcoReltn()))
-                                .beneficiary(beneficiary)
+                                .beneficiary(getBeneficiary(ecAppInsure))
                                 .age(ecoEcAppWsBeans.getEcoAge())
                                 .build())
                         .collect(Collectors.toList()))
@@ -146,6 +137,17 @@ public class PolicyDetailSpecificMapper {
                                 .build())
                         .collect(toList()))
                 .build();
+    }
+    private static String getBeneficiary(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure){
+        List<Integer> ecoSeqList = ecAppInsure.getEcoEcAppWsBean().stream()
+                .map(FubonPolicyDetailRespDTO.EcoEcAppWsBeans::getEcoSeq)
+                .toList();
+        List<FubonPolicyDetailRespDTO.BenEcAppWsBean> beneficiaries = ecAppInsure.getBenEcAppWsBeans().stream()
+                .filter(benEcAppWsBean -> "E".equals(benEcAppWsBean.getBenType()) && ecoSeqList.contains(benEcAppWsBean.getBenRskSeq()))
+                .toList();
+
+        return beneficiaries.stream()
+                .map(Object::toString).collect(Collectors.joining(", "));
     }
     public static String getPlanCNames(String ecoPlnCode, InsuranceType insType) {
         try {
@@ -385,15 +387,12 @@ public class PolicyDetailSpecificMapper {
                     .relation(pitNecAppWsBean.getPitNAppRelation());
 
             if (InsuranceType.Personal_Insurance.contains(insType)) {
-                // 取得險種資料的險種序號
                 List<Integer> pitSeqList = ecAppInsure.getPitEcAppWsBeans().stream()
                         .map(FubonPolicyDetailRespDTO.PitEcAppWsBean::getPitSeq)
                         .toList();
-                // 取得個人險受益人資料，條件：pitEcAppWsBean.pitSeq = benEcAppWsBeans.benPitseq & benType = P
                 List<FubonPolicyDetailRespDTO.BenEcAppWsBean> personalBeneficiaries = ecAppInsure.getBenEcAppWsBeans().stream()
-                        .filter(benEcAppWsBean -> "P".equals(benEcAppWsBean.getBenType()) && pitSeqList.contains(benEcAppWsBean.getBenSeq().toString()))
+                        .filter(benEcAppWsBean -> "P".equals(benEcAppWsBean.getBenType()) && pitSeqList.contains(benEcAppWsBean.getBenSeq()))
                         .toList();
-                // 將搜集的結果設置 'beneficiary' 屬性
                 String beneficiary = personalBeneficiaries.stream()
                         .findFirst().map(Object::toString).orElse(null);
 
@@ -407,7 +406,6 @@ public class PolicyDetailSpecificMapper {
         }).collect(Collectors.toList());
 
     }
-
 
     /**
      * 險種名冊-其他 (個險)
@@ -471,7 +469,7 @@ public class PolicyDetailSpecificMapper {
     /**
      * 繳費紀錄
      */
-    public static List<DetailResultVo.PaidRecord> mapToPaidRecord(PaymentRecordDTO paymentRecord) {
+    public static List<DetailResultVo.PaidRecord> mapToEcPaidRecord(FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure, PaymentRecordDTO paymentRecord) {
 
         String effDate = paymentRecord.getEffDa().toInstant().toString() + " - " + paymentRecord.getExpDa().toInstant().toString();
 
@@ -481,7 +479,7 @@ public class PolicyDetailSpecificMapper {
                 .quoteNum(paymentRecord.getPolyNo())
                 .proposer(paymentRecord.getIsrNm())
                 .insured(paymentRecord.getInsNm())
-                .platno("待確認")
+                .platno(ecAppInsure.getMohEcAppWsBean().getMohPlatno())
                 .effdate(effDate)
                 .payamt(paymentRecord.getPayAmt())
                 .pcllDate(paymentRecord.getPcllDa())
@@ -489,10 +487,28 @@ public class PolicyDetailSpecificMapper {
                 .build());
     }
 
+    public static List<DetailResultVo.PaidRecord> mapToEtpPaidRecord(PaymentRecordDTO paymentRecord) {
+
+        String effDate = paymentRecord.getEffDa().toInstant().toString() + " - " + paymentRecord.getExpDa().toInstant().toString();
+
+        return Collections.singletonList(DetailResultVo.PaidRecord.builder()
+                .insType(paymentRecord.getInsLin())
+                .policyNum(paymentRecord.getPolyNoQ())
+                .quoteNum(paymentRecord.getPolyNo())
+                .proposer(paymentRecord.getIsrNm())
+                .insured(paymentRecord.getInsNm())
+                .effdate(effDate)
+                .payamt(paymentRecord.getPayAmt())
+                .pcllDate(paymentRecord.getPcllDa())
+                .payKind(paymentRecord.getFundKind())
+                .build());
+    }
+
+
     /**
      * 理賠紀錄
      */
-    public static List<DetailResultVo.ClaimRecord> mapToClaimRecord(FubonClmSalesRespDTO clmSalesResp) {
+    public static List<DetailResultVo.ClaimRecord> mapToClaimRecord(String policyNum, FubonClmSalesRespDTO clmSalesResp) {
         List<FubonClmSalesRespDTO.Content.ClaimInfo> claimInfoList = clmSalesResp.getContent().getClaimInfo();
         return claimInfoList.stream()
                 .map(claimInfo -> DetailResultVo.ClaimRecord.builder()
@@ -505,9 +521,30 @@ public class PolicyDetailSpecificMapper {
                         .clamStatus(claimInfo.getClamsts())
                         .prcdeptNm(claimInfo.getPrcdeptnm())
                         .prcempNm(claimInfo.getPrcempnm())
-                        .phone("資料庫查詢")
+                        .phone(claimInfo.getPhone())
+                        .payDate(getClaimDate(claimInfo.getClamno(), policyNum))
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    private static LocalDateTime getClaimDate(String claimNo, String policyNo) {
+        try (Connection connection = dataSource.getConnection()) {
+            String sql = "SELECT MAX(d00view.paydate) AS max_paydate " + "FROM fin.find00_view d00view " + "WHERE d00view.clamno = ? " + "AND d00view.status = '1' " + "AND d00view.polyno = ? " + "AND d00view.payacc = '01'";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, claimNo);
+                preparedStatement.setString(2, policyNo);
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        java.sql.Timestamp sqlTimestamp = resultSet.getTimestamp("max_paydate");
+                        if (sqlTimestamp != null) { return sqlTimestamp.toLocalDateTime(); }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

@@ -43,10 +43,11 @@ public class InsuranceEntityMapper {
     }
 
     public static UnpaidRecordDTO mapToUnpaidRecordDTO(NFNV02Entity entity) {
+
         return modelMapper.map(entity, UnpaidRecordDTO.class);
     }
 
-    public static PaymentRecordDTO mapToPaymentRecordDTO(NFNV03Entity entity) {
+    public static PaymentRecordDTO mapToPaymentRecordDTO(NFNV03Entity entity){
         return modelMapper.map(entity, PaymentRecordDTO.class);
     }
 }

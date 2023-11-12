@@ -35,34 +35,23 @@ public class PolicyDetailMapper {
     }
 
     public static DetailResultVo mapToDetailResultVo(PolicyDetailReqDTO request, FubonPolicyDetailRespDTO policyDetail, FubonPrnDetailResp prnDetail, FubonClmSalesRespDTO clmSales, FubonChkEnrDataRespDTO chkEnrData) {
-
-        String polyNo2 = "Polyno1";
-        String polyNo3 = "PolynoC";
-
-        UnpaidRecordDTO unpaidRecord = InsuranceEntityMapper.mapToUnpaidRecordDTO(nfnv02Repository.findUnpaidByPolyno(polyNo2));
-        PaymentRecordDTO paymentRecord = InsuranceEntityMapper.mapToPaymentRecordDTO(nfnv03Repository.findPaymentByPolyno(polyNo3));
+        String policyNum = request.getPolicyNum();
+        InsuranceType insType = InsuranceType.valueOf(request.getInsType());
+        UnpaidRecordDTO unpaidRecord = InsuranceEntityMapper.mapToUnpaidRecordDTO(nfnv02Repository.findUnpaidByPolyno(policyNum));
+        PaymentRecordDTO paymentRecord = InsuranceEntityMapper.mapToPaymentRecordDTO(nfnv03Repository.findPaymentByPolyno(policyNum));
         try {
-
-            InsuranceType insType = InsuranceType.valueOf(request.getInsType());
-
             if (InsuranceType.Car_Insurance.equals(insType) || InsuranceType.Personal_Insurance.contains(insType)) {
-
-                return mapToCarAndPersonalInsType(insType, policyDetail, prnDetail, clmSales, chkEnrData, unpaidRecord, paymentRecord);
-
+                return mapToCarAndPersonalInsType(insType, policyNum, policyDetail, prnDetail, clmSales, chkEnrData, unpaidRecord, paymentRecord);
             } else if(InsuranceType.Business_Insurance.contains(insType)){
-
-                return mapToBusinessInsType(policyDetail, clmSales, chkEnrData, unpaidRecord, paymentRecord);
-
+                return mapToBusinessInsType(policyDetail, policyNum, clmSales, chkEnrData, unpaidRecord, paymentRecord);
             }
-
         }catch (Exception e) {
             e.printStackTrace();
-
         }
         return null;
     }
 
-    private static DetailResultVo mapToCarAndPersonalInsType(InsuranceType insType, FubonPolicyDetailRespDTO policyDetail, FubonPrnDetailResp prnDetail, FubonClmSalesRespDTO clmSales, FubonChkEnrDataRespDTO chkEnrData, UnpaidRecordDTO unpaidRecord, PaymentRecordDTO paymentRecord){
+    private static DetailResultVo mapToCarAndPersonalInsType(InsuranceType insType, String policyNum, FubonPolicyDetailRespDTO policyDetail, FubonPrnDetailResp prnDetail, FubonClmSalesRespDTO clmSales, FubonChkEnrDataRespDTO chkEnrData, UnpaidRecordDTO unpaidRecord, PaymentRecordDTO paymentRecord){
 
         FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure = policyDetail.getEcAppInsure();
 
@@ -84,15 +73,15 @@ public class PolicyDetailMapper {
                 // 未繳保費
                 .unpaidRecord(mapToUnpaidRecord(unpaidRecord))
                 // 繳費紀錄
-                .paidRecord(mapToPaidRecord(paymentRecord))
+                .paidRecord(mapToEcPaidRecord(ecAppInsure, paymentRecord))
                 // 理賠紀錄
-                .claimRecord(mapToClaimRecord(clmSales))
+                .claimRecord(mapToClaimRecord(policyNum, clmSales))
                 // 保全紀錄
                 .conservationRecord(getConservationRecord(chkEnrData))
                 .build();
     }
 
-    private static DetailResultVo mapToBusinessInsType(FubonPolicyDetailRespDTO policyDetail, FubonClmSalesRespDTO clmSales, FubonChkEnrDataRespDTO chkEnrData, UnpaidRecordDTO unpaidRecord, PaymentRecordDTO paymentRecord){
+    private static DetailResultVo mapToBusinessInsType(FubonPolicyDetailRespDTO policyDetail, String policyNum, FubonClmSalesRespDTO clmSales, FubonChkEnrDataRespDTO chkEnrData, UnpaidRecordDTO unpaidRecord, PaymentRecordDTO paymentRecord){
 
         FubonPolicyDetailRespDTO.EcAppInsureEtp ecAppInsureEtp = policyDetail.getEcAppInsureEtp();
 
@@ -108,9 +97,9 @@ public class PolicyDetailMapper {
                 // 未繳保費
                 .unpaidRecord(mapToUnpaidRecord(unpaidRecord))
                 // 繳費紀錄
-                .paidRecord(mapToPaidRecord(paymentRecord))
+                .paidRecord(mapToEtpPaidRecord(paymentRecord))
                 // 理賠紀錄
-                .claimRecord(mapToClaimRecord(clmSales))
+                .claimRecord(mapToClaimRecord(policyNum, clmSales))
                 // 保全紀錄
                 .conservationRecord(getConservationRecord(chkEnrData))
                 .build();

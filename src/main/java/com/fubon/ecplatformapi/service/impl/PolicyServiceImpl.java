@@ -22,6 +22,7 @@ import java.util.List;
 @Service
 public class PolicyServiceImpl implements PolicyService {
     private static final String FUBON_API_URL = "http://localhost:8080";
+    private static final String URL = "http://10.0.45.55:9080/fgisws/rest/ClmSalesAppWs/api101";
     private final WebClient webClient;
 
     @Autowired

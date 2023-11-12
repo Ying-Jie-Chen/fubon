@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -17,19 +18,19 @@ import java.util.List;
 @Builder
 public class DetailResultVo {
 
-    private InsuranceInfo insuranceInfo; // 保單基本資料：富邦API - 取得保單資訊
-    private InsuranceSubject insuranceSubject; // 保險標的：富邦API - 取得保單資訊
-    private List<EtpInsuranceSubject> etpInsuranceSubject; // 企業險保險標的：富邦API - 取得保單資訊
-    private List<EtpInsuranceSubjectDetail> etpInsuranceSubjectDetail; // 企業險保險標的明細：富邦API - 取得保單資訊
-    private List<InsuranceItem> insuranceItem; // 保險項目：富邦API - 取得保單資訊
-    private List<AdditionalTerm> additionalTerms; // 附加條款- 車險才有
-    private List<InsuranceList> insuranceList; // 險種名冊：富邦API - 取得保單資訊
-    private List<InsuranceOtherList> insuranceOtherList; // 其他險種名冊 個人傷害險的寵物險
-    private List<PolicyDeliveryRecord> policyDeliveryRecord; // 保單寄送記錄：富邦API - 保單寄送紀錄查詢
-    private List<UnpaidRecord> unpaidRecord; // 未繳保費
-    private List<PaidRecord> paidRecord; // 繳費紀錄：繳費記錄/未繳費記錄 未繳費記錄查詢條件：NFNV02.POLYNO ＝保單號碼 繳費記錄查詢條件：NFNV03.POLYNO ＝保單號碼
-    private List<ClaimRecord> claimRecord; // 理賠記錄：富邦API - 理賠紀錄查詢
-    private List<ConservationRecord> conservationRecord; // 保全紀錄：富邦API - 保全紀錄查詢
+    private InsuranceInfo insuranceInfo;
+    private InsuranceSubject insuranceSubject;
+    private List<EtpInsuranceSubject> etpInsuranceSubject;
+    private List<EtpInsuranceSubjectDetail> etpInsuranceSubjectDetail;
+    private List<InsuranceItem> insuranceItem;
+    private List<AdditionalTerm> additionalTerms;
+    private List<InsuranceList> insuranceList;
+    private List<InsuranceOtherList> insuranceOtherList;
+    private List<PolicyDeliveryRecord> policyDeliveryRecord;
+    private List<UnpaidRecord> unpaidRecord;
+    private List<PaidRecord> paidRecord;
+    private List<ClaimRecord> claimRecord;
+    private List<ConservationRecord> conservationRecord;
 
     @Data
     @Builder
@@ -432,6 +433,7 @@ public class DetailResultVo {
         private String prcdeptNm;
         private String prcempNm;
         private String phone;
+        private LocalDateTime payDate;
     }
 
     @Data
