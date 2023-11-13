@@ -2,14 +2,14 @@ package com.fubon.ecplatformapi.controller;
 
 import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
-import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
+import com.fubon.ecplatformapi.model.dto.req.QueryPolicyDetailReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import com.fubon.ecplatformapi.model.dto.vo.CreateDetailResultVO;
 import com.fubon.ecplatformapi.model.dto.vo.MyPolicyListVO;
 import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
-import com.fubon.ecplatformapi.service.impl.PolicyServiceImpl;
+import com.fubon.ecplatformapi.service.PolicyService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import java.util.List;
 public class PolicyController extends SessionController {
 
     @Autowired
-    PolicyServiceImpl policyService;
+    PolicyService policyService;
 
     @GetMapping("/queryPolicyList")
     public ApiRespDTO<List<PolicyListResultVO>> queryList(@Valid @RequestBody PolicyListReqDTO req) {
@@ -48,7 +48,7 @@ public class PolicyController extends SessionController {
 
 
     @GetMapping("/queryPolicyDetail")
-    public ApiRespDTO<CreateDetailResultVO> queryDetail(@Valid @RequestBody PolicyDetailReqDTO request) {
+    public ApiRespDTO<CreateDetailResultVO> queryDetail(@Valid @RequestBody QueryPolicyDetailReqDTO request) {
         try {
 
             DetailResultVo detailResult = policyService.getPolicyDetail(request);

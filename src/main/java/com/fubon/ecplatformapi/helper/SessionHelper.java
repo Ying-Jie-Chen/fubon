@@ -50,10 +50,10 @@ public class SessionHelper extends SessionController {
      * 取得儲存在Session中的特定Value
      */
     public static String getValueByAttribute(String sessionId, SessionAttribute attribute) {
-        HttpSession session = SessionManager.getSessionById(sessionId);
-        String value = session.getAttribute(attribute.name()).toString();
-        //log.info(attribute + ": " + value);
-        return value;
+            HttpSession session = SessionManager.getSessionById(sessionId);
+            String value = session.getAttribute(attribute.name()).toString();
+            //log.info(attribute + ": " + value);
+            return value;
     }
 
     private static String findSessionFromCookies(Cookie[] cookies) {

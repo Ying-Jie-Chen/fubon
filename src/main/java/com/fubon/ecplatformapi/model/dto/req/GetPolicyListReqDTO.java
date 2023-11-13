@@ -1,10 +1,12 @@
 package com.fubon.ecplatformapi.model.dto.req;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Calendar;
 
 @Data
+@Builder
 public class GetPolicyListReqDTO {
     private String clsGrp;
     private String module;

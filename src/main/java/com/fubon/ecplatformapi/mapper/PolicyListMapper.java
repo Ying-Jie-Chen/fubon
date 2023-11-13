@@ -34,6 +34,7 @@ public class PolicyListMapper {
         List<QueryPolicyListRespDTO.PolicyResult> queryPolicyList = queryPolicyResp.getPolicyResults();
 
         return queryPolicyList.stream().map(policyResult -> MyPolicyListVO.builder()
+                        .insType(policyResult.getClsGrp())
                         .policyNum(policyResult.getPolFormatid())
                         .premiums(policyResult.getUnPaidPrm())
                         .insuredName(policyResult.getRmaClinameI())

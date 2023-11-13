@@ -1,6 +1,7 @@
 package com.fubon.ecplatformapi.service;
 
-import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
+import com.fubon.ecplatformapi.model.dto.req.GetPolicyListReqDTO;
+import com.fubon.ecplatformapi.model.dto.req.QueryPolicyDetailReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
 import com.fubon.ecplatformapi.model.dto.vo.MyPolicyListVO;
@@ -15,5 +16,5 @@ public interface PolicyService {
 
     List<MyPolicyListVO> getMyPolicyList();
 
-    DetailResultVo getPolicyDetail(PolicyDetailReqDTO request);
+    DetailResultVo getPolicyDetail(QueryPolicyDetailReqDTO request);
 }

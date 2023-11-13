@@ -339,6 +339,37 @@ public class BuildResponse {
         return chkEnrData;
     }
 
+    public QueryPolicyListRespDTO buildMyPolicyList() {
+        return QueryPolicyListRespDTO.builder()
+                .policyResults(List.of(
+                        QueryPolicyListRespDTO.PolicyResult.builder()
+                                .clsGrp("Class A")
+                                .module("Module 1")
+                                .polFormatid("PolicyFormat-001")
+                                .rmaClinameI("RMA Client 1")
+                                .rmaUidI("RMA_UID_001")
+                                .mohPlatno("MOH123")
+                                .secEffdate(Calendar.getInstance())
+                                .secExpdate(Calendar.getInstance())
+                                .ascIscXref("ASC_ISC_XREF_001")
+                                .unPaidPrm(1000)
+                                .build(),
+                        QueryPolicyListRespDTO.PolicyResult.builder()
+                                .clsGrp("Class B")
+                                .module("Module 2")
+                                .polFormatid("PolicyFormat-002")
+                                .rmaClinameI("RMA Client 2")
+                                .rmaUidI("RMA_UID_002")
+                                .mohPlatno("MOH456")
+                                .secEffdate(Calendar.getInstance())
+                                .secExpdate(Calendar.getInstance())
+                                .ascIscXref("ASC_ISC_XREF_002")
+                                .unPaidPrm(1500)
+                                .build()
+                ))
+                .build();
+    }
+
 
     private void printJSON(FbQueryRespDTO response) {
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版

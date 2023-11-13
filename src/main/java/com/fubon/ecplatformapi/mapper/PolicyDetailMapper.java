@@ -3,10 +3,9 @@ package com.fubon.ecplatformapi.mapper;
 import com.fubon.ecplatformapi.enums.InsuranceType;
 import com.fubon.ecplatformapi.model.dto.PaymentRecordDTO;
 import com.fubon.ecplatformapi.model.dto.UnpaidRecordDTO;
-import com.fubon.ecplatformapi.model.dto.req.PolicyDetailReqDTO;
+import com.fubon.ecplatformapi.model.dto.req.QueryPolicyDetailReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.fubon.*;
 import com.fubon.ecplatformapi.model.dto.vo.DetailResultVo;
-import com.fubon.ecplatformapi.model.dto.vo.PolicyListResultVO;
 import com.fubon.ecplatformapi.repository.NFNV02Repository;
 import com.fubon.ecplatformapi.repository.NFNV03Repository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ public class PolicyDetailMapper {
         PolicyDetailMapper.nfnv03Repository = nfnv03Repository;
     }
 
-    public static DetailResultVo mapToDetailResultVo(PolicyDetailReqDTO request, FubonPolicyDetailRespDTO policyDetail, FubonPrnDetailResp prnDetail, FubonClmSalesRespDTO clmSales, FubonChkEnrDataRespDTO chkEnrData) {
+    public static DetailResultVo mapToDetailResultVo(QueryPolicyDetailReqDTO request, FubonPolicyDetailRespDTO policyDetail, FubonPrnDetailResp prnDetail, FubonClmSalesRespDTO clmSales, FubonChkEnrDataRespDTO chkEnrData) {
         String policyNum = request.getPolicyNum();
         InsuranceType insType = InsuranceType.valueOf(request.getInsType());
         UnpaidRecordDTO unpaidRecord = InsuranceEntityMapper.mapToUnpaidRecordDTO(nfnv02Repository.findUnpaidByPolyno(policyNum));

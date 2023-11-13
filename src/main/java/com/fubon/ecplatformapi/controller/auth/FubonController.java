@@ -24,7 +24,7 @@ public class FubonController {
     @GetMapping("/GetSSOToken")
     public SSOTokenRespDTO getSSOToken(){return buildResponse.buildSSOTokenResponse();}
 
-    @PostMapping ("/queryPolicy")
+    //@PostMapping ("/queryPolicy")
     public FbQueryRespDTO QueryList(@RequestBody PolicyListReqDTO req){
         return buildResponse.buildListResponse();
     }
@@ -37,6 +37,8 @@ public class FubonController {
     public FubonClmSalesRespDTO getClmSales(GetClmSalesReqDTO reqDTO){return buildResponse.buildClmSalesResponse(); }
     @PostMapping("/chkEnrData")
     public FubonChkEnrDataRespDTO getEnrData(GetChkEnrDataReqDTO reqDTO){return buildResponse.buildChkEnrData();}
+    @PostMapping("/queryPolicy")
+    public QueryPolicyListRespDTO getMpPolicyList(GetPolicyListReqDTO reqDTO){return  buildResponse.buildMyPolicyList(); }
     @PostMapping ("/GetVerificationImage")
     public VerificationResp GetVerificationImage(FubonVerificationReqDTO fubonVerificationReqDTO) {
         return buildResponse.buildVerificationImageResponse();

@@ -1,5 +1,8 @@
 package com.fubon.ecplatformapi.service.impl;
 
+import com.fubon.ecplatformapi.controller.auth.SessionController;
+import com.fubon.ecplatformapi.enums.SessionAttribute;
+import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.mapper.PolicyDetailMapper;
 import com.fubon.ecplatformapi.mapper.PolicyListMapper;
 import com.fubon.ecplatformapi.model.dto.req.*;
@@ -22,7 +25,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class PolicyServiceImpl implements PolicyService {
+public class PolicyServiceImpl extends SessionController implements PolicyService {
     private static final String FUBON_API_URL = "http://localhost:8080";
     private static final String URL = "http://10.0.45.55:9080/fgisws/rest/ClmSalesAppWs/api101";
     private final WebClient webClient;
@@ -59,22 +62,25 @@ public class PolicyServiceImpl implements PolicyService {
      */
     @Override
     public List<MyPolicyListVO> getMyPolicyList(){
-        return webClient
-                .get()
-                .uri("/policy/queryMyPolicyList")
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(QueryPolicyListRespDTO.class)
-                .log()
-                .map(PolicyListMapper::mapToMyPolicyList)
-                .block();
+
+        Mono<QueryPolicyListRespDTO> policyListMono = callWebClient("/queryPolicy", getQueryPolicyRequest(), QueryPolicyListRespDTO.class);
+        return policyListMono.map(PolicyListMapper::mapToMyPolicyList).block();
+    }
+
+    private GetPolicyListReqDTO getQueryPolicyRequest() {
+        return GetPolicyListReqDTO.builder()
+                .module("POL")
+                .ascAdmin(SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.EMP_NO))
+                .ascIscXref(SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.XREF_INFOS))
+                .fbId(SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.IDENTITY))
+                .build();
     }
 
     /**
      * 取得保單資訊
      */
     @Override
-    public DetailResultVo getPolicyDetail(PolicyDetailReqDTO request) {
+    public DetailResultVo getPolicyDetail(QueryPolicyDetailReqDTO request) {
         try {
             // 取得保單資訊
             Mono<FubonPolicyDetailRespDTO> policyDetailMono = callWebClient("/policyDetail", getPolicyDetailRequest(request), FubonPolicyDetailRespDTO.class);
@@ -95,13 +101,13 @@ public class PolicyServiceImpl implements PolicyService {
 
     }
 
-    private GetChkEnrDataReqDTO getChkEnrDataRequest(PolicyDetailReqDTO request) {
+    private GetChkEnrDataReqDTO getChkEnrDataRequest(QueryPolicyDetailReqDTO request) {
         return GetChkEnrDataReqDTO.builder()
                 .fotmatid(request.getPolicyNum())
                 .build();
     }
 
-    private GetClmSalesReqDTO getClmSalesRequest(PolicyDetailReqDTO request) {
+    private GetClmSalesReqDTO getClmSalesRequest(QueryPolicyDetailReqDTO request) {
         return GetClmSalesReqDTO.builder()
                 .query_SalesId("")
                 .query_Plan("")
@@ -109,7 +115,7 @@ public class PolicyServiceImpl implements PolicyService {
                 .build();
     }
 
-    private GetPrnDetailReqDTO getPrnDetailRequest(PolicyDetailReqDTO request) {
+    private GetPrnDetailReqDTO getPrnDetailRequest(QueryPolicyDetailReqDTO request) {
         return GetPrnDetailReqDTO.builder()
                 .queryType("%")
                 .formatid(request.getPolicyNum())
@@ -117,7 +123,7 @@ public class PolicyServiceImpl implements PolicyService {
                 .build();
     }
 
-    private GetPolicyDetailReqDTO getPolicyDetailRequest(PolicyDetailReqDTO request) {
+    private GetPolicyDetailReqDTO getPolicyDetailRequest(QueryPolicyDetailReqDTO request) {
         return GetPolicyDetailReqDTO.builder()
                 .queryType("1")
                 .policyNum(request.getPolicyNum())

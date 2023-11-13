@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PolicyDetailReqDTO {
+public class QueryPolicyDetailReqDTO {
 
     @NotNull(message = "insType 不可為空值")
     @Size(max = 5, message = "insType 最大長度為 5")
