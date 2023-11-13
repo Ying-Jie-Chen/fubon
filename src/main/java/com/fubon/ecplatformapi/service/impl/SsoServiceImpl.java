@@ -3,7 +3,10 @@ package com.fubon.ecplatformapi.service.impl;
 
 import com.fubon.ecplatformapi.config.EcwsConfig;
 import com.fubon.ecplatformapi.config.SsoLoginConfig;
+import com.fubon.ecplatformapi.controller.auth.SessionController;
+import com.fubon.ecplatformapi.enums.SessionAttribute;
 import com.fubon.ecplatformapi.helper.JsonHelper;
+import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.model.dto.resp.SSOTokenRespDTO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import com.fubon.ecplatformapi.service.SsoService;
@@ -19,6 +22,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,10 +32,16 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @Slf4j
 @Service
-public class SsoServiceImpl implements SsoService{
+public class SsoServiceImpl extends SessionController implements SsoService{
+    @Autowired
+    DataSource dataSource;
     @Autowired
     JsonHelper jsonHelper;
     @Autowired
@@ -54,17 +64,6 @@ public class SsoServiceImpl implements SsoService{
             return respDTO.getAny().getSid();
     }
 
-    private <T> T callFubonService(String jsonRequest, Class<T> responseType) {
-        return webClient
-                .post()
-                .uri("")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(jsonRequest)
-                .retrieve()
-                .bodyToMono(responseType)
-                .block();
-    }
-
 
     @Override
     public void verifySSOLogin(SsoReqDTO ssoReq) {
@@ -75,8 +74,66 @@ public class SsoServiceImpl implements SsoService{
             String msg = createSoapRequest(domain, tokenKey);
             sendHttpPostRequest(ecwsConfig.getDomain(), msg);
 
+            log.info("檢核是否有考過保險證照 #Start");
+            checkInsuranceLicense();
+
+            log.info("檢核產險公司別是否開跨售ID #Start");
+            checkCrossSellId();
+
         } catch (Exception e) {
             log.error("SOAP 請求失敗");
+            e.printStackTrace();
+        }
+    }
+
+    private void checkInsuranceLicense() {
+        try (Connection connection = dataSource.getConnection()) {
+            String userId = SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.IDENTITY);
+            String sql = "SELECT * FROM dbo.licfl WHERE lic_idno = ? AND lic_codeflag NOT IN ('C', 'D', 'S')";
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, userId);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        log.info("資料庫有結果，考過保險證照，資訊如下： ");
+                        String licId = resultSet.getString("lic_idno");
+                        String licCodeFlag = resultSet.getString("lic_codeflag");
+                        log.info("Lic ID: " + licId);
+                        log.info("Lic Code Flag: " + licCodeFlag);
+                    } else {
+                        log.info("資料庫查不到資料，返回訊息") ;
+                        log.info("此ID[" + userId + "]尚未登錄富邦產險");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void checkCrossSellId() {
+        try (Connection connection = dataSource.getConnection()) {
+            String unionNum = SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.UNION_NUM);
+            String userId = SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.IDENTITY);
+
+            String sql = "SELECT * FROM unionc WITH (NOLOCK) WHERE type = 'B' AND union_num = ?";
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, unionNum);
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        log.info("資料庫有結果，檢核產險公司別開檔跨售ID，資訊如下： ");
+                        String company = resultSet.getString("union_num");
+                        log.info("union_num: " + company);
+                        log.info("產險EC公司別[" + unionNum + "]已開檔跨售ID[" + userId + "]");
+                    } else {
+                        log.info("資料庫查不到資料，返回訊息") ;
+                        log.info("產險EC公司別[" + unionNum + "]尚未開檔跨售ID[" + userId + "]，請洽產險窗口或電子商務部！");
+                    }
+                }
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -284,6 +341,17 @@ public class SsoServiceImpl implements SsoService{
         char firstChar = input.charAt(0);
         String maskedPart = "*".repeat(input.length() - 1);
         return firstChar + maskedPart;
+    }
+
+    private <T> T callFubonService(String jsonRequest, Class<T> responseType) {
+        return webClient
+                .post()
+                .uri("")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(jsonRequest)
+                .retrieve()
+                .bodyToMono(responseType)
+                .block();
     }
 
 }
