@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.Calendar;
 import java.util.Date;
 @Data
 @NoArgsConstructor
@@ -32,10 +33,10 @@ public class PolicyListReqDTO {
     private String insurerId;
 
     @NotNull(message = "effectDateStart 不可為空值")
-    private Date effectDateStart;
+    private Calendar effectDateStart;
 
     @NotNull(message = "effectDateEnd 不可為空值")
-    private Date effectDateEnd;
+    private Calendar effectDateEnd;
 
     @NotNull(message = "managerId 不可為空值")
     private String managerId;

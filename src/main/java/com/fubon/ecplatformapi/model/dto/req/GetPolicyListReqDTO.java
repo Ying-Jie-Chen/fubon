@@ -17,6 +17,7 @@ public class GetPolicyListReqDTO {
     private String rmaUidA;
     private String mohPlatno;
     private String secTradeNo;
+    //private String secTradeNo;
     private String ascAdmin;
     private String ascIscXref;
     private String fbId;
@@ -24,4 +25,5 @@ public class GetPolicyListReqDTO {
     private Calendar dateFr;
     private Calendar dateTo;
     private String sourcePage;
+    private String secWrpsts;
 }

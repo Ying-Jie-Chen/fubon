@@ -1,15 +1,21 @@
 package com.fubon.ecplatformapi.service.impl;
 
+import com.fubon.ecplatformapi.controller.auth.SessionController;
+import com.fubon.ecplatformapi.enums.SessionAttribute;
+import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.model.dto.resp.LoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.service.XrefInfoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
+@Slf4j
 @Service
-public class XrefInfoServiceImpl implements XrefInfoService {
+public class XrefInfoServiceImpl extends SessionController implements XrefInfoService {
 
     @Override
     public LoginRespVo.ResponseData getXrefInfoList(LoginRespDTO dto){
@@ -34,9 +40,20 @@ public class XrefInfoServiceImpl implements XrefInfoService {
     }
 
     @Override
-    public LoginRespDTO.XrefInfo findXrefInfoByXref(List<LoginRespDTO.XrefInfo> xrefInfos, String xref) {
+    public LoginRespDTO.XrefInfo findXrefInfoByXref() {
+        String xref = (String) SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.EMP_NO);
+        Object xrefInfoList = SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.XREF_INFOS);
+
+        List<LoginRespDTO.XrefInfo> xrefInfos = Optional.ofNullable(xrefInfoList)
+                .filter(List.class::isInstance)
+                .map(list -> (List<LoginRespDTO.XrefInfo>) list)
+                .orElse(Collections.emptyList());
+
         return xrefInfos.stream()
-                .filter(xrefInfo -> xref.equals(xrefInfo.getXref()))
+                .filter(xrefInfo -> {
+                    log.info("Xref: " + xrefInfo.getXref());
+                    return xref.equals(xrefInfo.getXref());
+                })
                 .findFirst()
                 .orElse(null);
     }

@@ -88,7 +88,7 @@ public class SsoServiceImpl extends SessionController implements SsoService{
 
     private void checkInsuranceLicense() {
         try (Connection connection = dataSource.getConnection()) {
-            String userId = SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.IDENTITY);
+            String userId = (String) SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.IDENTITY);
             String sql = "SELECT * FROM dbo.licfl WHERE lic_idno = ? AND lic_codeflag NOT IN ('C', 'D', 'S')";
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -113,8 +113,8 @@ public class SsoServiceImpl extends SessionController implements SsoService{
 
     private void checkCrossSellId() {
         try (Connection connection = dataSource.getConnection()) {
-            String unionNum = SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.UNION_NUM);
-            String userId = SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.IDENTITY);
+            String unionNum = (String) SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.UNION_NUM);
+            String userId = (String) SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.IDENTITY);
 
             String sql = "SELECT * FROM unionc WITH (NOLOCK) WHERE type = 'B' AND union_num = ?";
 

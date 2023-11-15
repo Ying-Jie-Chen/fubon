@@ -12,5 +12,5 @@ public interface XrefInfoService {
 
     List<LoginRespDTO.XrefInfo> getXrefInfo(List<LoginRespDTO.XrefInfo> xrefInfoList);
 
-    LoginRespDTO.XrefInfo findXrefInfoByXref(List<LoginRespDTO.XrefInfo> xrefInfos, String xref);
+    LoginRespDTO.XrefInfo findXrefInfoByXref();
 }

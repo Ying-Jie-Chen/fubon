@@ -10,5 +10,8 @@ spring:
 token:
   expiration-minutes: 20
 
-
+#nas:
+#  expiration-days: 30
+#  cron:
+#    expression: "0 0 2 * * ?"
 

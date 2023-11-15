@@ -24,8 +24,8 @@ import java.util.Objects;
 public class HeaderAspect {
     @Autowired
     TokenService tokenService;
-
-    @Pointcut("execution(* com.fubon.ecplatformapi.controller.other.*.*(..)) || execution(* com.fubon.ecplatformapi.controller.auth.AuthController.getSSOToken(..)) || execution(* com.fubon.ecplatformapi.controller.auth.AuthController.SSOLogin(..))")
+    // || execution(* com.fubon.ecplatformapi.controller.auth.AuthController.getSSOToken(..)) || execution(* com.fubon.ecplatformapi.controller.auth.AuthController.SSOLogin(..))
+    @Pointcut("execution(* com.fubon.ecplatformapi.controller.other.*.*(..)) ")
     private void headerValidation() { }
 
     @Around("headerValidation()")
