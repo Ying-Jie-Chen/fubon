@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.Calendar;
-import java.util.Date;
 @Data
 @NoArgsConstructor
 @PlateValidation
