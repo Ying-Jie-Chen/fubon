@@ -1,8 +1,13 @@
 package com.fubon.ecplatformapi.service.impl;
 
-import com.fubon.ecplatformapi.config.SessionManager;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fubon.ecplatformapi.config.EcwsConfig;
-import com.fubon.ecplatformapi.helper.JsonHelper;
+import com.fubon.ecplatformapi.config.SessionManager;
+import com.fubon.ecplatformapi.enums.StatusCodeEnum;
+import com.fubon.ecplatformapi.exception.CustomException;
+import com.fubon.ecplatformapi.helper.ConvertToJsonHelper;
+import com.fubon.ecplatformapi.model.dto.FubonEcWsLoginReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.LoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.resp.VerificationResp;
@@ -15,6 +20,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -23,6 +30,7 @@ import reactor.core.publisher.Mono;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -32,10 +40,14 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     EcwsConfig ecwsConfig;
     @Autowired
-    JsonHelper jsonHelper;
+    ConvertToJsonHelper jsonHelper;
     @Autowired
     XrefInfoService xrefInfoService;
+    @Autowired
+    ObjectMapper objectMapper;
+
     private final WebClient webClient;
+
     @Autowired
     public AuthServiceImpl(WebClient.Builder webClientBuilder, EcwsConfig ecwsConfig) {
         this.ecwsConfig = ecwsConfig;
@@ -51,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
         String jsonRequest = jsonHelper.convertVerificationConfigToJson(ecwsConfig.verificationConfig());
 
         VerificationResp verificationResp = callFubonService(jsonRequest, VerificationResp.class).block();
+
         String imageBase64 = verificationResp != null ?
                 verificationResp.getAny().getVerificationImageBase64() : null;
         String token = verificationResp != null ?
@@ -60,6 +73,7 @@ public class AuthServiceImpl implements AuthService {
                 .verificationImage(imageBase64)
                 .token(token)
                 .build();
+
     }
 
     /**
@@ -67,22 +81,37 @@ public class AuthServiceImpl implements AuthService {
      *
      */
     @Override
-    public LoginRespVo getUserInfo(LoginReqDTO loginReq, HttpSession session, HttpServletResponse response) throws Exception {
+    public LoginRespVo getUserInfo(LoginReqDTO loginReq, HttpSession session, HttpServletResponse response) {
+        try {
+            FubonEcWsLoginReqDTO fubonEcWsLoginReqDTO = jsonHelper.convertFubonEcWsLoginReq(loginReq);
+            //String jsonRequest = jsonHelper.convertLoginConfigToJson(ecwsConfig.fubonLoginConfig(), loginReq);
+            //LoginRespDTO fbLoginRespDTO = callFubonService(jsonRequest, LoginRespDTO.class).block();
 
-        String jsonRequest = jsonHelper.convertLoginConfigToJson(ecwsConfig.fubonLoginConfig(), loginReq);
-        LoginRespDTO fbLoginRespDTO = callFubonService(jsonRequest, LoginRespDTO.class).block();
+            LoginRespDTO fbLoginRespDTO = callFubonService(objectMapper.writeValueAsString(fubonEcWsLoginReqDTO), LoginRespDTO.class).block();
 
-        SessionManager.saveSession(session, response, fbLoginRespDTO);
+            SessionManager.saveSession(session, response, fbLoginRespDTO);
 
-        String authToken = tokenService.generateToken(session.getId(), loginReq.getAccount(), System.currentTimeMillis());
-        tokenService.saveAuthToken(session, authToken);
+            SessionManager.saveAuthToken(response, session);
 
-        LoginRespVo.ResponseData data = xrefInfoService.getXrefInfoList(fbLoginRespDTO);
+            String authToken = tokenService.generateToken(session.getId(), loginReq.getAccount(), System.currentTimeMillis());
+            tokenService.saveAuthToken(response, session, authToken);
 
-        return LoginRespVo.builder()
-                .token(authToken)
-                .data(data)
-                .build();
+            LoginRespVo.ResponseData data = xrefInfoService.getXrefInfoList(fbLoginRespDTO);
+
+            return LoginRespVo.builder()
+                    .token(authToken)
+                    .data(data)
+                    .build();
+
+        } catch (CustomException exception) {
+            log.error(exception.getMessage());
+        } catch (NullPointerException ex){
+            log.debug(ex.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return null;
     }
 
     private <T> Mono<T> callFubonService(String jsonRequest, Class<T> responseType) {
@@ -93,6 +122,16 @@ public class AuthServiceImpl implements AuthService {
                 .bodyValue(jsonRequest)
                 .retrieve()
                 .bodyToMono(responseType);
+//                .flatMap(response -> {
+//                    if (response instanceof LoginRespDTO) {
+//                        String statusCode = ((LoginRespDTO) response).getHeader().getStatusCode();
+//                        log.info("Status Code: " + statusCode);
+//                        if (!"0000".equals(statusCode)) {
+//                            return Mono.error(new CustomException(((LoginRespDTO) response).getHeader().getStatusDesc(), StatusCodeEnum.ERR00998.getCode()));
+//                        }
+//                    }
+//                    return Mono.just(response);
+//                });
     }
 
     @Override
