@@ -5,8 +5,9 @@ import com.fubon.ecplatformapi.config.EcwsConfig;
 import com.fubon.ecplatformapi.config.SsoLoginConfig;
 import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.enums.SessionAttribute;
-import com.fubon.ecplatformapi.helper.JsonHelper;
+import com.fubon.ecplatformapi.helper.ConvertToJsonHelper;
 import com.fubon.ecplatformapi.helper.SessionHelper;
+import com.fubon.ecplatformapi.model.dto.req.FubonSsoTokenDTO;
 import com.fubon.ecplatformapi.model.dto.resp.SSOTokenRespDTO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import com.fubon.ecplatformapi.service.SsoService;
@@ -43,7 +44,7 @@ public class SsoServiceImpl extends SessionController implements SsoService{
     @Autowired
     DataSource dataSource;
     @Autowired
-    JsonHelper jsonHelper;
+    ConvertToJsonHelper jsonHelper;
     @Autowired
     EcwsConfig ecwsConfig;
     @Autowired
@@ -59,9 +60,10 @@ public class SsoServiceImpl extends SessionController implements SsoService{
 
     @Override
     public String getSSOToken(){
-            String jsonRequest = jsonHelper.convertSsoTokenToJson(ecwsConfig.fubonSsoTokenDTO());
-            SSOTokenRespDTO respDTO = callFubonService(jsonRequest, SSOTokenRespDTO.class);
-            return respDTO.getAny().getSid();
+        //String jsonRequest = jsonHelper.convertSsoTokenToJson(ecwsConfig.fubonSsoTokenDTO());
+        FubonSsoTokenDTO fubonSsoTokenDTO = new FubonSsoTokenDTO();
+        SSOTokenRespDTO respDTO = callFubonService(fubonSsoTokenDTO.toString(), SSOTokenRespDTO.class);
+        return respDTO.getAny().getSid();
     }
 
 

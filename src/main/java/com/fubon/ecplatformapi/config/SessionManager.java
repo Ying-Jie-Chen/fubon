@@ -49,7 +49,14 @@ public class SessionManager {
         response.addCookie(sessionCookie);
     }
 
-    public static void setSessionAttributes(String sessionId, LoginRespDTO dto) {
+    public static void saveAuthToken(HttpServletResponse response, HttpSession session) {
+        Cookie sessionCookie = new Cookie("AUTH-TOKEN", session.getId());
+        sessionCookie.setMaxAge(-1);
+        sessionCookie.setPath("/");
+        response.addCookie(sessionCookie);
+    }
+
+    public static void setSessionAttributes(String sessionId, LoginRespDTO dto){
         HttpSession session = getSessionById(sessionId);
         session.setMaxInactiveInterval(1200);
 

@@ -7,5 +7,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @Builder
 public class GetChkEnrDataReqDTO {
-    private String fotmatid;
+    private String formatid;
 }

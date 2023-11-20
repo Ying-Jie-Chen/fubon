@@ -1,6 +1,8 @@
 package com.fubon.ecplatformapi.controller.auth;
 
+import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.helper.SessionHelper;
+import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -25,5 +27,22 @@ public abstract class SessionController {
             return (String) session.getAttribute("AUTH_TOKEN");
         }
         return null;
+    }
+
+    public <T> ApiRespDTO<T> successApiResp(T data){
+        return result(StatusCodeEnum.SUCCESS.getCode(), StatusCodeEnum.SUCCESS.getMessage(), data);
+    }
+
+    public <T> ApiRespDTO<T> errorApiResp(){
+        return result(StatusCodeEnum.ERR00999.name(), StatusCodeEnum.ERR00999.getMessage(), null);
+    }
+
+    public  <T> ApiRespDTO<T> result(String statusCode, String msg, T data) {
+        return ApiRespDTO.<T>builder()
+                .code(statusCode)
+                .message(msg)
+                .authToken(getAuthToken())
+                .data(data)
+                .build();
     }
 }

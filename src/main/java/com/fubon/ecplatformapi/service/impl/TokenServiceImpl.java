@@ -6,6 +6,7 @@ import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.service.TokenService;
 import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.properties.TokenProperties;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Service
 public class TokenServiceImpl extends SessionController implements TokenService {
-
     private final Map<String, HttpSession> authTokenMap = new ConcurrentHashMap<String, HttpSession>();
     @Autowired
     TokenProperties tokenProperties;
@@ -38,9 +38,15 @@ public class TokenServiceImpl extends SessionController implements TokenService 
      *  儲存 Token
      */
     @Override
-    public void saveAuthToken(HttpSession session, String authToken) {
+    public void saveAuthToken(HttpServletResponse response,HttpSession session, String authToken) {
         authTokenMap.put(authToken, session);
         session.setAttribute("AUTH_TOKEN", authToken);
+        SessionManager.saveAuthToken(response, session);
+    }
+
+    @Override
+    public void getAuthToken(String authToken){
+        authTokenMap.get(authToken);
     }
 
     /**

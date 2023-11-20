@@ -14,6 +14,8 @@ public class EcwsConfig {
 
     private String domain;
 
+    private EcWsHeaderConfig header;
+
     @Bean
     public FubonLoginReqDTO fubonLoginConfig() {
         return new FubonLoginReqDTO();
@@ -26,4 +28,10 @@ public class EcwsConfig {
 
     @Bean
     public FubonSsoTokenDTO fubonSsoTokenDTO(){ return  new FubonSsoTokenDTO(); }
+
+    @Data
+    public static class EcWsHeaderConfig {
+        private String fromSys;
+        private String sysPwd;
+    }
 }

@@ -18,6 +18,7 @@
 //import lombok.extern.slf4j.Slf4j;
 //import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 //import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
+//import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 //
 //import java.text.SimpleDateFormat;
 //import java.time.Duration;
@@ -33,6 +34,7 @@
 //    JobBuilderFactory jobBuilderFactory;
 //    @Autowired
 //    StepBuilderFactory stepBuilderFactory;
+//
 //
 //    /**
 //     * 影像清理

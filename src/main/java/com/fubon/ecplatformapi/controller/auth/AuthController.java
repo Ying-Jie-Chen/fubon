@@ -1,6 +1,8 @@
 package com.fubon.ecplatformapi.controller.auth;
 
 import com.fubon.ecplatformapi.config.SessionManager;
+import com.fubon.ecplatformapi.exception.CustomException;
+import com.fubon.ecplatformapi.exception.EcwsCaseException;
 import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
@@ -19,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @Slf4j
 @RestController
 @RequestMapping("/auth")
@@ -34,9 +38,7 @@ public class AuthController extends SessionController {
      */
     @PostMapping("/login")
     public ResponseEntity<ApiRespDTO<LoginRespVo.ResponseData>> login(@RequestBody LoginReqDTO loginReq, HttpSession session, HttpServletResponse response){
-
         try {
-
             LoginRespVo responseData = authService.getUserInfo(loginReq, session, response);
             SessionHelper.getAllValue(session.getId());
 
@@ -51,9 +53,12 @@ public class AuthController extends SessionController {
                             .data(responseData.getData())
                             .build());
 
+        } catch (CustomException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(result(exception.getErrorCode(), exception.getMessage(), null));
+
         } catch (Exception e) {
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity.ok()
                     .body(ApiRespDTO.<LoginRespVo.ResponseData>builder()
                             .code(StatusCodeEnum.ERR00999.name())
                             .message(StatusCodeEnum.ERR00999.getMessage())
@@ -73,18 +78,9 @@ public class AuthController extends SessionController {
 
             // 保存解碼圖片到指定路徑
             authService.saveVerificationImage("/Users/yingjie/Desktop/image.png", responseData.getVerificationImage());
+            return successApiResp(responseData);
 
-            return ApiRespDTO.<VerificationVo>builder()
-                    .data(responseData)
-                    .build();
-
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return ApiRespDTO.<VerificationVo>builder()
-                    .code(StatusCodeEnum.ERR00999.name())
-                    .message(StatusCodeEnum.ERR00999.getMessage())
-                    .build();
-        }
+        } catch (Exception e) { return errorApiResp(); }
     }
 
     /**
@@ -95,17 +91,9 @@ public class AuthController extends SessionController {
     public ApiRespDTO<String> logout(){
         try {
             SessionManager.removeSession(sessionID());
-
-            return ApiRespDTO.<String>builder()
-                    .code(StatusCodeEnum.SUCCESS.getCode())
-                    .message(StatusCodeEnum.SUCCESS.getMessage())
-                    .build();
-
+            return successApiResp(null);
         } catch (Exception e) {
-            return ApiRespDTO.<String>builder()
-                    .code(StatusCodeEnum.ERR00999.name())
-                    .message(StatusCodeEnum.ERR00999.getMessage())
-                    .build();
+            return errorApiResp();
         }
     }
 
@@ -116,22 +104,8 @@ public class AuthController extends SessionController {
     @GetMapping("/getSSOToken")
     public ApiRespDTO<String> getSSOToken(){
         try {
-
-            String ssoToken = ssoService.getSSOToken();
-
-            return ApiRespDTO.<String>builder()
-                    .code(StatusCodeEnum.SUCCESS.getCode())
-                    .message(StatusCodeEnum.SUCCESS.getMessage())
-                    .authToken(getAuthToken())
-                    .data(ssoToken)
-                    .build();
-
-        }catch (Exception e){
-            return  ApiRespDTO.<String>builder()
-                    .code(StatusCodeEnum.ERR00999.name())
-                    .message(StatusCodeEnum.ERR00999.getMessage())
-                    .build();
-        }
+            return successApiResp(ssoService.getSSOToken());
+        } catch (Exception e){ return errorApiResp(); }
     }
 
     /**

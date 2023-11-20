@@ -193,7 +193,7 @@ public class PolicyServiceImpl extends SessionController implements PolicyServic
      */
     private GetChkEnrDataReqDTO getChkEnrDataRequest(QueryPolicyDetailReqDTO request) {
         return GetChkEnrDataReqDTO.builder()
-                .fotmatid(request.getPolicyNum())
+                .formatid(request.getPolicyNum())
                 .build();
     }
 

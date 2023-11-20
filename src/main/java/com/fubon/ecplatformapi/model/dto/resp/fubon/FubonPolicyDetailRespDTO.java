@@ -63,6 +63,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class EcAppInsureEtp {
         private String policyNum;
         private String clsCode;
@@ -84,6 +86,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class SecEcAppWsBean {
         @Size(max = 14)
         private String secFormatid;
@@ -96,7 +100,7 @@ public class FubonPolicyDetailRespDTO {
         @Size(max = 10)
         private String secAexpdate;
         @Size(max = 1)
-        private Boolean secEip;
+        private String secEip;
         @Size(max = 1)
         private String secFubonlifeAgree;
         @Size(max = 1)
@@ -119,6 +123,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class EecEcAppWsBean {
         @Size(max = 100)
         private String eecMountain;
@@ -127,6 +133,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class RmaEcAppWsBean {
         @Size(max = 14)
         private String rmaType;
@@ -163,6 +171,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class EcoEcAppWsBeans {
         @Size(max = 10)
         private Integer ecoSeq;
@@ -195,6 +205,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class MohEcAppWsBean {
         @Size(max = 11)
         private String mohPlatno;
@@ -219,6 +231,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CrdEcAppWsBean {
         @Size(max = 10)
         private String crdPrsnid;
@@ -233,6 +247,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PitEcAppWsBean {
         private Integer pitSeq;
         @Size(max = 10)
@@ -252,6 +268,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PitEb0List {
         private String eb0TsiDesc;
         private String eb0TsiValue;
@@ -259,6 +277,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PitNecAppWsBeans {
         @Size(max = 10)
         private String pitBnfCode;
@@ -278,6 +298,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class RskEcAppWsBean {
         @Size(max = 200)
         private String rskLocation;
@@ -286,6 +308,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class BudEcAppWsBean {
         @Size(max = 3)
         private String budBuildyear;
@@ -318,6 +342,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class AscEcAppWsBean {
         @Size(max = 10)
         private String ascAdmin;
@@ -328,6 +354,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class MidEcAppWsBean {
         @Size(max = 100)
         private String midContent;
@@ -342,6 +370,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class FliEcAppWsBeans {
         @Size(max = 10)
         private Integer fliRskSeq;
@@ -358,6 +388,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PitEcAppEtpWsBean {
         private Integer pitRskSeq;
         private String pitRskType;
@@ -365,12 +397,16 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class RskEcAppEtpWsBean {
         private String content;
         private String desc;
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class RskDEcAppEtpWsBean {
         private Integer seq;
         private Collection<String> values;
@@ -378,6 +414,8 @@ public class FubonPolicyDetailRespDTO {
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class BenEcAppWsBean {
         private String benRsktype;
         private Integer benRskSeq;
@@ -394,6 +432,8 @@ public class FubonPolicyDetailRespDTO {
     }
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class SbcEcAppWsBean {
         @Size(max = 20)
         private String sbcCode;
@@ -413,6 +453,8 @@ public class FubonPolicyDetailRespDTO {
 
     @Data
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     private static class  EcoEcAppWsBean {
         private String ecoSeq;
         private String ecoGprId;
@@ -428,5 +470,4 @@ public class FubonPolicyDetailRespDTO {
         private String ecoPeriod;
         private String ecoGprIdDesc;
     }
-
 }

@@ -10,19 +10,27 @@ import java.util.List;
 @Data
 public class LoginRespDTO {
     @JsonProperty("Header")
-    private Header Header;
+    private Header header;
     @JsonProperty("any")
     private Any any;
 
     @Data
+    @Builder
     public static class Header {
+        @JsonProperty("msgId")
         private String MsgId;
+        @JsonProperty("fromSys")
         private String FromSys;
+        @JsonProperty("toSys")
         private String ToSys;
-        private String SysPwd;
-        private String FunctionCode;
-        private String StatusCode;
-        private String StatusDesc;
+        @JsonProperty("SysPwd")
+        private String sysPwd;
+        @JsonProperty("FunctionCode")
+        private String functionCode;
+        @JsonProperty("statusCode")
+        private String statusCode;
+        @JsonProperty("statusDesc")
+        private String statusDesc;
     }
 
     @Data
@@ -42,7 +50,6 @@ public class LoginRespDTO {
     }
 
     @Data
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class UserInfo {
         private String agent_name;
         private String agent_id;
@@ -65,6 +72,14 @@ public class LoginRespDTO {
         private String adminworkunna3;
         private String adminname;
         private String adminworkun2;
+
+        public boolean getSigned(){
+           return signed;
+        }
+
+        public boolean getTested(){
+            return tested;
+        }
     }
 
     @Data

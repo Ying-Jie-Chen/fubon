@@ -19,14 +19,16 @@ public class SessionHelper extends SessionController {
     /**
      * 取得 Session ID
      */
-    public static String getSessionID(HttpServletRequest request){
+    public static String getSessionID(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         String sessionId = findSessionFromCookies(cookies);
         if (sessionId != null) {
             if (SessionManager.getSessionById(sessionId) != null) {
                 //log.info(sessionId);
                 return sessionId;
-            } else { log.warn("Session不存在"); }
+            } else {
+                throw new RuntimeException("Error in get Session ID: need to login first");
+            }
         }
         return null;
     }

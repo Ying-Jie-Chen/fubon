@@ -1,7 +1,6 @@
 package com.fubon.ecplatformapi.config;
 
-import com.fubon.ecplatformapi.helper.JsonHelper;
-import com.fubon.ecplatformapi.mapper.InsuranceEntityMapper;
+import com.fubon.ecplatformapi.helper.ConvertToJsonHelper;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +13,8 @@ public class CommonConfig {
     }
 
     @Bean
-    public JsonHelper jsonHelper() {
-        return new JsonHelper();
+    public ConvertToJsonHelper jsonHelper() {
+        return new ConvertToJsonHelper();
     }
 
 }

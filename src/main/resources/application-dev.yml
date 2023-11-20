@@ -15,9 +15,11 @@ spring:
 #      hibernate:
 #        dialect: org.hibernate.dialect.SQLServerDialect
 
-#Fubon Get VerificationImage & Login Request
 ecws:
   domain: https://tb2b.518fb.com/ecws/json/service
+  header:
+    fromSys: "B2A"
+    sysPwd: "lYKMhPW8SGg="
   get-verification-image:
     header:
       from-sys: "B2A"

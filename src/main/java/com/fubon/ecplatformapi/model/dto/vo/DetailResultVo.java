@@ -65,7 +65,8 @@ public class DetailResultVo {
         private Double voltPremium;
         @Digits(integer = 15, fraction = 2)
         private Double compPremium;
-        private Boolean isEIP;
+        @Size(max = 1)
+        private String isEIP;
         private String fubonLifeAgree;
         private String cgrCode;
         private String clsCode;

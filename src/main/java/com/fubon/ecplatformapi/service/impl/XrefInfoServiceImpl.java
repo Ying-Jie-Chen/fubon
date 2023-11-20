@@ -3,6 +3,7 @@ package com.fubon.ecplatformapi.service.impl;
 import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.enums.SessionAttribute;
 import com.fubon.ecplatformapi.helper.SessionHelper;
+import com.fubon.ecplatformapi.mapper.UserInfoMapper;
 import com.fubon.ecplatformapi.model.dto.resp.LoginRespDTO;
 import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.service.XrefInfoService;
@@ -21,9 +22,10 @@ public class XrefInfoServiceImpl extends SessionController implements XrefInfoSe
     public LoginRespVo.ResponseData getXrefInfoList(LoginRespDTO dto){
 
         List<LoginRespDTO.XrefInfo> xrefInfoList = getXrefInfo(dto.getAny().getXrefInfo());
+        LoginRespVo.UserInfo userInfo = UserInfoMapper.mapToUserInfoVo(dto);
 
         return LoginRespVo.ResponseData.builder()
-                .userInfo(dto.getAny().getUserInfo())
+                .userInfo(userInfo)
                 .xrefInfo(xrefInfoList)
                 .build();
     }

@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.controller;
+package com.fubon.ecplatformapi.controller.other;
 
 import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
@@ -55,6 +55,7 @@ public class PolicyController extends SessionController {
 
             CreateDetailResultVO resultVO = new CreateDetailResultVO();
             resultVO.setDetailResult(detailResult);
+
 
             return ApiRespDTO.<CreateDetailResultVO>builder()
                     .code(StatusCodeEnum.SUCCESS.getCode())
