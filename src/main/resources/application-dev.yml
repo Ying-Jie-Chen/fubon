@@ -15,6 +15,7 @@ spring:
 #      hibernate:
 #        dialect: org.hibernate.dialect.SQLServerDialect
 
+#Fubon Get VerificationImage & Login Request
 ecws:
   domain: https://tb2b.518fb.com/ecws/json/service
   header:

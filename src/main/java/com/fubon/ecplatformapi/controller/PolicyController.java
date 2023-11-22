@@ -1,4 +1,4 @@
-package com.fubon.ecplatformapi.controller.other;
+package com.fubon.ecplatformapi.controller;
 
 import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;

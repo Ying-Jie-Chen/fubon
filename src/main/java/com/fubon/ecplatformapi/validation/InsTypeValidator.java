@@ -14,6 +14,10 @@ public class InsTypeValidator implements ConstraintValidator<InsTypeValidation, 
     @Override
     public boolean isValid(String insType, ConstraintValidatorContext context) {
 
+        if (insType == null || insType.trim().isEmpty()) {
+            return true;
+        }
+
         for (InsuranceType type : InsuranceType.values()) {
             if (type.getName().equals(insType)) {
                 return true;

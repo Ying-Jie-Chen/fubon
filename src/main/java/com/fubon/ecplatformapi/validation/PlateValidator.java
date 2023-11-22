@@ -21,7 +21,7 @@ public class PlateValidator implements ConstraintValidator<PlateValidation, Poli
                 return false;
             }
         } else {
-            if (request.getPlate() != null) {
+            if(!request.getPlate().trim().isEmpty()){
                 context.disableDefaultConstraintViolation();
                 context.buildConstraintViolationWithTemplate("此險種不需輸入車牌").addConstraintViolation();
                 return false;

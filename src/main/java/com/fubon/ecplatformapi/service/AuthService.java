@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public interface AuthService {
     VerificationVo getVerificationImage();
 
-    LoginRespVo getUserInfo(LoginReqDTO loginReqDTO, HttpSession session, HttpServletResponse response) throws Exception;
+    LoginRespVo getUserInfo(LoginReqDTO loginReqDTO, HttpSession session) throws Exception;
 
     void saveVerificationImage(String outputPath, String base64String);
 

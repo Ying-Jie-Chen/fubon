@@ -31,29 +31,9 @@ public class SessionManager {
         sessionMap.remove(sessionId);
     }
 
-    public static void saveSession(HttpSession session, HttpServletResponse response, LoginRespDTO fbLoginRespDTO){
+    public static void saveSession(HttpSession session, LoginRespDTO fbLoginRespDTO){
         associateSession(session, session.getId());
         setSessionAttributes(session.getId(), fbLoginRespDTO);
-        saveSessionID(response, session);
-    }
-
-
-    /**
-     * 儲存登入者資訊
-     *
-     */
-    public static void saveSessionID(HttpServletResponse response, HttpSession session) {
-        Cookie sessionCookie = new Cookie("SESSION-ID", session.getId());
-        sessionCookie.setMaxAge(-1);
-        sessionCookie.setPath("/");
-        response.addCookie(sessionCookie);
-    }
-
-    public static void saveAuthToken(HttpServletResponse response, HttpSession session) {
-        Cookie sessionCookie = new Cookie("AUTH-TOKEN", session.getId());
-        sessionCookie.setMaxAge(-1);
-        sessionCookie.setPath("/");
-        response.addCookie(sessionCookie);
     }
 
     public static void setSessionAttributes(String sessionId, LoginRespDTO dto){
@@ -91,14 +71,6 @@ public class SessionManager {
                         .licempcname(xref.getLicempcname())
                         .build())
                 .collect(Collectors.toList());
-    }
-
-
-    public static void removeSessionAttributes(String sessionId) {
-        HttpSession session = getSessionById(sessionId);
-        for (SessionAttribute attribute : SessionAttribute.values()) {
-            session.removeAttribute(attribute.name());
-        }
     }
 }
 

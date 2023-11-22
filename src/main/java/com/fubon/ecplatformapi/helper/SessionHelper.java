@@ -20,15 +20,12 @@ public class SessionHelper extends SessionController {
      * 取得 Session ID
      */
     public static String getSessionID(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        String sessionId = findSessionFromCookies(cookies);
+        String sessionId = request.getSession().getId();
         if (sessionId != null) {
             if (SessionManager.getSessionById(sessionId) != null) {
                 //log.info(sessionId);
                 return sessionId;
-            } else {
-                throw new RuntimeException("Error in get Session ID: need to login first");
-            }
+            } else { log.warn("Session不存在"); }
         }
         return null;
     }
@@ -56,18 +53,6 @@ public class SessionHelper extends SessionController {
             Object value = session.getAttribute(attribute.name());
             log.info(attribute + ": " + value);
             return value;
-    }
-
-    private static String findSessionFromCookies(Cookie[] cookies) {
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("SESSION-ID".equals(cookie.getName())) {
-                    //log.info("SESSION-ID="+cookie.getValue());
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
     }
 
 }

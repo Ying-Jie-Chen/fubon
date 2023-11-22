@@ -1,32 +1,27 @@
 package com.fubon.ecplatformapi.controller.auth;
 
-import com.fubon.ecplatformapi.config.SessionManager;
+import com.fubon.ecplatformapi.enums.StatusCodeEnum;
 import com.fubon.ecplatformapi.exception.CustomException;
-import com.fubon.ecplatformapi.exception.EcwsCaseException;
-import com.fubon.ecplatformapi.helper.SessionHelper;
-import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
+import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
+import com.fubon.ecplatformapi.model.dto.req.LoginReqDTO;
 import com.fubon.ecplatformapi.model.dto.vo.LoginRespVo;
 import com.fubon.ecplatformapi.model.dto.vo.VerificationVo;
 import com.fubon.ecplatformapi.service.AuthService;
-import com.fubon.ecplatformapi.enums.StatusCodeEnum;
-import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
 import com.fubon.ecplatformapi.service.SsoService;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.fubon.ecplatformapi.config.SessionManager;
 
-import java.util.Objects;
 
 @Slf4j
 @RestController
 @RequestMapping("/auth")
-public class AuthController extends SessionController {
+public class AuthController extends SessionController{
     @Autowired
     AuthService authService;
     @Autowired
@@ -37,10 +32,12 @@ public class AuthController extends SessionController {
      *
      */
     @PostMapping("/login")
-    public ResponseEntity<ApiRespDTO<LoginRespVo.ResponseData>> login(@RequestBody LoginReqDTO loginReq, HttpSession session, HttpServletResponse response){
+    public ResponseEntity<ApiRespDTO<LoginRespVo.ResponseData>> login(@RequestBody LoginReqDTO loginReq, HttpSession session){
+
         try {
-            LoginRespVo responseData = authService.getUserInfo(loginReq, session, response);
-            SessionHelper.getAllValue(session.getId());
+
+            LoginRespVo responseData = authService.getUserInfo(loginReq, session);
+            //SessionHelper.getAllValue();
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", "Bearer " + responseData.getToken());
@@ -53,17 +50,10 @@ public class AuthController extends SessionController {
                             .data(responseData.getData())
                             .build());
 
-        } catch (CustomException exception) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(result(exception.getErrorCode(), exception.getMessage(), null));
+        } catch (CustomException exception){
+            return ResponseEntity.ok().body(systemErrorResp(exception.getMessage()));
 
-        } catch (Exception e) {
-            return ResponseEntity.ok()
-                    .body(ApiRespDTO.<LoginRespVo.ResponseData>builder()
-                            .code(StatusCodeEnum.ERR00999.name())
-                            .message(StatusCodeEnum.ERR00999.getMessage())
-                            .build());
-        }
+        } catch (Exception e) { return ResponseEntity.ok().body(systemErrorResp()); }
     }
 
     /**
@@ -72,15 +62,12 @@ public class AuthController extends SessionController {
      */
     @GetMapping("/getVerificationImage")
     public ApiRespDTO<VerificationVo> getVerificationImage() {
-
         try {
             VerificationVo responseData = authService.getVerificationImage();
-
-            // 保存解碼圖片到指定路徑
-            authService.saveVerificationImage("/Users/yingjie/Desktop/image.png", responseData.getVerificationImage());
             return successApiResp(responseData);
-
-        } catch (Exception e) { return errorApiResp(); }
+        } catch (Exception e) {
+            return systemErrorResp();
+        }
     }
 
     /**
@@ -91,21 +78,24 @@ public class AuthController extends SessionController {
     public ApiRespDTO<String> logout(){
         try {
             SessionManager.removeSession(sessionID());
-            return successApiResp(null);
+            return ApiRespDTO.<String>builder()
+                    .code(StatusCodeEnum.SUCCESS.getCode())
+                    .message(StatusCodeEnum.SUCCESS.getMessage())
+                    .build();
         } catch (Exception e) {
-            return errorApiResp();
+            return systemErrorResp();
         }
     }
+
 
     /**
      * 取得 SSO Token
      *
      */
     @GetMapping("/getSSOToken")
-    public ApiRespDTO<String> getSSOToken(){
-        try {
-            return successApiResp(ssoService.getSSOToken());
-        } catch (Exception e){ return errorApiResp(); }
+    public ApiRespDTO<String> getSSOToken() {
+        String ssoToken = ssoService.getSSOToken();
+        return successApiResp(ssoToken);
     }
 
     /**
@@ -115,20 +105,12 @@ public class AuthController extends SessionController {
     @PostMapping("/loginSSO")
     public ApiRespDTO<LoginRespVo.ResponseData> SSOLogin(@RequestBody SsoReqDTO ssoReq) {
         try {
-
             ssoService.verifySSOLogin(ssoReq);
-
-            return ApiRespDTO.<LoginRespVo.ResponseData>builder()
-                    .code(StatusCodeEnum.SUCCESS.getCode())
-                    .message(StatusCodeEnum.SUCCESS.getMessage())
-                    //.data(responseData)
-                    .build();
+            return successApiResp(null);
 
         } catch (Exception e) {
-            return  ApiRespDTO.<LoginRespVo.ResponseData>builder()
-                    .code(StatusCodeEnum.ERR00999.name())
-                    .message(StatusCodeEnum.ERR00999.getMessage())
-                    .build();
+            return systemErrorResp();
         }
     }
 }
+

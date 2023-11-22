@@ -1,5 +1,6 @@
 package com.fubon.ecplatformapi.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fubon.ecplatformapi.config.EcwsConfig;
@@ -81,20 +82,29 @@ public class AuthServiceImpl implements AuthService {
      *
      */
     @Override
-    public LoginRespVo getUserInfo(LoginReqDTO loginReq, HttpSession session, HttpServletResponse response) {
+    public LoginRespVo getUserInfo(LoginReqDTO loginReq, HttpSession session) throws Exception {
+        String errorMsg = null;
         try {
             FubonEcWsLoginReqDTO fubonEcWsLoginReqDTO = jsonHelper.convertFubonEcWsLoginReq(loginReq);
             //String jsonRequest = jsonHelper.convertLoginConfigToJson(ecwsConfig.fubonLoginConfig(), loginReq);
             //LoginRespDTO fbLoginRespDTO = callFubonService(jsonRequest, LoginRespDTO.class).block();
 
             LoginRespDTO fbLoginRespDTO = callFubonService(objectMapper.writeValueAsString(fubonEcWsLoginReqDTO), LoginRespDTO.class).block();
+            if (fbLoginRespDTO != null) {
+                if (!fbLoginRespDTO.getHeader().getStatusCode().equals("0000")) {
+                    errorMsg = fbLoginRespDTO.getHeader().getStatusDesc();
+                }
+                if (!fbLoginRespDTO.getAny().getStaffValid()) {
+                    errorMsg = fbLoginRespDTO.getAny().getStaffValidMsg();
+                }
+                log.debug("Error message: " + errorMsg);
+            }
+            log.debug(objectMapper.writeValueAsString(fbLoginRespDTO));
 
-            SessionManager.saveSession(session, response, fbLoginRespDTO);
-
-            SessionManager.saveAuthToken(response, session);
+            SessionManager.saveSession(session, fbLoginRespDTO);
 
             String authToken = tokenService.generateToken(session.getId(), loginReq.getAccount(), System.currentTimeMillis());
-            tokenService.saveAuthToken(response, session, authToken);
+            tokenService.saveAuthToken(session, authToken);
 
             LoginRespVo.ResponseData data = xrefInfoService.getXrefInfoList(fbLoginRespDTO);
 
@@ -103,15 +113,10 @@ public class AuthServiceImpl implements AuthService {
                     .data(data)
                     .build();
 
-        } catch (CustomException exception) {
-            log.error(exception.getMessage());
-        } catch (NullPointerException ex){
-            log.debug(ex.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-
+            throw new CustomException(errorMsg, StatusCodeEnum.ERR00999.getCode());
         }
-        return null;
     }
 
     private <T> Mono<T> callFubonService(String jsonRequest, Class<T> responseType) {

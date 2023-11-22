@@ -1,12 +1,11 @@
 package com.fubon.ecplatformapi.service.impl;
 
-
 import com.fubon.ecplatformapi.config.SessionManager;
 import com.fubon.ecplatformapi.controller.auth.SessionController;
-import com.fubon.ecplatformapi.service.TokenService;
-import com.fubon.ecplatformapi.helper.SessionHelper;
+import com.fubon.ecplatformapi.exception.TokenValidationException;
 import com.fubon.ecplatformapi.properties.TokenProperties;
-import jakarta.servlet.http.HttpServletResponse;
+import com.fubon.ecplatformapi.service.TokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Service
 public class TokenServiceImpl extends SessionController implements TokenService {
-    private final Map<String, HttpSession> authTokenMap = new ConcurrentHashMap<String, HttpSession>();
+    private final Map<String, String> authTokenMap = new ConcurrentHashMap<String, String>();
     @Autowired
     TokenProperties tokenProperties;
     private final SecretKey secretKey;
@@ -38,16 +37,36 @@ public class TokenServiceImpl extends SessionController implements TokenService 
      *  儲存 Token
      */
     @Override
-    public void saveAuthToken(HttpServletResponse response,HttpSession session, String authToken) {
-        authTokenMap.put(authToken, session);
-        session.setAttribute("AUTH_TOKEN", authToken);
-        SessionManager.saveAuthToken(response, session);
+    public void saveAuthToken(HttpSession session, String authToken) {
+        log.debug("Saving Auth Token for session: " + session.getId() + ", AUTH_TOKEN: " + authToken);
+        authTokenMap.put(authToken, session.getId());
+        log.debug("Session and Auth Token saved successfully.");
     }
 
     @Override
-    public void getAuthToken(String authToken){
-        authTokenMap.get(authToken);
+    public HttpSession getSession(String authToken) throws TokenValidationException{
+        log.debug("用 AuthToken 拿取登入的 HttpSession #Start : " + authToken);
+
+        String sessionId = authTokenMap.get(authToken);
+        log.debug("從 AuthTokenMap 取得 AuthToken 對應的 SessionID #Passed ");
+
+        if (sessionId != null) {
+            HttpSession session = SessionManager.getSessionById(sessionId);
+            log.debug(" 從 SessionManager 找到 SessionID 回傳登入的 HttpSession #Passed");
+
+            if (session != null) {
+                log.debug("Found session ID from authTokenMap: " + sessionId + " for authToken: " + authToken);
+                return session;
+            } else {
+                log.debug("Session is null");
+                throw new TokenValidationException("Session不存在或已經清除 ex.登出");
+            }
+        } else {
+            log.debug("SessionID is null");
+            throw new TokenValidationException("授權令牌重複輸入");
+        }
     }
+
 
     /**
      *  生成 Token
@@ -63,22 +82,23 @@ public class TokenServiceImpl extends SessionController implements TokenService 
      * 驗證 Token
      */
     @Override
-    public boolean isTokenValid(String token){
+    public boolean isTokenValid(String token) throws TokenValidationException {
+        log.debug("Validating Token for: " + token);
 
         try{
-
             String[] tokenParts = decrypt(token, secretKey).split("\\|");
-
-            if (tokenParts.length != 4 || !tokenParts[0].equals(sessionID())) {
-                return false;
+            String sessionID = tokenParts[0];
+            if (tokenParts.length != 4 ) {
+                log.debug("Incorrect Token length");
+                throw new TokenValidationException("Incorrect Token length");
             }
 
-            Object value = SessionHelper.getAllValue(sessionID());
-            //log.info("value: " + value);
+            //SessionHelper.getAllValue();
 
             if (!validateSignature(tokenParts[0], tokenParts[1], Long.parseLong(tokenParts[2]), tokenParts[3])) {
-                SessionManager.removeSession(sessionID());
-                return false;
+                log.debug("Signature validation failed");
+                SessionManager.removeSession(sessionID);
+                throw new TokenValidationException("Signature validation failed");
             }
 
             long decryptedTimestamp = Long.parseLong(tokenParts[2]);
@@ -86,31 +106,45 @@ public class TokenServiceImpl extends SessionController implements TokenService 
             long tokenAge = currentTimestamp - decryptedTimestamp;
             Duration tokenExpirationTime = tokenProperties.getExpirationMinutes();
 
+            log.debug("Token Age: " + tokenAge + " ms, Expiration Time: " + tokenExpirationTime.toMillis() + " ms");
+
             if (tokenAge > tokenExpirationTime.toMillis()) {
-                SessionManager.removeSession(sessionID());
-                return false;
+                log.debug("Token has expired");
+                SessionManager.removeSession(sessionID);
+                throw new TokenValidationException("Token has expired");
             }
 
+            log.debug("Token validation passed");
             return true;
 
         } catch (Exception e){
-            log.error("Token驗證失敗: " + e.getMessage());
-            return false;
+            log.error("Token validation failed: " + e.getMessage());
+            throw new TokenValidationException("Token validation failed: " + e.getMessage());
         }
-
     }
 
     /**
      * 更新 Token
      */
     @Override
-    public void updateToken(HttpSession session, String oldToken) throws Exception {
-
+    public void updateToken(HttpServletRequest request, String oldToken) throws Exception {
+        log.debug("Updating Token for old Token");
         String[] tokenParts = decrypt(oldToken, secretKey).split("\\|");
         long currentTimestamp = System.currentTimeMillis();
 
         String newToken = generateToken(tokenParts[0], tokenParts[1],currentTimestamp);
-        session.setAttribute("AUTH_TOKEN", newToken);
+        log.debug("Generated new token: " + newToken);
+        authTokenMap.remove(oldToken);
+        authTokenMap.put(newToken, tokenParts[0]);
+        log.debug("sessionID: " + tokenParts[0]);
+
+        request.setAttribute("AUTH_TOKEN", newToken);
+
+        log.debug("New Token : " + request.getAttribute("AUTH_TOKEN"));
+        log.debug("Session and Auth Token saved successfully.");
+
+        //log.debug("New AUTH_TOKEN saved in request: " + request.getAttribute("AUTH_TOKEN"));
+        log.debug("Token updating passed");
     }
 
     public static String encrypt(String data, SecretKey secretKey) throws Exception {
