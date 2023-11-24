@@ -120,6 +120,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private <T> Mono<T> callFubonService(String jsonRequest, Class<T> responseType) {
+
         return webClient
                 .post()
                 .uri("")
@@ -127,16 +128,7 @@ public class AuthServiceImpl implements AuthService {
                 .bodyValue(jsonRequest)
                 .retrieve()
                 .bodyToMono(responseType);
-//                .flatMap(response -> {
-//                    if (response instanceof LoginRespDTO) {
-//                        String statusCode = ((LoginRespDTO) response).getHeader().getStatusCode();
-//                        log.info("Status Code: " + statusCode);
-//                        if (!"0000".equals(statusCode)) {
-//                            return Mono.error(new CustomException(((LoginRespDTO) response).getHeader().getStatusDesc(), StatusCodeEnum.ERR00998.getCode()));
-//                        }
-//                    }
-//                    return Mono.just(response);
-//                });
+
     }
 
     @Override

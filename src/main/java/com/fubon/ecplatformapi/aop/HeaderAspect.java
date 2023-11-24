@@ -66,7 +66,7 @@ public class HeaderAspect extends SessionController {
             }
         }catch (TokenValidationException e){
             log.error("** Error during Valid Token: " + e.getMessage());
-            return systemErrorResp(e.getMessage());
+            return tokenErrorResp(e.getMessage());
 
         }catch (CustomException e){
             log.error("** Error during JoinPoint CustomExecution: " + e.getMessage());

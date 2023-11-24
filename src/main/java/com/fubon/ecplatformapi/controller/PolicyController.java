@@ -48,24 +48,23 @@ public class PolicyController extends SessionController {
 
 
     @GetMapping("/queryPolicyDetail")
-    public ApiRespDTO<CreateDetailResultVO> queryDetail(@Valid @RequestBody QueryPolicyDetailReqDTO request) {
+    public ApiRespDTO<DetailResultVo> queryDetail(@Valid @RequestBody QueryPolicyDetailReqDTO request) {
         try {
 
             DetailResultVo detailResult = policyService.getPolicyDetail(request);
 
-            CreateDetailResultVO resultVO = new CreateDetailResultVO();
-            resultVO.setDetailResult(detailResult);
+//            CreateDetailResultVO resultVO = new CreateDetailResultVO();
+//            resultVO.setDetailResult(detailResult);
 
-
-            return ApiRespDTO.<CreateDetailResultVO>builder()
+            return ApiRespDTO.<DetailResultVo>builder()
                     .code(StatusCodeEnum.SUCCESS.getCode())
                     .message(StatusCodeEnum.SUCCESS.getMessage())
                     .authToken(getAuthToken())
-                    .data(resultVO)
+                    .data(detailResult)
                     .build();
 
         } catch (Exception e) {
-            return ApiRespDTO.<CreateDetailResultVO>builder()
+            return ApiRespDTO.<DetailResultVo>builder()
                     .code(StatusCodeEnum.ERR00999.name())
                     .message(StatusCodeEnum.ERR00999.getMessage())
                     .build();

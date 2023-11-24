@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -117,9 +118,13 @@ public class TokenServiceImpl extends SessionController implements TokenService 
             log.debug("Token validation passed");
             return true;
 
+        } catch (BadPaddingException e) {
+            log.error("Bad padding exception: " + e.getMessage());
+            throw new TokenValidationException("令牌已被篡改或在傳輸過程中損壞");
+
         } catch (Exception e){
             log.error("Token validation failed: " + e.getMessage());
-            throw new TokenValidationException("Token validation failed: " + e.getMessage());
+            throw new TokenValidationException(e.getMessage());
         }
     }
 

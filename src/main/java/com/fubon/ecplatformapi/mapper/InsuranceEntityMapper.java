@@ -48,6 +48,7 @@ public class InsuranceEntityMapper {
     }
 
     public static PaymentRecordDTO mapToPaymentRecordDTO(NFNV03Entity entity){
+        if(entity == null) return null;
         return modelMapper.map(entity, PaymentRecordDTO.class);
     }
 }

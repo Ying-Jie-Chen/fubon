@@ -138,12 +138,12 @@ public class PolicyServiceImpl extends SessionController implements PolicyServic
             // 保單寄送紀錄查詢
             Mono<FubonPrnDetailResp> prnDetailMono = callWebClient("/getPrnDetail", getPrnDetailRequest(request), FubonPrnDetailResp.class);
             // 理賠紀錄查詢
-            Mono<FubonClmSalesRespDTO> clmSalesMono = callWebClient("/ClmSalesAppWs/api101", getClmSalesRequest(request), FubonClmSalesRespDTO.class);
+            //Mono<FubonClmSalesRespDTO> clmSalesMono = callWebClient("/ClmSalesAppWs/api101", getClmSalesRequest(request), FubonClmSalesRespDTO.class);
             // 保全紀錄查詢
             Mono<FubonChkEnrDataRespDTO> chkEnrDataMono = callWebClient("/chkEnrData", getChkEnrDataRequest(request), FubonChkEnrDataRespDTO.class);
 
-            return Mono.zip(policyDetailMono, prnDetailMono, clmSalesMono, chkEnrDataMono)
-                    .map(tuple -> PolicyDetailMapper.mapToDetailResultVo(request, tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4())).block();
+            return Mono.zip(policyDetailMono, prnDetailMono, chkEnrDataMono) //clmSalesMono
+                    .map(tuple -> PolicyDetailMapper.mapToDetailResultVo(request, tuple.getT1(), tuple.getT2(),tuple.getT3())).block(); // tuple.getT3(),
 
         }catch (Exception e) {
             e.printStackTrace();

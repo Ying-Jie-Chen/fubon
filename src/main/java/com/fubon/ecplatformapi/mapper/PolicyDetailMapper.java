@@ -23,16 +23,16 @@ public class PolicyDetailMapper {
         PolicyDetailMapper.nfnv03Repository = nfnv03Repository;
     }
 
-    public static DetailResultVo mapToDetailResultVo(QueryPolicyDetailReqDTO request, FubonPolicyDetailRespDTO policyDetail, FubonPrnDetailResp prnDetail, FubonClmSalesRespDTO clmSales, FubonChkEnrDataRespDTO chkEnrData) {
+    public static DetailResultVo mapToDetailResultVo(QueryPolicyDetailReqDTO request, FubonPolicyDetailRespDTO policyDetail, FubonPrnDetailResp prnDetail, FubonChkEnrDataRespDTO chkEnrData) { //FubonClmSalesRespDTO clmSales,
         String policyNum = request.getPolicyNum();
         InsuranceType insType = InsuranceType.valueOf(request.getInsType());
         UnpaidRecordDTO unpaidRecord = InsuranceEntityMapper.mapToUnpaidRecordDTO(nfnv02Repository.findUnpaidByPolyno(policyNum));
         PaymentRecordDTO paymentRecord = InsuranceEntityMapper.mapToPaymentRecordDTO(nfnv03Repository.findPaymentByPolyno(policyNum));
         try {
             if (InsuranceType.Car_Insurance.equals(insType) || InsuranceType.Personal_Insurance.contains(insType)) {
-                return mapToCarAndPersonalInsType(insType, policyNum, policyDetail, prnDetail, clmSales, chkEnrData, unpaidRecord, paymentRecord);
+                return mapToCarAndPersonalInsType(insType, policyNum, policyDetail, prnDetail, chkEnrData, unpaidRecord, paymentRecord); // (insType, policyNum, policyDetail, prnDetail, clmSales, chkEnrData, unpaidRecord, paymentRecord);
             } else if(InsuranceType.Business_Insurance.contains(insType)){
-                return mapToBusinessInsType(policyDetail, policyNum, clmSales, chkEnrData, unpaidRecord, paymentRecord);
+                return mapToBusinessInsType(policyDetail, policyNum, chkEnrData, unpaidRecord, paymentRecord); // (policyDetail, policyNum, clmSales, chkEnrData, unpaidRecord, paymentRecord)
             }
         }catch (Exception e) {
             e.printStackTrace();
@@ -40,7 +40,8 @@ public class PolicyDetailMapper {
         return null;
     }
 
-    private static DetailResultVo mapToCarAndPersonalInsType(InsuranceType insType, String policyNum, FubonPolicyDetailRespDTO policyDetail, FubonPrnDetailResp prnDetail, FubonClmSalesRespDTO clmSales, FubonChkEnrDataRespDTO chkEnrData, UnpaidRecordDTO unpaidRecord, PaymentRecordDTO paymentRecord){
+    // (InsuranceType insType, String policyNum, FubonPolicyDetailRespDTO policyDetail, FubonPrnDetailResp prnDetail, FubonClmSalesRespDTO clmSales, FubonChkEnrDataRespDTO chkEnrData, UnpaidRecordDTO unpaidRecord, PaymentRecordDTO paymentRecord){
+    private static DetailResultVo mapToCarAndPersonalInsType(InsuranceType insType, String policyNum, FubonPolicyDetailRespDTO policyDetail, FubonPrnDetailResp prnDetail, FubonChkEnrDataRespDTO chkEnrData, UnpaidRecordDTO unpaidRecord, PaymentRecordDTO paymentRecord){
 
         FubonPolicyDetailRespDTO.EcAppInsure ecAppInsure = policyDetail.getEcAppInsure();
 
@@ -64,13 +65,13 @@ public class PolicyDetailMapper {
                 // 繳費紀錄
                 .paidRecord(mapToEcPaidRecord(ecAppInsure, paymentRecord))
                 // 理賠紀錄
-                .claimRecord(mapToClaimRecord(policyNum, clmSales))
+                //.claimRecord(mapToClaimRecord(policyNum, clmSales))
                 // 保全紀錄
                 .conservationRecord(getConservationRecord(chkEnrData))
                 .build();
     }
-
-    private static DetailResultVo mapToBusinessInsType(FubonPolicyDetailRespDTO policyDetail, String policyNum, FubonClmSalesRespDTO clmSales, FubonChkEnrDataRespDTO chkEnrData, UnpaidRecordDTO unpaidRecord, PaymentRecordDTO paymentRecord){
+    // (FubonPolicyDetailRespDTO policyDetail, String policyNum, FubonClmSalesRespDTO clmSales, FubonChkEnrDataRespDTO chkEnrData, UnpaidRecordDTO unpaidRecord, PaymentRecordDTO paymentRecord)
+    private static DetailResultVo mapToBusinessInsType(FubonPolicyDetailRespDTO policyDetail, String policyNum, FubonChkEnrDataRespDTO chkEnrData, UnpaidRecordDTO unpaidRecord, PaymentRecordDTO paymentRecord){
 
         FubonPolicyDetailRespDTO.EcAppInsureEtp ecAppInsureEtp = policyDetail.getEcAppInsureEtp();
 
@@ -88,7 +89,7 @@ public class PolicyDetailMapper {
                 // 繳費紀錄
                 .paidRecord(mapToEtpPaidRecord(paymentRecord))
                 // 理賠紀錄
-                .claimRecord(mapToClaimRecord(policyNum, clmSales))
+                //.claimRecord(mapToClaimRecord(policyNum, clmSales))
                 // 保全紀錄
                 .conservationRecord(getConservationRecord(chkEnrData))
                 .build();
