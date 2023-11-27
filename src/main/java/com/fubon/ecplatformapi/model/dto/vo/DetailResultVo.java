@@ -16,6 +16,8 @@ import java.util.List;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class DetailResultVo {
 
     private InsuranceInfo insuranceInfo;
@@ -34,6 +36,8 @@ public class DetailResultVo {
 
     @Data
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class InsuranceInfo {
         private BasicInfo basicInfo;
         private InsuredInfo insuredInfo;
@@ -45,7 +49,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
-    //@JsonInclude(JsonInclude.Include.NON_NULL)
+    @NoArgsConstructor
     public static class BasicInfo {
         @Size(max = 14)
         private String policyNum;
@@ -82,6 +86,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class InsuredInfo {
         @Size(max = 200)
         private String insuredName;
@@ -115,7 +120,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @NoArgsConstructor
     public static class InsuredList {
         @Size(max = 200)
         private String insuredName;
@@ -155,6 +160,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class ProposerInfo {
         @Size(max = 60)
         private String proposerName;
@@ -190,6 +196,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class FlightInfo {
         @Size(max = 10)
         private Integer flightSeq;
@@ -207,6 +214,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class InsuranceSubject {
         @Size(max = 11)
         private String plateNo;
@@ -275,6 +283,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class EtpInsuranceSubjectDetail{
         private Integer seq;
         private List<String> values;
@@ -283,6 +292,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class InsuranceItem{
         @Size(max = 500)
         private String bnfCode;
@@ -298,6 +308,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class AdditionalTerm {
         private String term;
         private String value;
@@ -315,6 +326,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class InsuranceList{
         @Size(max = 10)
         private String bnfCode;
@@ -335,6 +347,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class InsuranceOtherList {
         @Size(max = 100)
         private String petType;
@@ -351,6 +364,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class PolicyDeliveryRecord{
         @Size(max = 30)
         private String prnDoc;
@@ -371,6 +385,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class UnpaidRecord{
         @Size(max = 3)
         private String insType;
@@ -394,6 +409,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class PaidRecord{
         @Size(max = 3)
         private String insType;
@@ -423,6 +439,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class ClaimRecord{
         private String insType;
         private Date acdate;
@@ -440,6 +457,7 @@ public class DetailResultVo {
     @Data
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class ConservationRecord{
         private String proposerName;
         private String insuredName;

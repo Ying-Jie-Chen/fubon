@@ -3,6 +3,8 @@ package com.fubon.ecplatformapi.service.impl;
 import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.enums.InsuranceType;
 import com.fubon.ecplatformapi.enums.SessionAttribute;
+import com.fubon.ecplatformapi.enums.StatusCodeEnum;
+import com.fubon.ecplatformapi.exception.CustomException;
 import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.mapper.PolicyDetailMapper;
 import com.fubon.ecplatformapi.mapper.PolicyListMapper;
@@ -145,10 +147,9 @@ public class PolicyServiceImpl extends SessionController implements PolicyServic
             return Mono.zip(policyDetailMono, prnDetailMono, chkEnrDataMono) //clmSalesMono
                     .map(tuple -> PolicyDetailMapper.mapToDetailResultVo(request, tuple.getT1(), tuple.getT2(),tuple.getT3())).block(); // tuple.getT3(),
 
-        }catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception e){
+            throw new CustomException(e.getMessage(), StatusCodeEnum.ERR00999.getCode());
         }
-        return null;
 
     }
 

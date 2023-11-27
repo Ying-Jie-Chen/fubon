@@ -2,6 +2,7 @@ package com.fubon.ecplatformapi.controller;
 
 import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
+import com.fubon.ecplatformapi.exception.CustomException;
 import com.fubon.ecplatformapi.model.dto.req.QueryPolicyDetailReqDTO;
 import com.fubon.ecplatformapi.model.dto.req.PolicyListReqDTO;
 import com.fubon.ecplatformapi.model.dto.resp.ApiRespDTO;
@@ -50,25 +51,12 @@ public class PolicyController extends SessionController {
     @GetMapping("/queryPolicyDetail")
     public ApiRespDTO<DetailResultVo> queryDetail(@Valid @RequestBody QueryPolicyDetailReqDTO request) {
         try {
-
             DetailResultVo detailResult = policyService.getPolicyDetail(request);
-
-//            CreateDetailResultVO resultVO = new CreateDetailResultVO();
-//            resultVO.setDetailResult(detailResult);
-
-            return ApiRespDTO.<DetailResultVo>builder()
-                    .code(StatusCodeEnum.SUCCESS.getCode())
-                    .message(StatusCodeEnum.SUCCESS.getMessage())
-                    .authToken(getAuthToken())
-                    .data(detailResult)
-                    .build();
-
-        } catch (Exception e) {
-            return ApiRespDTO.<DetailResultVo>builder()
-                    .code(StatusCodeEnum.ERR00999.name())
-                    .message(StatusCodeEnum.ERR00999.getMessage())
-                    .build();
+            return successApiResp(detailResult);
+        } catch (Exception e){
+            return systemErrorResp(e.getMessage());
         }
+
     }
 
     @GetMapping("/queryMyPolicyList")

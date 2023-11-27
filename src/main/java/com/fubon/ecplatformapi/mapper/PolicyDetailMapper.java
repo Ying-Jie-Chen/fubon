@@ -1,6 +1,8 @@
 package com.fubon.ecplatformapi.mapper;
 
 import com.fubon.ecplatformapi.enums.InsuranceType;
+import com.fubon.ecplatformapi.enums.StatusCodeEnum;
+import com.fubon.ecplatformapi.exception.CustomException;
 import com.fubon.ecplatformapi.model.dto.PaymentRecordDTO;
 import com.fubon.ecplatformapi.model.dto.UnpaidRecordDTO;
 import com.fubon.ecplatformapi.model.dto.req.QueryPolicyDetailReqDTO;
@@ -11,6 +13,7 @@ import com.fubon.ecplatformapi.repository.NFNV03Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static com.fubon.ecplatformapi.enums.InsuranceType.*;
 import static com.fubon.ecplatformapi.mapper.PolicyDetailSpecificMapper.*;
 @Component
 public class PolicyDetailMapper {
@@ -26,16 +29,19 @@ public class PolicyDetailMapper {
     public static DetailResultVo mapToDetailResultVo(QueryPolicyDetailReqDTO request, FubonPolicyDetailRespDTO policyDetail, FubonPrnDetailResp prnDetail, FubonChkEnrDataRespDTO chkEnrData) { //FubonClmSalesRespDTO clmSales,
         String policyNum = request.getPolicyNum();
         InsuranceType insType = InsuranceType.valueOf(request.getInsType());
-        UnpaidRecordDTO unpaidRecord = InsuranceEntityMapper.mapToUnpaidRecordDTO(nfnv02Repository.findUnpaidByPolyno(policyNum));
-        PaymentRecordDTO paymentRecord = InsuranceEntityMapper.mapToPaymentRecordDTO(nfnv03Repository.findPaymentByPolyno(policyNum));
         try {
-            if (InsuranceType.Car_Insurance.equals(insType) || InsuranceType.Personal_Insurance.contains(insType)) {
+            UnpaidRecordDTO unpaidRecord = InsuranceEntityMapper.mapToUnpaidRecordDTO(nfnv02Repository.findUnpaidByPolyno(policyNum));
+            PaymentRecordDTO paymentRecord = InsuranceEntityMapper.mapToPaymentRecordDTO(nfnv03Repository.findPaymentByPolyno(policyNum));
+
+            if (Car_Insurance.equals(insType) || Personal_Insurance.contains(insType)) {
                 return mapToCarAndPersonalInsType(insType, policyNum, policyDetail, prnDetail, chkEnrData, unpaidRecord, paymentRecord); // (insType, policyNum, policyDetail, prnDetail, clmSales, chkEnrData, unpaidRecord, paymentRecord);
-            } else if(InsuranceType.Business_Insurance.contains(insType)){
+            } else if (Business_Insurance.contains(insType)) {
                 return mapToBusinessInsType(policyDetail, policyNum, chkEnrData, unpaidRecord, paymentRecord); // (policyDetail, policyNum, clmSales, chkEnrData, unpaidRecord, paymentRecord)
             }
+
         }catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            throw new CustomException(e.getMessage(), StatusCodeEnum.ERR00999.getCode());
         }
         return null;
     }

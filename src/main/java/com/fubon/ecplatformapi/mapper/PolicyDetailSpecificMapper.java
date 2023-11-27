@@ -1,6 +1,8 @@
 package com.fubon.ecplatformapi.mapper;
 
 import com.fubon.ecplatformapi.enums.InsuranceType;
+import com.fubon.ecplatformapi.enums.StatusCodeEnum;
+import com.fubon.ecplatformapi.exception.CustomException;
 import com.fubon.ecplatformapi.model.dto.CarInsuranceTermDTO;
 import com.fubon.ecplatformapi.model.dto.PaymentRecordDTO;
 import com.fubon.ecplatformapi.model.dto.UnpaidRecordDTO;
@@ -328,32 +330,31 @@ public class PolicyDetailSpecificMapper {
         String mohPrmCode = ecAppInsure.getMohEcAppWsBean().getMohPrmCode();
         List<String> sbcMohParam1 = ecAppInsure.getSbcEcAppWsBeans().stream()
                 .map(FubonPolicyDetailRespDTO.SbcEcAppWsBean::getSbcMohParam1)
-                .toList();
-        List<CarInsuranceTermDTO> insuranceTerms = Optional.ofNullable(getInsuranceTerms(mohPrmCode, sbcMohParam1)).orElseGet(Collections::emptyList);
+                .collect(toList());
 
-        return insuranceTerms.stream()
-                .map(term -> {
-                    String[] contentArray = term.getTermInsContent1().split(";");
-                    String value = "";
+        try {
 
-                    for (String content : contentArray) {
-                        String[] keyValue = content.split(",");
-                        if (keyValue.length == 2) {
-                            String key = keyValue[0].trim();
-                            String contentValue = keyValue[1].trim();
+            List<CarInsuranceTermDTO> insuranceTerms = getInsuranceTerms(mohPrmCode, sbcMohParam1);
 
-                            if (key.equals(term.getTermInsApiParam1())) {
-                                value = "型式 " + contentValue;
-                                break;
-                            }
-                        }
-                    }
-                    return DetailResultVo.AdditionalTerm.builder()
-                            .term(term.getTermInsName())
-                            .value(value)
-                            .build();
-                })
-                .collect(Collectors.toList());
+            return insuranceTerms.stream()
+                    .map(term -> {
+                        String value = Arrays.stream(term.getTermInsContent1().split(";"))
+                                .map(content -> content.split(","))
+                                .filter(keyValue -> keyValue.length == 2)
+                                .filter(keyValue -> keyValue[0].trim().equals(term.getTermInsApiParam1()))
+                                .findFirst()
+                                .map(keyValue -> "型式 " + keyValue[1].trim())
+                                .orElse("");
+
+                        return DetailResultVo.AdditionalTerm.builder()
+                                .term(term.getTermInsName())
+                                .value(value)
+                                .build();
+                    }).collect(Collectors.toList());
+
+        } catch (Exception e){
+            throw new CustomException(e.getMessage(), StatusCodeEnum.ERR00999.getCode());
+        }
     }
 
     /**

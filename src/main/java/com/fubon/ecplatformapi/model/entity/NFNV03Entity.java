@@ -7,61 +7,58 @@ import java.math.BigDecimal;
 import java.util.Date;
 @Entity
 @Data
-@Table(name = "nfnv03")
+@Table(name = "NFNV03")
 public class NFNV03Entity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
 
-    @Column(name = "inslin")
+    @Column(name = "INSLIN")
     private String inslin;
 
-    @Column(name = "insdesc")
+    @Column(name = "INSDESC")
     private String insdesc;
 
-    @Column(name = "polyno_q")
+    @Column(name = "POLYNO_Q")
     private String polynoQ;
 
-    @Column(name = "polyno")
+    @Id
+    @Column(name = "POLYNO")
     private String polyno;
 
-    @Column(name = "trade_no")
+    @Column(name = "TRADE_NO")
     private String tradeNo;
 
-    @Column(name = "payamt")
+    @Column(name = "PAYAMT")
     private BigDecimal payamt;
 
-    @Column(name = "isrid")
+    @Column(name = "ISRID")
     private String isrid;
 
-    @Column(name = "isrnm")
+    @Column(name = "ISRNM")
     private String isrnm;
 
-    @Column(name = "insid")
+    @Column(name = "INSID")
     private String insid;
 
-    @Column(name = "insnm")
+    @Column(name = "INSNM")
     private String insnm;
 
-    @Column(name = "effda")
+    @Column(name = "EFFDA")
     private Date effda;
 
-    @Column(name = "expda")
+    @Column(name = "EXPDA")
     private Date expda;
 
-    @Column(name = "pcllda")
+    @Column(name = "PCLLDA")
     private Date pcllda;
 
-    @Column(name = "fundkind")
+    @Column(name = "FUNDKIND")
     private String fundkind;
 
-    @Column(name = "isc_admin")
+    @Column(name = "ISC_ADMIN")
     private String iscAdmin;
 
-    @Column(name = "isc_xref")
+    @Column(name = "ISC_XREF")
     private String iscXref;
 
-    @Column(name = "prsnid")
+    @Column(name = "PRSNID")
     private String prsnid;
 }
