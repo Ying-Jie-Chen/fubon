@@ -424,24 +424,14 @@ public class PolicyDetailSpecificMapper {
                     List<String> listTile = insureEtpList.stream()
                             .map(bean -> Collections.singletonList(bean.getPitRskType()))
                             .flatMap(List::stream)
-                            .collect(Collectors.toList());
+                            .toList();
 
-//                    return ecAppInsureEtp.getPitColumnNames().stream()
-//                            .map(pitColumnName -> DetailResultVo.InsuranceItem.builder()
-//                                    .seq(Integer.parseInt(String.valueOf(
-//                                            ecAppInsureEtp.getRskDEcAppWsBeans().iterator().next().getSeq())))
-//                                    .title(String.valueOf(listTile))
-//                                    //.title(pitColumnName)
-//                                    .values(listValues)
-//                                    .build())
-//                            .collect(Collectors.toList());
-                    return Optional.ofNullable(ecAppInsureEtp.getRskDEcAppWsBeans())
-                            .map(rskDEcAppWsBeans -> rskDEcAppWsBeans.stream()
+                    return Optional.ofNullable(ecAppInsureEtp.getPitEcAppEtpWsBeans())
+                            .map(pitEcAppEtpWsBeans -> pitEcAppEtpWsBeans.stream()
                                     .findFirst()
-                                    .map(rskDEcAppWsBean -> DetailResultVo.InsuranceItem.builder()
-                                            .seq(Integer.parseInt(String.valueOf(rskDEcAppWsBean.getSeq())))
-                                            .title(String.valueOf(listTile))
-                                            //.title(pitColumnName)
+                                    .map(pitEcAppEtpWsBean -> DetailResultVo.InsuranceItem.builder()
+                                            .seq(Integer.parseInt(String.valueOf(pitEcAppEtpWsBean.getPitRskSeq())))
+                                            .title(listTile)
                                             .values(listValues)
                                             .build())
                                     .map(Collections::singletonList)

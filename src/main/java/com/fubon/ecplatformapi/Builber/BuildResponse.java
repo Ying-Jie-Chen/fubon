@@ -164,7 +164,7 @@ public class BuildResponse {
                                 .pitType("SampleType")
                                 .pitFinalprm(1000.0)
                                 .pitPex(500.0)
-                                .pitPexUnit("SampleUnit")
+                                .pitPexUnit("")
                                 .pitEb0Lists(Arrays.asList(FubonPolicyDetailRespDTO.PitEb0List.builder()
                                                 .eb0TsiDesc("Desc1")
                                                 .eb0TsiUnit("Unit1")
@@ -246,17 +246,35 @@ public class BuildResponse {
                         // 保險項目標題
                         .pitColumnNames(Arrays.asList("險種代碼", "保險種類"))
                         // 保險項目
-                        .pitEcAppEtpWsBeans(Collections.singleton(FubonPolicyDetailRespDTO.PitEcAppEtpWsBean.builder()
-
-                                .pitRskSeq(1)
-                                .pitRskType("pitRskType")
-                                .values(Arrays.asList("Value1", "Value2", "Value3"))
-                                .build()))
-                        .build())
+                        .pitEcAppEtpWsBeans(List.of(
+                                        FubonPolicyDetailRespDTO.PitEcAppEtpWsBean.builder()
+                                                .pitRskSeq(1)
+                                                .pitRskType("RSK")
+                                                .values(List.of("BEC11 雇主意外責任", "", ""))
+                                                .build(),
+                                        FubonPolicyDetailRespDTO.PitEcAppEtpWsBean.builder()
+                                                .pitRskSeq(1)
+                                                .pitRskType("RSK")
+                                                .values(List.of("每一人體傷死亡", "TWD 8,000,000", ""))
+                                                .build(),
+                                        FubonPolicyDetailRespDTO.PitEcAppEtpWsBean.builder()
+                                                .pitRskSeq(1)
+                                                .pitRskType("RSK")
+                                                .values(List.of("每一事故體傷死亡", "TWD 32,000,000", ""))
+                                                .build(),
+                                        FubonPolicyDetailRespDTO.PitEcAppEtpWsBean.builder()
+                                                .pitRskSeq(1)
+                                                .pitRskType("RSK")
+                                                .values(List.of("保險期間限額", "TWD 48,000,000", ""))
+                                                .build())
+                        ).build())
                 .build();
-
+        printJSON(response);
         return response;
     }
+
+
+
     public FubonPrnDetailResp buildPrnDetailResponse() {
         FubonPrnDetailResp.PrnResult prnResult1 = FubonPrnDetailResp.PrnResult.builder()
                 .build();
@@ -382,7 +400,7 @@ public class BuildResponse {
         System.out.println(jsonRequest);
     }
 
-    public void printJSON(LoginRespDTO response){
+    public void printJSON(FubonPolicyDetailRespDTO response){
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Json 排版
         String jsonRequest;
         try {

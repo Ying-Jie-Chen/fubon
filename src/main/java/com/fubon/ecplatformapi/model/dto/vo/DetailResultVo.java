@@ -1,6 +1,5 @@
 package com.fubon.ecplatformapi.model.dto.vo;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -302,7 +301,7 @@ public class DetailResultVo {
         @Digits(integer = 15, fraction = 2)
         private Double pex;
         private Integer seq;
-        private String title;
+        private List<String> title;
         private List<List<String>> values;
     }
     @Data

@@ -1,6 +1,7 @@
-package com.fubon.ecplatformapi.repository.fgisdb;
+package com.fubon.ecplatformapi.repository;
 
-import com.fubon.ecplatformapi.model.entity.fgisdb.AZNFLEntity;
+
+import com.fubon.ecplatformapi.model.entity.AZNFLEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
