@@ -16,6 +16,7 @@
 //import java.time.format.DateTimeFormatter;
 //
 //import lombok.extern.slf4j.Slf4j;
+//import org.springframework.scheduling.annotation.Scheduled;
 //import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 //import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
 //import org.springframework.scheduling.quartz.SchedulerFactoryBean;
@@ -41,6 +42,7 @@
 //     *
 //     */
 //    @Bean
+//    @Scheduled(fixedRateString = "${scheduling.fixedRate}")
 //    public Tasklet fileCleanupTasklet(String path) {
 //        return (stepContribution, chunkContext) -> {
 //
