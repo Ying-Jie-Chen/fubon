@@ -11,10 +11,8 @@ token:
   expiration-minutes: 20
 
 scheduling:
-  fixedRate: 600000
+  cron-expression: 0 0 2 * * ?
+  expiration-days: 30
+  clean-path: /path/to/nas
 
-#nas:
-#  expiration-days: 30
-#  cron:
-#    expression: "0 0 2 * * ?"
 

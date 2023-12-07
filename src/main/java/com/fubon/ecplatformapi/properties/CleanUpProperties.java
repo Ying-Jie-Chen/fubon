@@ -10,7 +10,7 @@ import java.time.temporal.ChronoUnit;
 
 @Getter
 @Configuration
-@ConfigurationProperties(prefix = "nas")
+@ConfigurationProperties(prefix = "scheduling")
 public class CleanUpProperties {
 
     @DurationUnit(ChronoUnit.DAYS)
@@ -18,8 +18,9 @@ public class CleanUpProperties {
 
     private String cronExpression;
 
-    public void setExpirationDays(Duration expirationDays) {
-        this.expirationDays = expirationDays;
-    }
+    private String cleanPath;
+
+    public void setExpirationDays(Duration expirationDays) { this.expirationDays = expirationDays; }
     public void setCronExpression(String cronExpression) { this.cronExpression = cronExpression; }
+    public void setCleanPath(String cleanPath){ this.cleanPath = cleanPath; }
 }

@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -157,28 +160,30 @@ public class BuildResponse {
                         .crdEcAppWsBean(FubonPolicyDetailRespDTO.CrdEcAppWsBean.builder()
                                 .build())
                         // 險種資料
-                        .pitEcAppWsBeans(Collections.singleton(FubonPolicyDetailRespDTO.PitEcAppWsBean.builder()
-                                .pitSeq(100)
-                                .pitBnfCode("SampleCode")
-                                .pitEb0Name("SampleName")
-                                .pitType("SampleType")
-                                .pitFinalprm(1000.0)
-                                .pitPex(500.0)
-                                .pitPexUnit("")
-                                .pitEb0Lists(Arrays.asList(FubonPolicyDetailRespDTO.PitEb0List.builder()
-                                                .eb0TsiDesc("Desc1")
-                                                .eb0TsiUnit("Unit1")
-                                                .eb0TsiValue("Value1")
-                                                .build(),
-                                        FubonPolicyDetailRespDTO.PitEb0List.builder()
-                                                .eb0TsiDesc("Desc2")
-                                                .eb0TsiUnit("Unit2")
-                                                .eb0TsiValue("Value2")
-                                                .build()))
-                                .build()))
+                        .pitEcAppWsBeans(Stream.of(
+                                                IntStream.range(0, 5)
+                                                        .mapToObj(i -> createPitEcAppWsBean("C005", "地震災害修復費用保險", 598.0))
+                                                        .collect(Collectors.toList()),
+                                                IntStream.range(0, 5)
+                                                        .mapToObj(i -> createPitEcAppWsBean("C013", "丙：家庭財物火災損害保險", 205.0))
+                                                        .collect(Collectors.toList()),
+                                                IntStream.range(0, 5)
+                                                        .mapToObj(i -> createPitEcAppWsBean("C015", "丙：家庭災害費用補償保險-基本事故", 52.0))
+                                                        .collect(Collectors.toList()),
+                                                IntStream.range(0, 5)
+                                                        .mapToObj(i -> createPitEcAppWsBean("C016", "丙：家庭災害費用補償保險-地震事故", 110.0))
+                                                        .collect(Collectors.toList()),
+                                                IntStream.range(0, 5)
+                                                        .mapToObj(i -> createPitEcAppWsBean("Q00Q", "地震基本保險", 637.0))
+                                                        .collect(Collectors.toList())
+                                        )
+                                        .flatMap(Collection::stream)
+                                        .collect(Collectors.toList())
+                        )
+
                         // 險種名冊資料
-                        .pitNEcAppWsBeans(Collections.singleton(FubonPolicyDetailRespDTO.PitNecAppWsBeans.builder()
-                                .build()))
+//                        .pipitNEcAppWsBeans(Collections.singleton(FubonPolicyDetailRespDTO.PitNecAppWsBeans.builder()
+//                                .build()))
                         // 經辦資料
                         .ascEcAppWsBean(FubonPolicyDetailRespDTO.AscEcAppWsBean.builder()
                                 .build())
@@ -272,6 +277,44 @@ public class BuildResponse {
         printJSON(response);
         return response;
     }
+
+    private FubonPolicyDetailRespDTO.PitEcAppWsBean createPitEcAppWsBean(String bnfCode, String eb0Name, Double finalprm) {
+        return FubonPolicyDetailRespDTO.PitEcAppWsBean.builder()
+                .pitBnfCode(bnfCode)
+                .pitEb0Name(eb0Name)
+                .pitFinalprm(finalprm)
+                .pitPex(0.0)
+                .pitPexUnit("")
+                .pitEb0Lists(generateEb0List())
+                .build();
+    }
+
+
+    private List<FubonPolicyDetailRespDTO.PitEb0List> generateEb0List() {
+        return Arrays.asList(
+                FubonPolicyDetailRespDTO.PitEb0List.builder()
+                        .eb0TsiDesc("保期內最高")
+                        .eb0TsiValue("500000")
+                        .eb0TsiUnit("元").build(),
+                FubonPolicyDetailRespDTO.PitEb0List.builder()
+                        .eb0TsiDesc("保期內最高")
+                        .eb0TsiValue("708000")
+                        .eb0TsiUnit("元").build(),
+                FubonPolicyDetailRespDTO.PitEb0List.builder()
+                        .eb0TsiDesc("保期內最高")
+                        .eb0TsiValue("50000")
+                        .eb0TsiUnit("元").build(),
+                FubonPolicyDetailRespDTO.PitEb0List.builder()
+                        .eb0TsiDesc("保期內最高")
+                        .eb0TsiValue("50000")
+                        .eb0TsiUnit("元").build(),
+                FubonPolicyDetailRespDTO.PitEb0List.builder()
+                        .eb0TsiDesc("保期內最高")
+                        .eb0TsiValue("708000")
+                        .eb0TsiUnit("元").build()
+        );
+    }
+
 
 
 

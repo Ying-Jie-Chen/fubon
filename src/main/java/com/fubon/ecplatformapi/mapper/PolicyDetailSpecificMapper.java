@@ -400,9 +400,10 @@ public class PolicyDetailSpecificMapper {
                 .map(pitEcAppWsBean -> {
                     String pitPexUnit = pitEcAppWsBean.getPitPexUnit();
                     Double pex = pitEcAppWsBean.getPitPex() + (pitPexUnit != null && !pitPexUnit.isEmpty() ? Double.parseDouble(pitPexUnit):0.0);
+                    List<DetailResultVo.PitEb0List> eb0Lists = mapToEb0Lists(pitEcAppWsBean);
                     return DetailResultVo.InsuranceItem.builder()
                             .bnfCode(pitEcAppWsBean.getPitBnfCode() + pitEcAppWsBean.getPitEb0Name())
-                            .eb0Lists(mapToEb0Lists(ecAppInsure))
+                            .eb0Lists(eb0Lists)
                             .finalPrm(pitEcAppWsBean.getPitFinalprm())
                             .pex(pex)
                             .build();
@@ -513,21 +514,23 @@ public class PolicyDetailSpecificMapper {
                     return detailResultVoItem;
                 })
                 .collect(Collectors.toList());
-//        return Optional.ofNullable(ecAppInsure.getPitEcAppWsBeans())
-//                .orElse(Collections.emptyList())
-//                .stream()
-//                .filter(Objects::nonNull)
-//                .flatMap(pitEcAppWsBean -> Optional.ofNullable(pitEcAppWsBean.getPitEb0Lists())
-//                        .orElse(Collections.emptyList())
-//                        .stream())
-//                .map(fubonItem -> {
-//                    DetailResultVo.PitEb0List detailResultVoItem = new DetailResultVo.PitEb0List();
-//                    detailResultVoItem.setEb0TsiDesc(fubonItem.getEb0TsiDesc());
-//                    detailResultVoItem.setEb0TsiValue(fubonItem.getEb0TsiValue());
-//                    detailResultVoItem.setEb0TsiUnit(fubonItem.getEb0TsiUnit());
-//                    return detailResultVoItem;
-//                })
-//                .collect(Collectors.toList());
+    }
+
+    /**
+     * 保額
+     */
+    private static List<DetailResultVo.PitEb0List> mapToEb0Lists(FubonPolicyDetailRespDTO.PitEcAppWsBean pitEcAppWsBean) {
+        Collection<FubonPolicyDetailRespDTO.PitEb0List> pitEb0Lists = Optional.ofNullable(pitEcAppWsBean.getPitEb0Lists()).orElseGet(Collections::emptyList);
+
+        return pitEb0Lists.stream()
+                .map(fubonItem -> {
+                    DetailResultVo.PitEb0List detailResultVoItem = new DetailResultVo.PitEb0List();
+                    detailResultVoItem.setEb0TsiDesc(fubonItem.getEb0TsiDesc());
+                    detailResultVoItem.setEb0TsiValue(fubonItem.getEb0TsiValue());
+                    detailResultVoItem.setEb0TsiUnit(fubonItem.getEb0TsiUnit());
+                    return detailResultVoItem;
+                })
+                .collect(Collectors.toList());
     }
 
     /**
