@@ -2,7 +2,6 @@ package com.fubon.ecplatformapi;
 
 import com.fubon.ecplatformapi.properties.CleanUpProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.File;
@@ -12,43 +11,47 @@ import java.time.format.DateTimeFormatter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
 import java.time.Duration;
 
 @Slf4j
-@Configuration
+@Component
 public class NasCleanUpJob {
     @Autowired
-    CleanUpProperties cleanUpProperties;
+    private CleanUpProperties cleanUpProperties;
 
     /**
      * 影像清理
      *
      */
-    @Bean
     @Scheduled(cron = "${scheduling.cron-expression}")
     public void fileCleanupTasklet() {
-            log.debug("Nas排程時間: " + cleanUpProperties.getCronExpression());
+        System.out.println("現在時間：" + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now()) + " - Nas影像清理 #Start!");
+        log.info("現在時間：" + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now()) + " - Nas影像清理 #Start!");
 
-            String filePath = cleanUpProperties.getCleanPath();
-            Duration expirationDays = cleanUpProperties.getExpirationDays();
-            log.debug("Nas清理路徑: " + filePath + "Nas檔案過期時間: " + expirationDays.toDays());
+        System.out.println("Nas排程時間: " + cleanUpProperties.getCronExpression());
+        log.info("Nas排程時間: " + cleanUpProperties.getCronExpression());
 
-            File nasDirectory = new File(filePath);
-            File[] files = nasDirectory.listFiles();
+        String filePath = cleanUpProperties.getCleanPath();
+        Duration expirationDays = cleanUpProperties.getExpirationDays();
 
-            if (files != null) {
-                for (File file : files) {
-                    if (isExpired(file, expirationDays)) {
-                        if (file.delete()) {
-                            log.info("刪除過期的檔案: " + file.getName());
-                            log.info("Path: " + file.getAbsolutePath());
-                        } else {
-                            log.info("沒有過期的檔案: " + file.getName());
-                            log.info("Path: " + file.getAbsolutePath());
-                        }
+        log.info("Nas清理路徑: " + filePath + " ,Nas檔案過期時間: " + expirationDays.toDays());
+
+        File nasDirectory = new File(filePath);
+        File[] files = nasDirectory.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                if (isExpired(file, expirationDays)) {
+                    if (file.delete()) {
+                        log.info("刪除過期的檔案: " + file.getName() + "Path: " + file.getAbsolutePath());
+                    } else {
+                        log.info("沒有過期的檔案: " + file.getName() + "Path: " + file.getAbsolutePath());
                     }
                 }
             }
+        }
     }
 
     private boolean isExpired(File file, Duration expirationDays) {
@@ -62,13 +65,13 @@ public class NasCleanUpJob {
                 LocalDateTime expirationDate = LocalDateTime.now().minus(expirationDays);
                 return fileTimestamp.isBefore(expirationDate);
             }catch (DateTimeException e){
-                log.debug("日期解析錯誤，文件名：" + fileName, e);
+                System.out.println("日期解析錯誤，文件名：" + fileName + " ,ErrMsg: " + e.getMessage());
+                log.info("日期解析錯誤，文件名：" + fileName + " ,ErrMsg: " + e.getMessage());
                 return false;
             }
         }
         return false;
     }
-
 }
 
 

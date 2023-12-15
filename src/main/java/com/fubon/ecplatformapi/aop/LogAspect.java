@@ -29,7 +29,7 @@ public class LogAspect {
             long endTime = System.currentTimeMillis();
             long executionTime = endTime - startTime;
 
-            logger.info("Method {} executed in {} ms", methodName, executionTime);
+            //logger.info("Method {} executed in {} ms", methodName, executionTime);
         }
     }
 

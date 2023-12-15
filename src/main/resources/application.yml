@@ -11,7 +11,8 @@ token:
   expiration-minutes: 20
 
 scheduling:
-  cron-expression: 0 0 2 * * ?
+#  cron-expression: 0 0 2 * * ?
+  cron-expression: "*/5 * * * * *"
   expiration-days: 30
   clean-path: /path/to/nas
 
