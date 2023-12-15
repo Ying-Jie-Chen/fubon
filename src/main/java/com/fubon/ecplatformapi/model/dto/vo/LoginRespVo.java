@@ -33,7 +33,7 @@ public class LoginRespVo {
         private String agentName;
         private String agentId;
         private String adminNum;
-        private String identity;
+        private Integer identity;
         private String email;
         private String unionNum;
         private String id;

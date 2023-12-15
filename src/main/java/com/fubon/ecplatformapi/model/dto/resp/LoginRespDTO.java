@@ -57,7 +57,7 @@ public class LoginRespDTO {
         private String agent_name;
         private String agent_id;
         private String admin_num;
-        private String identity;
+        private Integer identity;
         private String union_num;
         private String email;
         private String id;
@@ -80,6 +80,9 @@ public class LoginRespDTO {
         }
         public boolean getTested(){
             return tested;
+        }
+        public boolean getTested2(){
+            return tested2;
         }
     }
 
