@@ -5,6 +5,8 @@ import com.fubon.ecplatformapi.config.EcwsConfig;
 import com.fubon.ecplatformapi.config.SsoLoginConfig;
 import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.enums.SessionAttribute;
+import com.fubon.ecplatformapi.enums.StatusCodeEnum;
+import com.fubon.ecplatformapi.exception.CustomException;
 import com.fubon.ecplatformapi.helper.ConvertToJsonHelper;
 import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.model.dto.req.FubonSsoTokenDTO;
@@ -12,10 +14,13 @@ import com.fubon.ecplatformapi.model.dto.resp.SSOTokenRespDTO;
 import com.fubon.ecplatformapi.model.dto.req.SsoReqDTO;
 import com.fubon.ecplatformapi.service.SsoService;
 import io.micrometer.common.util.StringUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -37,6 +42,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -69,12 +75,12 @@ public class SsoServiceImpl extends SessionController implements SsoService{
 
     @Override
     public void verifySSOLogin(SsoReqDTO ssoReq) {
-        String domain = ecwsConfig.getDomain();
+        HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         String tokenKey = ssoReq.getToken();
+
         try {
 
-            String msg = createSoapRequest(domain, tokenKey);
-            sendHttpPostRequest(ecwsConfig.getDomain(), msg);
+            sendHttpPostRequest(request, tokenKey);
 
             log.info("檢核是否有考過保險證照 #Start");
             checkInsuranceLicense();
@@ -90,7 +96,7 @@ public class SsoServiceImpl extends SessionController implements SsoService{
 
     private void checkInsuranceLicense() {
         try (Connection connection = dataSource.getConnection()) {
-            String userId = (String) SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.IDENTITY);
+            String userId = (String) SessionHelper.getValueByAttribute(SessionAttribute.IDENTITY);
             String sql = "SELECT * FROM dbo.licfl WHERE lic_idno = ? AND lic_codeflag NOT IN ('C', 'D', 'S')";
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -115,8 +121,8 @@ public class SsoServiceImpl extends SessionController implements SsoService{
 
     private void checkCrossSellId() {
         try (Connection connection = dataSource.getConnection()) {
-            String unionNum = (String) SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.UNION_NUM);
-            String userId = (String) SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.IDENTITY);
+            String unionNum = (String) SessionHelper.getValueByAttribute(SessionAttribute.UNION_NUM);
+            String userId = (String) SessionHelper.getValueByAttribute(SessionAttribute.IDENTITY);
 
             String sql = "SELECT * FROM unionc WITH (NOLOCK) WHERE type = 'B' AND union_num = ?";
 
@@ -140,32 +146,63 @@ public class SsoServiceImpl extends SessionController implements SsoService{
         }
     }
 
-    private String createSoapRequest(String domain, String tokenKey) {
+    private void sendHttpPostRequest(HttpServletRequest request, String tokenKey) {
+        String domain = request.getServerName();
+        log.debug("SOAP| Method createSoapRequest #Start, domain: " + domain + " ,tokenKey: " +tokenKey);
         String webServiceAcc;
         String webServicePwd;
+        String fblifeEndpointUrl;
         String ipAddress = null;
         try {
             ipAddress = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            log.debug("SOAP| UnknownHostException: " + e.getMessage());
+            throw new CustomException(e.getMessage(), StatusCodeEnum.ERR00999.getCode());
         }
         String srcSystem = "FBLIFESSO";
 
         if (domain.contains("/ttran.518fb.com/") || domain.contains("/tb2b.518fb.com/")) {
-            log.info(":測試環境");
+            log.debug(":測試環境");
+            fblifeEndpointUrl = ssoLoginConfig.getTest().getFblifeEndpointUrl();
             webServiceAcc = ssoLoginConfig.getTest().getWebServiceAcc();
             webServicePwd = ssoLoginConfig.getTest().getWebServicePwd();
 
         } else {
-            log.info(":正式環境");
+            log.debug(":正式環境");
+            fblifeEndpointUrl = ssoLoginConfig.getProduction().getFblifeEndpointUrl();
             webServiceAcc = ssoLoginConfig.getProduction().getWebServiceAcc();
             webServicePwd = ssoLoginConfig.getProduction().getWebServicePwd();
         }
+        log.debug("SOAP| Acc: " + webServiceAcc + "Pwd: " +  webServicePwd);
 
-        log.info("組成請求字串 #Start");
-        String reqInputParam = webServiceAcc +"|"+ webServicePwd +"|"+ srcSystem + "|" + ipAddress + "||" + tokenKey;
-        return genSoapRequest(reqInputParam).replace("#requestParam", reqInputParam);
+        log.debug("SOAP| 組成請求字串 #Start");
+        log.debug("SOAP| 組成請求字串 #Start, webServiceAcc = " +webServiceAcc+ "webServicePwd = " + webServicePwd + "ipAddress = " +ipAddress+ "tokenKey = " +tokenKey);
+        String reqInputParam = webServiceAcc +"|"+ webServicePwd +"|"+ srcSystem + "|" + ipAddress + "||" + tokenKey + "|";
+
+        log.debug("SOAP| 組成請求字串: " + reqInputParam);
+
+        String xmlData = genSoapRequest(reqInputParam).replace("#requestParam", reqInputParam);
+        log.debug("SOAP| Result: " + xmlData);
+
+        log.debug("SOAP| Send HttpPost Request, 建立對外 API Proxy 連線 #Start, url: " + fblifeEndpointUrl + " ,xmlData: "+xmlData);
+        HttpURLConnection conn = null;
+        try {
+            conn = openHttpConnection(fblifeEndpointUrl);
+            log.debug("SOAP| conn: " + conn);
+            writeXmlDataToConnection(conn, xmlData);
+            handleResponse(conn);
+
+        } catch (Exception e) {
+            log.debug("SOAP| Exception: " + e.getMessage());
+            throw new CustomException(e.getMessage(), StatusCodeEnum.ERR00999.getCode());
+        } finally {
+            if (conn != null) {
+                log.debug("SOAP| conn != null, disconnect");
+                conn.disconnect();
+            }
+        }
+        log.debug("SOAP| 建立對外 API Proxy 連線 #Passed");
     }
 
     private String genSoapRequest(String reqInputParam) {
@@ -174,24 +211,6 @@ public class SsoServiceImpl extends SessionController implements SsoService{
                 "<tem:InputMessage>#requestParam</tem:InputMessage>" +
                 "</tem:GetData>" + "</soapenv:Body>" + "</soapenv:Envelope>";
         return soapRequestTemplate.replace("#requestParam", reqInputParam);
-    }
-
-    public static void sendHttpPostRequest(String url, String xmlData) {
-        log.info("建立對外 API Proxy 連線 #Start");
-        HttpURLConnection conn = null;
-        try {
-            conn = openHttpConnection(url);
-            writeXmlDataToConnection(conn, xmlData);
-
-            handleResponse(conn);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
     }
 
     private static HttpURLConnection openHttpConnection(String url) {

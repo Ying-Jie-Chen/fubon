@@ -1,6 +1,5 @@
 package com.fubon.ecplatformapi.service.impl;
 
-import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.enums.SessionAttribute;
 import com.fubon.ecplatformapi.helper.SessionHelper;
 import com.fubon.ecplatformapi.mapper.UserInfoMapper;
@@ -16,7 +15,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 @Slf4j
 @Service
-public class XrefInfoServiceImpl extends SessionController implements XrefInfoService {
+public class XrefInfoServiceImpl implements XrefInfoService {
 
     @Override
     public LoginRespVo.ResponseData getXrefInfoList(LoginRespDTO dto){
@@ -43,8 +42,8 @@ public class XrefInfoServiceImpl extends SessionController implements XrefInfoSe
 
     @Override
     public LoginRespDTO.XrefInfo findXrefInfoByXref() {
-        String xref = (String) SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.EMP_NO);
-        Object xrefInfoList = SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.XREF_INFOS);
+        String xref = (String) SessionHelper.getValueByAttribute(SessionAttribute.EMP_NO);
+        Object xrefInfoList = SessionHelper.getValueByAttribute(SessionAttribute.XREF_INFOS);
 
         List<LoginRespDTO.XrefInfo> xrefInfos = Optional.ofNullable(xrefInfoList)
                 .filter(List.class::isInstance)

@@ -3,7 +3,6 @@ package com.fubon.ecplatformapi.helper;
 import com.fubon.ecplatformapi.config.SessionManager;
 import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.enums.SessionAttribute;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -48,11 +47,11 @@ public class SessionHelper extends SessionController {
     /**
      * 取得儲存在Session中的特定Value
      */
-    public static Object getValueByAttribute(String sessionId, SessionAttribute attribute) {
-            HttpSession session = SessionManager.getSessionById(sessionId);
-            Object value = session.getAttribute(attribute.name());
-            log.info(attribute + ": " + value);
-            return value;
+    public static Object getValueByAttribute(SessionAttribute attribute) {
+        HttpSession session = SessionManager.getSessionById(sessionID());
+        Object value = session.getAttribute(attribute.name());
+        log.debug(attribute + ": " + value);
+        return value;
     }
 
 }

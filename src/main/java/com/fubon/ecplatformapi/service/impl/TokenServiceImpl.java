@@ -1,7 +1,6 @@
 package com.fubon.ecplatformapi.service.impl;
 
 import com.fubon.ecplatformapi.config.SessionManager;
-import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.exception.TokenValidationException;
 import com.fubon.ecplatformapi.properties.TokenProperties;
 import com.fubon.ecplatformapi.service.TokenService;
@@ -24,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
-public class TokenServiceImpl extends SessionController implements TokenService {
+public class TokenServiceImpl implements TokenService {
     private final Map<String, String> authTokenMap = new ConcurrentHashMap<String, String>();
     @Autowired
     TokenProperties tokenProperties;

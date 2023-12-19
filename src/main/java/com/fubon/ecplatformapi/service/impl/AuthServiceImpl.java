@@ -19,12 +19,9 @@ import com.fubon.ecplatformapi.repository.LoginLogRepository;
 import com.fubon.ecplatformapi.service.AuthService;
 import com.fubon.ecplatformapi.service.TokenService;
 import com.fubon.ecplatformapi.service.XrefInfoService;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -34,7 +31,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -98,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
 
         LoginLogEntity loginLog = createLoginRecord(loginAccount);
         handleFubonLoginResp(loginLog, fbLoginRespDTO);
-        loginLogRepository.save(loginLog);
+        //loginLogRepository.save(loginLog);
 
         SessionManager.saveSession(session, fbLoginRespDTO);
         String authToken = tokenService.generateToken(session.getId(), loginReq.getAccount(), System.currentTimeMillis());
@@ -106,7 +102,7 @@ public class AuthServiceImpl implements AuthService {
 
         LoginRespVo.ResponseData data = xrefInfoService.getXrefInfoList(fbLoginRespDTO);
 
-        updateOrCreateAccount(loginAccount, data);
+        //updateOrCreateAccount(loginAccount, data);
 
         return LoginRespVo.builder()
                 .token(authToken)
@@ -119,16 +115,16 @@ public class AuthServiceImpl implements AuthService {
      *  登入成功後新增使用者帳號或更新最後登入時間
      */
     private void updateOrCreateAccount(String loginAccount, LoginRespVo.ResponseData data) {
-        // 查詢帳號是否存在
+        log.debug("查詢帳號是否存在");
         Optional<AccountEntity> optionalAccount = accountRepository.findByAccount(loginAccount);
 
         if (optionalAccount.isPresent()) {
-            // 帳號存在，更新最近登入時間
+            log.debug("帳號存在，更新最近登入時間");
             AccountEntity existingAccount = optionalAccount.get();
             existingAccount.setLastLoginTime(new Date());
-            accountRepository.save(existingAccount);
+            //accountRepository.save(existingAccount);
         } else {
-            // 帳號不存在，新增帳號資料
+            log.debug("帳號不存在，新增帳號資料");
             LoginRespVo.UserInfo userInfo = data.getUserInfo();
             AccountEntity newAccount = new AccountEntity();
             newAccount.setAccount(loginAccount);
@@ -137,7 +133,7 @@ public class AuthServiceImpl implements AuthService {
             newAccount.setIdentify(userInfo.getIdentity());
             newAccount.setFirstLoginTime(new Date());
             newAccount.setLastLoginTime(new Date());
-            accountRepository.save(newAccount);
+            //accountRepository.save(newAccount);
         }
     }
 
@@ -165,7 +161,7 @@ public class AuthServiceImpl implements AuthService {
             log.debug(objectMapper.writeValueAsString(fbLoginRespDTO));
 
         } catch (NullPointerException e) {
-            loginLogRepository.save(loginLog);
+            //loginLogRepository.save(loginLog);
             throw new CustomException(errorMsg, StatusCodeEnum.ERR00999.getCode());
         }
     }

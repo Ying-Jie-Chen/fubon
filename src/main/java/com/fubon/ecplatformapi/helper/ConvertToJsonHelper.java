@@ -69,14 +69,14 @@ public class ConvertToJsonHelper extends SessionController {
     public String convertSsoTokenToJson(FubonSsoTokenDTO config){
         FubonSsoTokenDTO.Header header = config.getHeader();
         FubonSsoTokenDTO.FunctionCode functionCode = config.getFbeccomsta1040RQ();
-        String unionNum = SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.UNION_NUM).toString();
-        String account = SessionHelper.getValueByAttribute(sessionID(), SessionAttribute.FBID).toString();
-        String parameter = generateCsv(sessionID());
+        String unionNum = SessionHelper.getValueByAttribute(SessionAttribute.UNION_NUM).toString();
+        String account = SessionHelper.getValueByAttribute(SessionAttribute.FBID).toString();
+        String parameter = generateCsv();
 
         return "{" + "\"Header\":{" + "\"FromSys\":\"" + header.getFromSys() + "\"," + "\"SysPwd\":\"" + header.getSysPwd() + "\"," + "\"FunctionCode\":\"" + header.getFunctionCode() + "\"" + "}," + "\"FBECCOMSTA1040RQ\":{" + "\"unionNum\":\"" + unionNum + "\"," + "\"account\":\"" + account + "\"," + "\"source\":\"" + functionCode.getSource() + "\"," + "\"desType\":\"" + functionCode.getDesType() + "\"," + "\"desFunction\":\"" + functionCode.getDesFunction() + "\"," + "\"desModule\":\"" + functionCode.getDesModule() + "\"," + "\"type\":\"" + functionCode.getType() + "\"," + "\"parameter\":\"" + parameter  + "\"" + "}" + "}";
     }
 
-    public String generateCsv(String sessionId) {
+    public String generateCsv() {
         List<SessionAttribute> attributes = new ArrayList<>();
         attributes.add(SessionAttribute.EMP_NO);
         attributes.add(SessionAttribute.EMAIL);
@@ -88,7 +88,7 @@ public class ConvertToJsonHelper extends SessionController {
         Map<SessionAttribute, String> sessionData = new HashMap<>();
 
         for (SessionAttribute attribute : attributes) {
-            Object value = SessionHelper.getValueByAttribute(sessionId, attribute);
+            Object value = SessionHelper.getValueByAttribute(attribute);
             sessionData.put(attribute, value.toString());
         }
 

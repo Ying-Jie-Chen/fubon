@@ -1,6 +1,5 @@
 package com.fubon.ecplatformapi.service.impl;
 
-import com.fubon.ecplatformapi.controller.auth.SessionController;
 import com.fubon.ecplatformapi.enums.InsuranceType;
 import com.fubon.ecplatformapi.enums.SessionAttribute;
 import com.fubon.ecplatformapi.enums.StatusCodeEnum;
@@ -31,7 +30,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class PolicyServiceImpl extends SessionController implements PolicyService {
+public class PolicyServiceImpl implements PolicyService {
     @Autowired
     XrefInfoService xrefInfoService;
     private static final String CPG_MOT_URL = "http://10.0.45.55:80/fgisws/rest/EcAppWs";
@@ -104,9 +103,9 @@ public class PolicyServiceImpl extends SessionController implements PolicyServic
      *
      */
     private GetPolicyListReqDTO getQueryPolicyRequest() {
-        String sessionId = sessionID();
-        String empNo = (String) SessionHelper.getValueByAttribute(sessionId, SessionAttribute.EMP_NO);
-        String identity = (String) SessionHelper.getValueByAttribute(sessionId, SessionAttribute.IDENTITY);
+
+        String empNo = (String) SessionHelper.getValueByAttribute(SessionAttribute.EMP_NO);
+        String identity = (String) SessionHelper.getValueByAttribute(SessionAttribute.IDENTITY);
 
         LoginRespDTO.XrefInfo xrefInfo = xrefInfoService.findXrefInfoByXref();
         log.info("XrefInfo: " + xrefInfo + " ,xref: " + (xrefInfo != null ? xrefInfo.getXref() : "N/A"));

@@ -79,9 +79,11 @@ ecws:
 
 sso-login:
     test:
+      fblifeEndpointUrl: http://test-api2.fubon.com.tw:7080/FBLifeAgentSingleSignOn/SingleSignOnAction.asmx
       webServiceAcc: zAq1xSw2
       webServicePwd: cDe3vFr4
     production:
+      fblifeEndpointUrl: http://api2.fubon.com.tw:7080/FBLifeAgentSingleSignOn/SingleSignOnAction.asmx
       webServiceAcc: zaq12wsxcde34rfV
       webServicePwd: vfr43edcxsw21qaZ
 

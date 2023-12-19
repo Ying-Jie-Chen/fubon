@@ -16,6 +16,8 @@ public class SsoLoginConfig {
     @Data
     public static class SSOLoginInfo {
 
+        private String fblifeEndpointUrl;
+
         private String webServiceAcc;
 
         private String webServicePwd;
